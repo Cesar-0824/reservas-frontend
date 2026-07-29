@@ -137,7 +137,7 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
 }
 
 function App() {
-    const [authTrigger, setAuthTrigger] = useState(false);
+    const [, setAuthTrigger] = useState(false);
 
     const handleLoginSuccess = () => {
         setAuthTrigger(prev => !prev);

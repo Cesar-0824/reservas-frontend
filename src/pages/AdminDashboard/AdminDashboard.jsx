@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './AdminDashboard.css';
 import {
-  FaUsers, FaFutbol, FaCalendarCheck, FaSignOutAlt, FaTachometerAlt,
-  FaUserFriends, FaClipboardList, FaPlus, FaEdit, FaTrash, FaTimes,
-  FaMoneyBillWave, FaStar, FaBullhorn, FaTools, FaChartBar, FaCog
-} from 'react-icons/fa';
+  FaUsers,
+  FaFutbol,
+  FaCalendarCheck,
+  FaSignOutAlt,
+  FaTachometerAlt,
+  FaUserFriends,
+  FaClipboardList,
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaTimes
+} from "react-icons/fa";
 
 function AdminDashboard({ onLogout }) {
   const [usuarios, setUsuarios] = useState([]);
@@ -101,7 +109,7 @@ const handleAgregarCancha = async e => {
     }
   };
 
-const [mostrarModalCancha, setMostrarModalCancha] = useState(false);
+
 
 const handleEditarCancha = (cancha) => {
   setEditandoCancha(cancha);
@@ -113,7 +121,7 @@ const handleEditarCancha = (cancha) => {
     imagen: null
   });
 
-  setMostrarModalCancha(true);
+ 
 };
 
 const handleActualizarCancha = async (e) => {
@@ -152,7 +160,7 @@ const handleActualizarCancha = async (e) => {
     );
 
     setEditandoCancha(null);
-    setMostrarModalCancha(false);
+    
 
     setNuevaCancha({
       nombre: "",
@@ -213,7 +221,7 @@ const handleEliminarUsuario = async (id) => {
       const token = localStorage.getItem('authToken');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-      const res = await axios.put(
+      await axios.put(
         `http://localhost:8080/api/usuarios/actualizar/${editandoUsuario.id}`,
         { ...editandoUsuario, rol: nuevoRol },
         { headers }
@@ -263,11 +271,6 @@ const handleEliminarUsuario = async (id) => {
     }
   };
 
-  const handlePagoExitoso = (reservaId) => {
-    setReservas(prev =>
-      prev.map(r => r.id === reservaId ? { ...r, estado: 'pagada' } : r)
-    );
-  };
 
   if (loading) return <div className="admin-loading">Cargando panel de administración...</div>;
 
