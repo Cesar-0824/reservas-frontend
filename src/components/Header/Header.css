@@ -1,0 +1,580 @@
+/* ===============================
+   HEADER PRINCIPAL
+================================ */
+
+.header {
+    width: 100%;
+    background: linear-gradient(
+        135deg,
+        #ffffff,
+        #f1f5ff
+    );
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    animation: headerAppear 0.8s ease;
+}
+
+
+.main-header {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 15px 60px;
+
+    max-width: 100%;
+    margin: auto;
+}
+
+
+/* ===============================
+   LOGO + INFORMACIÓN
+================================ */
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0; /* permite que el texto se achique en vez de desbordar */
+}
+
+
+.header-logo-link {
+    display: flex;
+    flex-shrink: 0;
+    transition: .4s ease;
+}
+
+
+.header-logo-img {
+    width: 70px;
+    height: 70px;
+
+    object-fit: contain;
+
+    animation: floatingLogo 3s infinite ease-in-out;
+
+    filter: drop-shadow(
+        0 5px 8px rgba(0,0,0,.15)
+    );
+}
+
+
+.header-logo-link:hover {
+    transform: rotate(-5deg) scale(1.08);
+}
+
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+
+/* Nombre aplicación */
+.header-app-name {
+
+    font-size: 28px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    background: linear-gradient(
+        90deg,
+        #2563eb,
+        #7c3aed,
+        #06b6d4
+    );
+
+    background-size: 200% auto;
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+
+
+    animation: gradientMove 4s linear infinite;
+
+    transition: .3s ease;
+
+    white-space: nowrap;
+}
+
+
+/* efecto cuando pasas el mouse */
+.header-app-name:hover {
+
+    transform: scale(1.08);
+
+    letter-spacing: 2px;
+
+}
+
+
+
+/* movimiento del degradado */
+
+@keyframes gradientMove {
+
+    0% {
+
+        background-position: 0% center;
+
+    }
+
+
+    50% {
+
+        background-position: 100% center;
+
+    }
+
+
+    100% {
+
+        background-position: 0% center;
+
+    }
+
+}
+
+
+/* Eslogan */
+
+.header-tagline {
+
+    font-size: 14px;
+
+    color: #64748b;
+
+    margin-top: 3px;
+
+    transition: .3s;
+
+    white-space: nowrap;
+}
+
+
+.header-info:hover .header-tagline {
+    color:#2563eb;
+}
+
+
+
+/* ===============================
+   MENU CENTRAL
+================================ */
+
+.menu-links {
+
+    position:absolute;
+
+    left:50%;
+    transform:translateX(-50%);
+
+    display:flex;
+
+    gap:45px;
+
+    list-style:none;
+
+    padding:0;
+    margin:0;
+}
+
+
+
+.menu-links li {
+    position:relative;
+}
+
+
+
+.menu-links a {
+
+    text-decoration:none;
+
+    color:#334155;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    padding:10px 5px;
+
+    transition:.3s ease;
+}
+
+
+
+/* línea animada */
+
+.menu-links a::after {
+
+    content:"";
+
+    position:absolute;
+
+    width:0;
+
+    height:3px;
+
+    bottom:0;
+
+    left:50%;
+
+    background:
+    linear-gradient(
+        90deg,
+        #2563eb,
+        #9333ea
+    );
+
+    border-radius:10px;
+
+    transition:.35s ease;
+
+}
+
+
+
+.menu-links a:hover {
+
+    color:#2563eb;
+
+    transform:translateY(-3px);
+
+}
+
+
+
+.menu-links a:hover::after {
+
+    width:100%;
+
+    left:0;
+
+}
+
+
+
+/* ===============================
+   REDES SOCIALES
+================================ */
+
+
+.header-social {
+
+    display:flex;
+
+    gap:15px;
+
+    flex-shrink: 0;
+
+}
+
+
+
+.social-icon {
+
+    width:40px;
+
+    height:40px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    border-radius:50%;
+
+
+    background:#f8fafc;
+
+    color:#475569;
+
+
+    font-size:18px;
+
+
+    box-shadow:
+    0 5px 15px rgba(0,0,0,.10);
+
+
+    transition:.4s ease;
+
+}
+
+
+
+/* Facebook */
+
+.social-icon.facebook:hover {
+
+    background:#1877f2;
+
+    color:white;
+
+    transform:
+    translateY(-5px)
+    rotate(10deg);
+
+}
+
+
+/* Google */
+
+.social-icon.google:hover {
+
+    background:#db4437;
+
+    color:white;
+
+    transform:
+    translateY(-5px)
+    rotate(10deg);
+
+}
+
+
+/* Twitter */
+
+.social-icon.twitter:hover {
+
+    background:#1da1f2;
+
+    color:white;
+
+    transform:
+    translateY(-5px)
+    rotate(10deg);
+
+}
+
+
+/* ===============================
+   BOTÓN HAMBURGUESA (oculto en desktop)
+================================ */
+
+.hamburger-btn {
+    display: none;
+
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    font-size: 24px;
+    color: #334155;
+
+    padding: 8px;
+    border-radius: 8px;
+
+    transition: background .2s ease;
+}
+
+.hamburger-btn:hover {
+    background: rgba(37, 99, 235, 0.08);
+}
+
+
+
+/* ===============================
+   ANIMACIONES
+================================ */
+
+
+@keyframes floatingLogo {
+
+    0%,100% {
+        transform:translateY(0);
+    }
+
+
+    50% {
+        transform:translateY(-8px);
+    }
+
+}
+
+
+
+@keyframes headerAppear {
+
+    from {
+
+        opacity:0;
+
+        transform:translateY(-30px);
+
+    }
+
+
+    to {
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+@keyframes textMove {
+
+    from {
+
+        letter-spacing:.5px;
+
+    }
+
+
+    to {
+
+        letter-spacing:2px;
+
+    }
+
+}
+
+
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+/* Tablet: reducimos paddings y el gap del menú, todo sigue en una fila */
+@media (max-width: 1024px) {
+
+    .main-header {
+        padding: 15px 28px;
+    }
+
+    .menu-links {
+        gap: 26px;
+    }
+
+    .header-app-name {
+        font-size: 24px;
+    }
+}
+
+
+/* Móvil: menú hamburguesa real, todo lo demás se oculta hasta abrir */
+@media (max-width: 768px) {
+
+    .main-header {
+        padding: 12px 20px;
+        flex-wrap: nowrap;
+    }
+
+    .header-logo-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .header-app-name {
+        font-size: 20px;
+    }
+
+    .header-tagline {
+        font-size: 12px;
+    }
+
+    /* El botón hamburguesa aparece */
+    .hamburger-btn {
+        display: block;
+        order: 3;
+    }
+
+    /* El menú se oculta y pasa a ser un dropdown vertical */
+    .menu-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        transform: none;
+
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+
+        background: #ffffff;
+        box-shadow: 0 10px 20px rgba(0,0,0,.08);
+
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+
+        transition: max-height .3s ease, opacity .25s ease;
+    }
+
+    .menu-links.open {
+        max-height: 300px;
+        opacity: 1;
+        padding: 10px 0;
+    }
+
+    .menu-links li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .menu-links a {
+        display: block;
+        padding: 14px 20px;
+    }
+
+    .menu-links a::after {
+        display: none; /* la línea animada no aporta nada en un menú vertical */
+    }
+
+    /* Las redes sociales se ocultan y aparecen dentro del menú desplegado */
+    .header-social {
+        position: absolute;
+        top: 100%;
+        left: 0;
+
+        width: 100%;
+        justify-content: center;
+
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+
+        transition: max-height .3s ease, opacity .25s ease;
+        transition-delay: .05s;
+
+        background: #ffffff;
+    }
+
+    .header-social.open {
+        max-height: 80px;
+        opacity: 1;
+        padding-bottom: 16px;
+
+        /* empuja las redes debajo del menú de links ya desplegado */
+        margin-top: 300px;
+    }
+}
+
+
+/* Móvil chico: recorta aún más el nombre y el tagline */
+@media (max-width: 380px) {
+
+    .header-info {
+        display: none; /* si no cabe, priorizamos el logo y el menú */
+    }
+}

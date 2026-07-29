@@ -1,0 +1,572 @@
+/* ===== LAYOUT BASE (igual estructura que AdminDashboard) ===== */
+.user-dashboard-container {
+  min-height: 100vh;
+  background: #f5f6fa;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+.user-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.1rem;
+  color: #4b5563;
+}
+
+/* ===== SIDEBAR (fija, no se mueve ni cambia de tamaño) ===== */
+.user-sidebar {
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  background: #111827;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.user-sidebar h2 {
+  font-size: 1.2rem;
+  margin: 0 0 28px 8px;
+  color: #f9fafb;
+}
+
+.user-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.user-nav button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: #d1d5db;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.user-nav button:hover {
+  background: #1f2937;
+  color: #fff;
+}
+
+.user-nav button.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.user-logout-button {
+  margin-top: auto;
+  color: #f87171;
+}
+
+.user-logout-button:hover {
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+}
+
+/* ===== CONTENIDO (ocupa todo el espacio restante, al lado de la sidebar fija) ===== */
+.user-content {
+  margin-left: 240px;
+  margin-top: 0px;
+  box-sizing: border-box;
+  padding: 28px 34px;
+  min-height: 100vh;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.user-header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-header .user-icon {
+  font-size: 1.8rem;
+  color: #2563eb;
+}
+
+.user-header h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.25rem;
+}
+
+/* ===== SUMMARY CARDS (dashboard) ===== */
+.user-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.user-summary-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.user-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.user-summary-card .icon {
+  font-size: 1.6rem;
+  color: #2563eb;
+  margin-bottom: 8px;
+}
+
+.user-summary-card h3 {
+  margin: 4px 0;
+  font-size: 1.6rem;
+  color: #111827;
+}
+
+.user-summary-card p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+/* ===== SECCIONES CON TABLA ===== */
+.user-table-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.user-table-section h3 {
+  margin-top: 0;
+  color: #111827;
+  margin-bottom: 18px;
+}
+
+.user-table-section .table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.user-table-section table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.user-table-section th {
+  text-align: left;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6b7280;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 10px 12px;
+}
+
+.user-table-section td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f1f3;
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.user-table-section tr:hover td {
+  background: #fafbfc;
+}
+
+/* ===== FORMULARIO DE CONSULTA ===== */
+.user-consulta-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.user-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-form-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.user-input-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #f9fafb;
+}
+
+.user-input-with-icon .input-icon {
+  color: #9ca3af;
+}
+
+.user-input-with-icon input,
+.user-input-with-icon select {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.user-main-button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.user-main-button:hover {
+  background: #1d4ed8;
+}
+
+.user-main-button:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+.user-error-message {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin: 8px 0;
+}
+
+/* ===== SLOTS DE DISPONIBILIDAD ===== */
+.user-slot-disponible td:nth-child(2) {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.user-slot-ocupado td:nth-child(2) {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.user-reserve-button {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.user-reserve-button:hover {
+  background: #15803d;
+}
+
+/* ===== ESTADOS ===== */
+.user-estado-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.user-estado-pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.user-estado-confirmada {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.user-estado-cancelada {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.user-estado-pagada {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* ===== BOTONES DE ACCIÓN (mis reservas) ===== */
+.user-actions-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.user-cancel-button,
+.user-pay-button {
+  border: none;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.user-cancel-button {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.user-cancel-button:hover {
+  background: #fecaca;
+}
+
+.user-pay-button {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.user-pay-button:hover {
+  background: #fde68a;
+}
+
+/* ===== GRID DE CANCHAS ===== */
+.user-canchas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.user-cancha-item {
+  background: #f9fafb;
+  border: 1px solid #eef0f2;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.user-cancha-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.user-cancha-imagen {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.user-sin-imagen {
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #e5e7eb;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.user-cancha-item h4 {
+  margin: 12px 0 4px;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.user-cancha-item p {
+  margin: 2px 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ===== RESPONSIVE ===== */
+
+/* Tablet: la sidebar deja de estar fija a la izquierda y pasa a una barra superior horizontal */
+@media (max-width: 900px) {
+  .user-sidebar {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .user-sidebar h2 {
+    margin: 0 16px 0 0;
+    white-space: nowrap;
+  }
+
+  .user-nav {
+    flex-direction: row;
+    flex: none;
+    gap: 4px;
+  }
+
+  .user-nav button {
+    white-space: nowrap;
+    padding: 9px 12px;
+  }
+
+  .user-logout-button {
+    margin-top: 0;
+    margin-left: auto;
+  }
+
+  .user-content {
+    margin-left: 0;
+    min-height: auto;
+    padding: 20px;
+  }
+
+  .user-summary {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+/* Móvil grande: formularios y cards apilados */
+@media (max-width: 640px) {
+  .user-sidebar h2 {
+    font-size: 1.05rem;
+  }
+
+  .user-nav button span,
+  .user-nav button {
+    font-size: 0.82rem;
+  }
+
+  .user-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .user-content {
+    padding: 16px;
+  }
+
+  .user-summary {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .user-summary-card {
+    padding: 16px;
+  }
+
+  .user-summary-card h3 {
+    font-size: 1.3rem;
+  }
+
+  .user-table-section {
+    padding: 16px;
+  }
+
+  .user-consulta-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .user-input-with-icon {
+    width: 100%;
+  }
+
+  .user-main-button {
+    width: 100%;
+  }
+
+  .user-canchas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .user-actions-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Móvil chico: una sola columna para las tarjetas de resumen */
+@media (max-width: 420px) {
+  .user-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .user-canchas-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .user-nav {
+    gap: 2px;
+  }
+
+  .user-nav button {
+    padding: 8px 10px;
+  }
+}
+
+/* Accesibilidad: respeta si el usuario prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .user-summary-card,
+  .user-cancha-item,
+  .user-nav button,
+  .user-main-button,
+  .user-reserve-button,
+  .user-cancel-button,
+  .user-pay-button {
+    transition: none;
+  }
+}

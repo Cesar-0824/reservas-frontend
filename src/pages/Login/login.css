@@ -1,0 +1,121 @@
+/* ===========================
+   WRAPPER: centra la tarjeta de login en la pantalla
+=========================== */
+.login-page-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.login-card {
+  background: #ffffff;
+  padding: 45px 40px;
+  border-radius: 16px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-title {
+  font-size: 2.4em;
+  color: #2c3e50;
+  margin-bottom: 35px;
+  font-weight: 800;
+}
+
+.login-form .form-group {
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #444;
+  font-size: 0.95em;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f1f4f8;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease;
+}
+
+.login-form input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+}
+
+.login-button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(to right, #4a90e2, #007bff);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-top: 20px;
+  -webkit-transition: background 0.3s ease, transform 0.2s ease;
+  -moz-transition: background 0.3s ease, transform 0.2s ease;
+  -ms-transition: background 0.3s ease, transform 0.2s ease;
+  -o-transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.login-button:hover {
+  background: linear-gradient(to right, #3b77c4, #0056b3);
+  transform: translateY(-2px);
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.9em;
+  margin-top: -10px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.register-link {
+  margin-top: 30px;
+  font-size: 0.95em;
+  color: #555;
+}
+
+.register-link a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}

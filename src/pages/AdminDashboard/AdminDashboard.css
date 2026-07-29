@@ -1,0 +1,709 @@
+/* ===========================
+   VARIABLES
+=========================== */
+:root {
+  --admin-sidebar-bg: #1e2a38;
+  --admin-sidebar-active: #1abc9c;
+  --admin-primary: #3498db;
+  --admin-danger: #e74c3c;
+  --admin-danger-dark: #c0392b;
+  --admin-success: #1abc9c;
+  --admin-success-dark: #16a085;
+  --admin-text-dark: #1f2937;
+  --admin-text-muted: #8b95a1;
+  --admin-border-light: #eef0f2;
+  --admin-bg-page: #f6f8fa;
+  --admin-radius: 14px;
+  --admin-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --admin-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* ===========================
+   CONTENEDOR GENERAL
+=========================== */
+.admin-dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: var(--admin-bg-page);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+.admin-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #1e2a38 0%, #16202c 100%);
+  color: white;
+  padding: 24px 18px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+  letter-spacing: 0.3px;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-nav button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
+}
+
+.admin-nav button:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+.admin-nav .active {
+  background-color: var(--admin-sidebar-active);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(26, 188, 156, 0.35);
+}
+
+/* ===========================
+   CONTENIDO
+=========================== */
+.admin-content {
+  flex: 1;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 45px 40px;
+  box-sizing: border-box;
+  align-items: flex-start;
+}
+
+/* Encabezado */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.admin-header h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--admin-text-dark);
+}
+
+.admin-logout-button {
+  background-color: var(--admin-danger);
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.admin-logout-button:hover {
+  background-color: var(--admin-danger-dark);
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   RESUMEN (TARJETAS)
+=========================== */
+.admin-summary {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.admin-summary-card {
+  background-color: white;
+  border-radius: var(--admin-radius);
+  padding: 24px;
+  flex: 1;
+  min-width: 220px;
+  box-shadow: var(--admin-shadow-sm);
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid var(--admin-border-light);
+}
+
+.admin-summary-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--admin-shadow-md);
+}
+
+.admin-summary-card .icon {
+  font-size: 2rem;
+  color: var(--admin-primary);
+  margin-bottom: 12px;
+  background: rgba(52, 152, 219, 0.1);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-inline: auto;
+}
+
+.admin-summary-card h3 {
+  font-size: 1.9rem;
+  margin: 4px 0;
+  color: var(--admin-text-dark);
+  font-weight: 800;
+}
+
+.admin-summary-card p {
+  font-size: 0.9rem;
+  color: var(--admin-text-muted);
+  font-weight: 500;
+}
+
+/* ===========================
+   TABLA
+=========================== */
+.admin-table-section {
+  background-color: white;
+  padding: 24px;
+  margin-bottom: 30px;
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow-sm);
+  overflow-x: auto;
+  width: 100%;
+  min-height: 300px;
+  border: 1px solid var(--admin-border-light);
+}
+
+.admin-table-section h3 {
+  margin-bottom: 18px;
+  font-size: 1.15rem;
+  color: var(--admin-text-dark);
+  font-weight: 700;
+}
+
+/* Escopado a .admin-table-section para no afectar tablas de otras páginas */
+.admin-table-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table-section thead {
+  background-color: #f8fafc;
+  color: var(--admin-text-dark);
+}
+
+.admin-table-section th {
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--admin-text-muted);
+}
+
+.admin-table-section th,
+.admin-table-section td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--admin-border-light);
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+.admin-table-section tbody tr {
+  transition: background 0.2s ease;
+}
+
+.admin-table-section tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.admin-table-section tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===========================
+   ESTADO DE CARGA
+=========================== */
+.admin-loading {
+  text-align: center;
+  padding: 60px;
+  font-size: 1.3rem;
+  color: var(--admin-text-muted);
+  width: 100%;
+}
+
+/* ===========================
+   GRID DE RESERVAS
+=========================== */
+.admin-reservas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.admin-reservas-card {
+  background-color: white;
+  padding: 22px;
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow-sm);
+  overflow-x: auto;
+  border: 1px solid var(--admin-border-light);
+  transition: box-shadow 0.25s ease;
+}
+
+.admin-reservas-card:hover {
+  box-shadow: var(--admin-shadow-md);
+}
+
+.admin-reservas-card h4 {
+  margin-bottom: 16px;
+  color: var(--admin-text-dark);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* ===========================
+   FORMULARIO DE CANCHAS
+=========================== */
+.admin-form-canchas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: white;
+  padding: 18px;
+  border-radius: var(--admin-radius);
+  border: 1px solid var(--admin-border-light);
+}
+
+.admin-form-canchas input[type="text"],
+.admin-form-canchas input[type="number"],
+.admin-form-canchas input[type="file"] {
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  border-radius: 10px;
+  border: 1px solid #dde1e6;
+  flex: 1 1 200px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.admin-form-canchas input[type="text"]:focus,
+.admin-form-canchas input[type="number"]:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+.admin-form-canchas button {
+  background-color: var(--admin-success);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.25s ease, transform 0.2s ease;
+  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.25);
+}
+
+.admin-form-canchas button:hover {
+  background-color: var(--admin-success-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 160, 133, 0.35);
+}
+
+/* ===========================
+   BOTONES EDITAR / ELIMINAR (tabla)
+=========================== */
+.admin-edit-btn,
+.admin-delete-btn {
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 0 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+.admin-edit-btn {
+  color: var(--admin-primary);
+  background-color: rgba(52, 152, 219, 0.08);
+}
+
+.admin-edit-btn:hover {
+  background-color: var(--admin-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+.admin-delete-btn {
+  color: var(--admin-danger);
+  background-color: rgba(231, 76, 60, 0.08);
+}
+
+.admin-delete-btn:hover {
+  background-color: var(--admin-danger);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
+
+.admin-table-section table img {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* ===========================
+   MENSAJE DE ERROR
+=========================== */
+.admin-error-box {
+  background-color: #fdecea;
+  color: var(--admin-danger-dark);
+  border: 1px solid #f5c6cb;
+  padding: 12px 16px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* ===========================
+   BADGES DE ROL
+=========================== */
+.admin-rol-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.admin-rol-admin {
+  background-color: rgba(155, 89, 182, 0.12);
+  color: #8e44ad;
+}
+
+.admin-rol-usuario {
+  background-color: rgba(52, 152, 219, 0.12);
+  color: #2980b9;
+}
+
+/* ===========================
+   BOTONES CONFIRMAR / CANCELAR (tabla reservas)
+=========================== */
+.admin-confirm-btn,
+.admin-cancel-btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: all 0.25s ease;
+}
+
+.admin-confirm-btn {
+  background-color: #1abc9c;
+  color: white;
+}
+
+.admin-confirm-btn:hover {
+  background-color: #16a085;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+}
+
+.admin-cancel-btn {
+  background-color: #fdecea;
+  color: #c0392b;
+  border: 1px solid #f5c6cb;
+}
+
+.admin-cancel-btn:hover {
+  background-color: #e74c3c;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+/* ===========================
+   MODAL (editar usuario / canchas)
+=========================== */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  animation: adminFadeIn 0.2s ease;
+}
+
+@keyframes adminFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.admin-modal-box {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  animation: adminSlideUp 0.25s ease;
+}
+
+@keyframes adminSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.admin-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.admin-modal-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #1f2937;
+}
+
+.admin-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.admin-modal-close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.admin-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+}
+
+.admin-modal-body label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 10px;
+}
+
+.admin-modal-body label:first-child {
+  margin-top: 0;
+}
+
+.admin-modal-body input[type="text"],
+.admin-modal-body input[type="number"],
+.admin-modal-body input[type="file"] {
+  padding: 9px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-modal-body input[type="text"]:focus,
+.admin-modal-body input[type="number"]:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.admin-modal-body input[type="file"] {
+  padding: 6px;
+  cursor: pointer;
+  background: #f9fafb;
+}
+
+.admin-modal-body p {
+  margin: 10px 0 4px;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.admin-modal-body img {
+  display: block;
+  max-width: 100%;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-modal-user-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 2px;
+}
+
+.admin-modal-user-email {
+  font-size: 0.88rem;
+  color: #8b95a1;
+  margin: 0 0 20px;
+}
+
+.admin-modal-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.admin-modal-select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #dde1e6;
+  font-size: 0.95rem;
+  color: #1f2937;
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: 0.2s ease;
+  box-sizing: border-box;
+}
+
+.admin-modal-select:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+.admin-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid #eaeaea;
+}
+
+.admin-modal-cancel-btn,
+.admin-modal-save-btn {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.admin-modal-cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.admin-modal-cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.admin-modal-save-btn {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.admin-modal-save-btn:hover {
+  background: #1d4ed8;
+}
+
+.admin-modal-cancel-btn:active,
+.admin-modal-save-btn:active {
+  transform: scale(0.97);
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 900px) {
+  .admin-dashboard-container {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 14px;
+  }
+
+  .admin-sidebar h2 {
+    display: none;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .admin-content {
+    padding: 20px;
+  }
+
+  .admin-reservas-grid {
+    grid-template-columns: 1fr;
+  }
+}

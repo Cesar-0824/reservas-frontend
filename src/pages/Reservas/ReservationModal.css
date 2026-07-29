@@ -1,0 +1,113 @@
+/* --- Overlay oscuro y centrado --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease;
+}
+
+/* --- Caja del modal --- */
+.modal-content {
+  background: white;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+}
+
+/* --- Botón para cerrar --- */
+.modal-close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s ease;
+}
+.modal-close-button:hover {
+  color: #000;
+}
+
+/* --- Detalles dentro del modal --- */
+.modal-detail-item {
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
+/* --- Acciones (botones) --- */
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Botón cancelar */
+.modal-cancel-btn {
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #ccc;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+.modal-cancel-btn:hover {
+  background-color: #bbb;
+}
+
+/* Botón confirmar */
+.modal-confirm-btn {
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #28a745;
+  color: white;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+.modal-confirm-btn:hover {
+  background-color: #218838;
+}
+
+/* --- Animaciones --- */
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Responsive --- */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 16px;
+    width: 95%;
+  }
+  .modal-detail-item {
+    font-size: 14px;
+  }
+  .modal-actions {
+    flex-direction: column;
+  }
+}

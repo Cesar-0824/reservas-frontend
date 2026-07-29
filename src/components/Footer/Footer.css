@@ -1,0 +1,30 @@
+
+:root {
+    --footer-background: #343a40; /* Gris oscuro para el fondo del footer */
+    --footer-text-color: #f8f9fa; /* Texto claro */
+    --border-color: #495057; /* Borde oscuro para el copyright */
+}
+
+.simple-footer-container {
+    background-color: var(--footer-background);
+    color: var(--footer-text-color);
+    padding: 15px 20px; /* Menos padding que el anterior */
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    width: 100%; /* Asegura que ocupe todo el ancho */
+}
+
+.simple-footer-copyright {
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.6);
+}
+@media (max-width: 600px) {
+    .simple-footer-container {
+        padding: 10px; /* Menos espacio en móviles */
+        font-size: 0.9em; /* Texto un poco más pequeño */
+    }
+
+    .simple-footer-copyright {
+        font-size: 0.75em;
+    }
+}
