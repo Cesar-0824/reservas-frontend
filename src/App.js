@@ -151,7 +151,7 @@ function App() {
         setAuthTrigger(prev => !prev);
     };
 
-    const isAuthenticated = getIsAuthenticated();   
+    const isAuthenticated = getIsAuthenticated();
 
     return (
         <Router>

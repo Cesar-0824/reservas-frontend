@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './login.css';
 
-import { auth } from "../../firebase";
+
 
 
 function Login({ onLoginSuccess }) {
