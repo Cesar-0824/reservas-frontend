@@ -6,7 +6,7 @@ import ReservationModal from './ReservationModal';
 import {
   FaCoins, FaUserCircle, FaSignOutAlt, FaCalendarAlt, FaClock, FaFutbol,
   FaPlusCircle, FaTimesCircle, FaTachometerAlt, FaClipboardList,
-  FaSearch, FaListAlt
+  FaSearch
 } from 'react-icons/fa';
 
 const parseLocalDateString = (dateStr) => {
@@ -37,7 +37,7 @@ function UserDashboard({ onLogout }) {
   const [errorCanchas, setErrorCanchas] = useState('');
   const [availabilityError, setAvailabilityError] = useState('');
 
-  // 🆕 Navegación tipo sidebar, igual que el AdminDashboard
+  // Navegacion tipo sidebar, igual que el AdminDashboard
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Cargar usuario desde localStorage
@@ -57,7 +57,7 @@ function UserDashboard({ onLogout }) {
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
-  // Función para cargar reservas filtrando solo las del usuario actual
+  // Funcion para cargar reservas filtrando solo las del usuario actual
   const refrescarDatos = async () => {
     if (!currentUser) return;
     setIsLoadingReservas(true);
@@ -71,7 +71,6 @@ function UserDashboard({ onLogout }) {
       setReservas(misReservas);
       setErrorReservas('');
 
-      // Si ya hay fecha y cancha seleccionados, actualizar disponibilidad también
       if (selectedDate && selectedCanchaId) {
         actualizarDisponibilidad(selectedDate, selectedCanchaId, misReservas);
       } else {
@@ -89,6 +88,7 @@ function UserDashboard({ onLogout }) {
 
   useEffect(() => {
     if (currentUser) refrescarDatos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   // Cargar canchas
@@ -109,7 +109,6 @@ function UserDashboard({ onLogout }) {
     fetchCanchas();
   }, [onLogout]);
 
-  // Actualizar disponibilidad según reservas, fecha y cancha
   const actualizarDisponibilidad = (fecha, canchaId, reservasData) => {
     const cancha = canchas.find(c => c.id === parseInt(canchaId));
     if (!cancha) {
@@ -139,13 +138,12 @@ function UserDashboard({ onLogout }) {
     setAvailableSlots(disponibilidad);
 
     if (disponibilidad.every(s => s.status === 'Ocupado')) {
-      setAvailabilityError("Todas las horas están ocupadas.");
+      setAvailabilityError("Todas las horas estan ocupadas.");
     } else {
       setAvailabilityError('');
     }
   };
 
-  // Manejar consulta de disponibilidad al enviar formulario
   const handleSearchAvailability = async (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedCanchaId) {
@@ -153,7 +151,6 @@ function UserDashboard({ onLogout }) {
       setAvailableSlots([]);
       return;
     }
-    // Validar rango de fechas (hoy hasta 2 meses)
     const fechaSeleccionada = parseLocalDateString(selectedDate);
 
     const hoy = new Date();
@@ -176,7 +173,6 @@ function UserDashboard({ onLogout }) {
     }
     setIsLoadingAvailability(true);
     try {
-      // Usamos las reservas ya cargadas para calcular disponibilidad
       actualizarDisponibilidad(selectedDate, selectedCanchaId, reservas);
     } catch (err) {
       console.error("Error disponibilidad:", err);
@@ -231,7 +227,6 @@ function UserDashboard({ onLogout }) {
     }
   };
 
-  // FUNCIONES PARA EL PAGO
   const handlePagoFicticio = async (reservaId) => {
     const ventanaPago = window.open('', '_blank');
     if (!ventanaPago) {
@@ -266,7 +261,7 @@ function UserDashboard({ onLogout }) {
             { headers: { Authorization: `Bearer ${token}` } }
           );
           alert('Pago confirmado y reserva actualizada');
-          refrescarDatos(); // Actualizar UI
+          refrescarDatos();
         } catch (error) {
           alert('Error al confirmar el pago');
           console.error(error);
@@ -286,7 +281,6 @@ function UserDashboard({ onLogout }) {
   const reservasConfirmadas = reservas.filter(r => r.estado === 'confirmada').length;
   return (
     <div className="user-dashboard-container">
-      {/* ===== SIDEBAR ===== */}
       <aside className="user-sidebar">
         <h2>Mi Panel</h2>
         <div className="user-nav">
@@ -303,12 +297,11 @@ function UserDashboard({ onLogout }) {
             <FaFutbol /> Canchas
           </button>
           <button className="user-logout-button" onClick={onLogout}>
-            <FaSignOutAlt /> Cerrar Sesión
+            <FaSignOutAlt /> Cerrar Sesion
           </button>
         </div>
       </aside>
 
-      {/* ===== CONTENIDO ===== */}
       <div className="user-content">
         <header className="user-header">
           <div className="user-info">
@@ -317,7 +310,6 @@ function UserDashboard({ onLogout }) {
           </div>
         </header>
 
-        {/* ===== TAB: DASHBOARD ===== */}
         {activeTab === 'dashboard' && (
           <section className="user-summary">
             <div className="user-summary-card">
@@ -343,7 +335,6 @@ function UserDashboard({ onLogout }) {
           </section>
         )}
 
-        {/* ===== TAB: CONSULTAR DISPONIBILIDAD ===== */}
         {activeTab === 'disponibilidad' && (
           <section className="user-table-section">
             <h3>Consultar Disponibilidad</h3>
@@ -385,7 +376,7 @@ function UserDashboard({ onLogout }) {
                       <th><FaClock /> Hora</th>
                       <th>Estado</th>
                       <th>Detalle</th>
-                      <th>Acción</th>
+                      <th>Accion</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -414,7 +405,6 @@ function UserDashboard({ onLogout }) {
           </section>
         )}
 
-        {/* ===== TAB: MIS RESERVAS ===== */}
         {activeTab === 'reservas' && (
           <section className="user-table-section">
             <h3>Mis Reservas</h3>
@@ -482,7 +472,6 @@ function UserDashboard({ onLogout }) {
           </section>
         )}
 
-        {/* ===== TAB: CANCHAS ===== */}
         {activeTab === 'canchas' && (
           <section className="user-table-section">
             <h3>Canchas Disponibles</h3>
@@ -528,4 +517,3 @@ function UserDashboard({ onLogout }) {
 }
 
 export default UserDashboard;
-
