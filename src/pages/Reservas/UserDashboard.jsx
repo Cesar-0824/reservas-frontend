@@ -485,7 +485,7 @@ function UserDashboard({ onLogout }) {
                   <div key={c.id} className="user-cancha-item">
                     {c.imagen ? (
                       <img
-                        src={`http://localhost:8080${c.imagen}`}
+                        src={c.imagen}
                         alt={c.nombre}
                         className="user-cancha-imagen"
                       />

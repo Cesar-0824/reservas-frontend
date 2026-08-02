@@ -509,11 +509,7 @@ const handleEliminarUsuario = async (id) => {
 
             <td>
               {c.imagen ? (
-                <img
-                  src={`http://localhost:8080${c.imagen}`}
-                  alt={c.nombre}
-                  height="45"
-                />
+                <img src={c.imagen} alt={c.nombre} height="45" />
               ) : (
                 "Sin imagen"
               )}
@@ -611,7 +607,7 @@ const handleEliminarUsuario = async (id) => {
               <p>Imagen actual</p>
 
               <img
-                src={`http://localhost:8080${editandoCancha.imagen}`}
+                src={editandoCancha.imagen}
                 alt="Cancha"
                 width="220"
                 style={{
