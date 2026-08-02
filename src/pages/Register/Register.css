@@ -1,13 +1,16 @@
+/* ===================================================
+   TARJETA Y FORMULARIO DE REGISTRO
+=================================================== */
+
 .register-card {
   background: #ffffff;
-  padding: 45px 40px;
-  border-radius: 16px;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   text-align: center;
   animation: fadeIn 0.6s ease;
-  margin: 50px auto;
 }
 
 @keyframes fadeIn {
@@ -22,84 +25,98 @@
 }
 
 .register-title {
-  font-size: 2.4em;
-  color: #2c3e50;
-  margin-bottom: 35px;
+  font-size: 2.2em;
+  color: #1a202c;
+  margin-bottom: 25px;
   font-weight: 800;
 }
 
 .register-form .form-group {
-  margin-bottom: 22px;
+  margin-bottom: 20px;
   text-align: left;
 }
 
 .register-form label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 600;
-  color: #444;
-  font-size: 0.95em;
+  color: #4a5568;
+  font-size: 0.9em;
 }
 
 .register-form input {
   width: 100%;
-  padding: 12px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: #f1f4f8;
-  font-size: 1em;
+  padding: 13px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #f8fafc;
+  font-size: 0.95em;
   box-sizing: border-box;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .register-form input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+  background-color: #ffffff;
+  border-color: #2ecc71;
+  box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.15);
 }
 
 .register-button {
   width: 100%;
-  padding: 15px;
-  background: linear-gradient(to right, #4a90e2, #007bff);
+  padding: 14px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1em;
-  font-weight: bold;
+  border-radius: 10px;
+  font-size: 1.05em;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  margin-top: 20px;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
 }
 
 .register-button:hover {
-  background: linear-gradient(to right, #3b77c4, #0056b3);
+  background: linear-gradient(135deg, #27ae60, #219653);
   transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
 }
 
 .register-button:active {
   transform: translateY(0);
 }
 
+.register-button:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .error-message {
-  color: #dc3545;
-  font-size: 0.9em;
-  margin-top: -10px;
+  color: #e74c3c;
+  font-size: 0.85em;
+  margin-top: -5px;
   margin-bottom: 15px;
   text-align: left;
+  font-weight: 500;
 }
 
 .login-link {
-  margin-top: 30px;
-  font-size: 0.95em;
-  color: #555;
+  margin-top: 25px;
+  font-size: 0.9em;
+  color: #64748b;
 }
 
 .login-link a {
-  color: #007bff;
+  color: #2ecc71;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
+  margin-left: 5px;
 }
 
 .login-link a:hover {
   text-decoration: underline;
+  color: #27ae60;
 }

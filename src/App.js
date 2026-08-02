@@ -62,14 +62,21 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
     const location = useLocation();
     const isAdminRoute = location.pathname.startsWith('/admin');
     const isUserDashboardRoute = location.pathname.startsWith('/reservas');
+
+    const isFullWidthRoute = location.pathname === '/login' || location.pathname === '/registrar';
+
     const isDashboardRoute = isAdminRoute || isUserDashboardRoute;
+    
+    const hideHeaderAndFooter = isDashboardRoute || isFullWidthRoute;
+
+    
 
     return (
         <div className="App">
-            {!isDashboardRoute && <Header onLogout={globalHandleLogout} isLoggedIn={isAuthenticated} />}
-            {!isDashboardRoute && <BrandingBar />}
+            {!hideHeaderAndFooter && <Header onLogout={globalHandleLogout} isLoggedIn={isAuthenticated} />}
+            {!hideHeaderAndFooter && <BrandingBar />}
 
-            <main className={isDashboardRoute ? '' : 'main-content'}>
+            <main className={hideHeaderAndFooter ? '' : 'main-content'}>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/servicios" element={<Servicios />} />
@@ -133,7 +140,7 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
                 </Routes>
             </main>
 
-            {!isDashboardRoute && <Footer />}
+            {(!isDashboardRoute && !isFullWidthRoute) && <Footer />}
         </div>
     );
 }

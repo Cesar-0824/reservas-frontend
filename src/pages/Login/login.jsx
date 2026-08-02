@@ -62,53 +62,160 @@ function Login({ onLoginSuccess }) {
     }
   };
 
-  return (
-    <div className="login-page-container">
+return (
+  <div className="login-page">
+
+    {/* ==========================
+        LADO IZQUIERDO
+    =========================== */}
+    <div className="login-left">
+
+
+      <div className="overlay">
+
+        <div className="brand">
+          <h1>⚽ SportsMatch</h1>
+          <span>¡Disfruta de tu pasión!</span>
+        </div>
+
+        <h2>Reserva tu cancha en cualquier momento.</h2>
+
+        <p>
+          Encuentra las mejores canchas de fútbol de tu ciudad,
+          consulta horarios disponibles y realiza tus reservas
+          de forma rápida, sencilla y segura.
+        </p>
+
+        <div className="features">
+
+          <div className="feature">
+            <span>⚽</span>
+            <div>
+              <h4>Reserva rápida</h4>
+              <p>Elige fecha y horario en segundos.</p>
+            </div>
+          </div>
+
+          <div className="feature">
+            <span>📅</span>
+            <div>
+              <h4>Disponibilidad en tiempo real</h4>
+              <p>Consulta las canchas libres al instante.</p>
+            </div>
+          </div>
+
+          <div className="feature">
+            <span>💳</span>
+            <div>
+              <h4>Pagos seguros</h4>
+              <p>Confirma tu reserva fácilmente.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    {/* ==========================
+        LADO DERECHO
+    =========================== */}
+
+    <div className="login-right">
+
+      <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="back-btn-right"
+        >
+          ← Volver
+        </button>
+
       <div className="login-card">
-        <h2 className="login-title">Iniciar Sesión</h2>
-        <form onSubmit={handleSubmit} className="login-form">
+
+        <h2 className="login-title">
+          Iniciar Sesión
+        </h2>
+
+        <p className="login-subtitle">
+          Bienvenido nuevamente 👋
+        </p>
+
+        <form
+          onSubmit={handleSubmit}
+          className="login-form"
+        >
+
           <div className="form-group">
-            <label htmlFor="email">Correo Electrónico</label>
+            <label htmlFor="email">
+              Correo Electrónico
+            </label>
+
             <input
               type="email"
               id="email"
-              placeholder="tu@ejemplo.com"
+              placeholder="correo@ejemplo.com"
               value={formData.email}
               onChange={handleChange}
               required
               disabled={loading}
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
+
+            <label htmlFor="password">
+              Contraseña
+            </label>
+
             <input
               type="password"
               id="password"
-              placeholder="Contraseña"
+              placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
               required
               disabled={loading}
             />
+
           </div>
 
-          {/* Enlace para recuperar contraseña */}
           <div className="forgot-password">
-            <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
+            <a href="/forgot-password">
+              ¿Olvidaste tu contraseña?
+            </a>
           </div>
 
-          {error && <p className="error-message">{error}</p>}
+          {error && (
+            <p className="error-message">
+              {error}
+            </p>
+          )}
 
-          <button type="submit" className="login-button" disabled={loading}>
-            {loading ? 'Ingresando...' : 'Ingresar'}
+          <button
+            type="submit"
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? "Ingresando..." : "Ingresar"}
           </button>
+
         </form>
+
         <p className="register-link">
-          ¿No tienes una cuenta? <a href="/registrar">Regístrate aquí</a>
+          ¿No tienes una cuenta?
+          <a href="/registrar">
+            {" "}Regístrate aquí
+          </a>
         </p>
+
       </div>
+
     </div>
-  );
+
+  </div>
+);
 }
 
 export default Login;
