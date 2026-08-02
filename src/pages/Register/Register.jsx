@@ -97,7 +97,7 @@ function Register() {
         {/* Botón Volver posicionado en la parte superior derecha */}
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           className="back-btn-right"
         >
           ← Volver

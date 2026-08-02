@@ -126,7 +126,7 @@ return (
 
       <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           className="back-btn-right"
         >
           ← Volver
