@@ -176,9 +176,9 @@ console.log("Canchas recibidas:", canchas)
             <div className="cancha-img-wrapper">
               <span className="cancha-badge">{cancha.tipo}</span>
               <img
-                src={`http://localhost:8080${encodeURI(cancha.imagen)}`}
-                alt={cancha.nombre}
-              />
+  src={cancha.imagen}
+  alt={cancha.nombre}
+/>
             </div>
 
             <div className="cancha-info">
