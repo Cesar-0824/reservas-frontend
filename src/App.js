@@ -13,6 +13,7 @@ import Contacto from './pages/Contacto/Contacto';
 import Register from './pages/Register/Register';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import ResetPassword from './pages/ForgotPassword/ResetPassword'
 
 import './App.css';
 
@@ -75,6 +76,7 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
                     <Route path="/informacion" element={<Informacion />} />
                     <Route path="/contacto" element={<Contacto />} />
                     <Route path="/registrar" element={<Register />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
 
                     <Route
                         path="/login"
