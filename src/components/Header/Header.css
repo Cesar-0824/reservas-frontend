@@ -4,19 +4,20 @@
 
 .header {
     width: 100%;
-    background: linear-gradient(
-        135deg,
-        #ffffff,
-        #f1f5ff
-    );
-
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    /* Modo oscuro: totalmente transparente por defecto */
+    background: transparent;
+    border-bottom: 1px solid transparent;
 
     position: sticky;
     top: 0;
     z-index: 1000;
 
+    /* Sutil desenfoque de fondo para legibilidad */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
     animation: headerAppear 0.8s ease;
+    transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 
@@ -27,7 +28,7 @@
     align-items: center;
     justify-content: space-between;
 
-    padding: 15px 60px;
+    padding: 16px 40px;
 
     max-width: 100%;
     margin: auto;
@@ -35,40 +36,45 @@
 
 
 /* ===============================
-   LOGO + INFORMACIÓN
+   LOGO + NOMBRE
 ================================ */
 
 .header-left {
     display: flex;
     align-items: center;
-    gap: 18px;
-    min-width: 0; /* permite que el texto se achique en vez de desbordar */
+    gap: 12px;
+    min-width: 0;
 }
 
 
 .header-logo-link {
     display: flex;
+    align-items: center;
     flex-shrink: 0;
-    transition: .4s ease;
+}
+
+
+.header-logo-badge {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg, var(--primary-accent), var(--primary-hover));
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
 }
 
 
 .header-logo-img {
-    width: 70px;
-    height: 70px;
-
+    width: 35px;
+    height: 35px;
     object-fit: contain;
-
-    animation: floatingLogo 3s infinite ease-in-out;
-
-    filter: drop-shadow(
-        0 5px 8px rgba(0,0,0,.15)
-    );
-}
-
-
-.header-logo-link:hover {
-    transform: rotate(-5deg) scale(1.08);
 }
 
 
@@ -79,95 +85,14 @@
 }
 
 
-/* Nombre aplicación */
 .header-app-name {
-
-    font-size: 28px;
-    font-weight: 900;
-
-    letter-spacing: 1px;
-
-    background: linear-gradient(
-        90deg,
-        #2563eb,
-        #7c3aed,
-        #06b6d4
-    );
-
-    background-size: 200% auto;
-
-    -webkit-background-clip: text;
-    background-clip: text;
-
-    color: transparent;
-
-
-    animation: gradientMove 4s linear infinite;
-
-    transition: .3s ease;
-
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    color: var(--text-main);
     white-space: nowrap;
+    transition: color 0.4s ease;
 }
-
-
-/* efecto cuando pasas el mouse */
-.header-app-name:hover {
-
-    transform: scale(1.08);
-
-    letter-spacing: 2px;
-
-}
-
-
-
-/* movimiento del degradado */
-
-@keyframes gradientMove {
-
-    0% {
-
-        background-position: 0% center;
-
-    }
-
-
-    50% {
-
-        background-position: 100% center;
-
-    }
-
-
-    100% {
-
-        background-position: 0% center;
-
-    }
-
-}
-
-
-/* Eslogan */
-
-.header-tagline {
-
-    font-size: 14px;
-
-    color: #64748b;
-
-    margin-top: 3px;
-
-    transition: .3s;
-
-    white-space: nowrap;
-}
-
-
-.header-info:hover .header-tagline {
-    color:#2563eb;
-}
-
 
 
 /* ===============================
@@ -175,191 +100,113 @@
 ================================ */
 
 .menu-links {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 
-    position:absolute;
+    display: flex;
+    gap: 40px;
 
-    left:50%;
-    transform:translateX(-50%);
-
-    display:flex;
-
-    gap:45px;
-
-    list-style:none;
-
-    padding:0;
-    margin:0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
-
-
-
-.menu-links li {
-    position:relative;
-}
-
-
 
 .menu-links a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    text-decoration:none;
+    text-decoration: none;
+    color: var(--text-main);
 
-    color:#334155;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .3px;
 
-    font-size:16px;
+    height: 42px;
+    padding: 0 8px;
 
-    font-weight:700;
-
-    padding:10px 5px;
-
-    transition:.3s ease;
+    transition: color .25s ease, transform .25s ease;
 }
-
-
-
-/* línea animada */
 
 .menu-links a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
 
-    content:"";
+    transform: translateX(-50%);
 
-    position:absolute;
+    width: 0;
+    height: 2px;
 
-    width:0;
+    background: var(--primary-accent);
+    border-radius: 999px;
 
-    height:3px;
-
-    bottom:0;
-
-    left:50%;
-
-    background:
-    linear-gradient(
-        90deg,
-        #2563eb,
-        #9333ea
-    );
-
-    border-radius:10px;
-
-    transition:.35s ease;
-
+    transition: width .3s ease;
 }
-
-
 
 .menu-links a:hover {
-
-    color:#2563eb;
-
-    transform:translateY(-3px);
-
+    color: var(--primary-accent);
 }
-
-
 
 .menu-links a:hover::after {
-
-    width:100%;
-
-    left:0;
-
+    width: 100%;
 }
-
 
 
 /* ===============================
-   REDES SOCIALES
+   BOTONES DE AUTENTICACIÓN
 ================================ */
 
-
-.header-social {
-
-    display:flex;
-
-    gap:15px;
-
+.header-auth {
+    display: flex;
+    align-items: center;
+    gap: 14px;
     flex-shrink: 0;
-
 }
 
 
-
-.social-icon {
-
-    width:40px;
-
-    height:40px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-
-    border-radius:50%;
-
-
-    background:#f8fafc;
-
-    color:#475569;
-
-
-    font-size:18px;
-
-
-    box-shadow:
-    0 5px 15px rgba(0,0,0,.10);
-
-
-    transition:.4s ease;
-
+.header-btn-login {
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border-light);
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.25s ease;
+    white-space: nowrap;
 }
 
 
-
-/* Facebook */
-
-.social-icon.facebook:hover {
-
-    background:#1877f2;
-
-    color:white;
-
-    transform:
-    translateY(-5px)
-    rotate(10deg);
-
+.header-btn-login:hover {
+    border-color: var(--primary-accent);
+    color: var(--primary-accent);
 }
 
 
-/* Google */
-
-.social-icon.google:hover {
-
-    background:#db4437;
-
-    color:white;
-
-    transform:
-    translateY(-5px)
-    rotate(10deg);
-
+.header-btn-register {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: var(--primary-accent);
+    transition: all 0.25s ease;
+    white-space: nowrap;
 }
 
 
-/* Twitter */
-
-.social-icon.twitter:hover {
-
-    background:#1da1f2;
-
-    color:white;
-
-    transform:
-    translateY(-5px)
-    rotate(10deg);
-
+.header-btn-register:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(44, 163, 92, 0.35);
 }
 
 
@@ -374,132 +221,104 @@
     border: none;
     cursor: pointer;
 
-    font-size: 24px;
-    color: #334155;
+    font-size: 22px;
+    color: var(--text-main);
 
     padding: 8px;
     border-radius: 8px;
 
-    transition: background .2s ease;
+    transition: background 0.2s ease, color 0.4s ease;
 }
 
 .hamburger-btn:hover {
-    background: rgba(37, 99, 235, 0.08);
+    background: var(--border-light);
 }
 
+html:not(.light-theme) .header {
+    background: rgba(0, 0, 0, 0.925);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+/* ===============================
+   MODO CLARO (SÓLO AQUÍ BLANCO SEMITRANSPARENTE)
+================================ */
 
+html.light-theme .header {
+    background: rgba(255,255,255,.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+html.light-theme .header-btn-login {
+    background: rgba(255,255,255,.45);
+    border-color: rgba(23, 60, 44, 0.15);
+}
 
 /* ===============================
    ANIMACIONES
 ================================ */
 
-
-@keyframes floatingLogo {
-
-    0%,100% {
-        transform:translateY(0);
-    }
-
-
-    50% {
-        transform:translateY(-8px);
-    }
-
-}
-
-
-
 @keyframes headerAppear {
-
     from {
-
-        opacity:0;
-
-        transform:translateY(-30px);
-
+        opacity: 0;
+        transform: translateY(-30px);
     }
-
-
     to {
-
-        opacity:1;
-
-        transform:translateY(0);
-
+        opacity: 1;
+        transform: translateY(0);
     }
-
 }
-
-
-
-@keyframes textMove {
-
-    from {
-
-        letter-spacing:.5px;
-
-    }
-
-
-    to {
-
-        letter-spacing:2px;
-
-    }
-
-}
-
 
 
 /* ===============================
    RESPONSIVE
 ================================ */
 
-/* Tablet: reducimos paddings y el gap del menú, todo sigue en una fila */
+/* Tablet */
 @media (max-width: 1024px) {
 
     .main-header {
-        padding: 15px 28px;
+        padding: 14px 24px;
     }
 
     .menu-links {
-        gap: 26px;
+        gap: 24px;
     }
 
     .header-app-name {
-        font-size: 24px;
+        font-size: 18px;
     }
 }
 
 
-/* Móvil: menú hamburguesa real, todo lo demás se oculta hasta abrir */
+/* Móvil */
 @media (max-width: 768px) {
 
     .main-header {
-        padding: 12px 20px;
+        padding: 12px 18px;
         flex-wrap: nowrap;
     }
 
+    .header-logo-badge {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+    }
+
     .header-logo-img {
-        width: 50px;
-        height: 50px;
+        width: 20px;
+        height: 20px;
     }
 
     .header-app-name {
-        font-size: 20px;
+        font-size: 17px;
     }
 
-    .header-tagline {
-        font-size: 12px;
-    }
-
-    /* El botón hamburguesa aparece */
     .hamburger-btn {
         display: block;
         order: 3;
     }
 
-    /* El menú se oculta y pasa a ser un dropdown vertical */
+    /* Menú móvil adaptado a la transparencia en modo claro y oscuro */
     .menu-links {
         position: absolute;
         top: 100%;
@@ -511,14 +330,16 @@
         align-items: center;
         gap: 0;
 
-        background: #ffffff;
-        box-shadow: 0 10px 20px rgba(0,0,0,.08);
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border-light);
 
         max-height: 0;
         overflow: hidden;
         opacity: 0;
 
-        transition: max-height .3s ease, opacity .25s ease;
+        transition: max-height 0.3s ease, opacity 0.25s ease, background-color 0.4s ease;
     }
 
     .menu-links.open {
@@ -537,44 +358,50 @@
         padding: 14px 20px;
     }
 
-    .menu-links a::after {
-        display: none; /* la línea animada no aporta nada en un menú vertical */
-    }
-
-    /* Las redes sociales se ocultan y aparecen dentro del menú desplegado */
-    .header-social {
+    .header-auth {
         position: absolute;
         top: 100%;
         left: 0;
 
         width: 100%;
-        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 20px;
 
         max-height: 0;
         overflow: hidden;
         opacity: 0;
 
-        transition: max-height .3s ease, opacity .25s ease;
-        transition-delay: .05s;
+        transition: max-height 0.3s ease, opacity 0.25s ease, background-color 0.4s ease;
+        transition-delay: 0.05s;
 
-        background: #ffffff;
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
     }
 
-    .header-social.open {
-        max-height: 80px;
+    .header-auth.open {
+        max-height: 160px;
         opacity: 1;
+        padding-top: 4px;
         padding-bottom: 16px;
 
-        /* empuja las redes debajo del menú de links ya desplegado */
         margin-top: 300px;
+    }
+
+    .header-btn-login,
+    .header-btn-register {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
     }
 }
 
 
-/* Móvil chico: recorta aún más el nombre y el tagline */
+/* Móvil chico */
 @media (max-width: 380px) {
 
-    .header-info {
-        display: none; /* si no cabe, priorizamos el logo y el menú */
+    .header-app-name {
+        font-size: 15px;
     }
 }

@@ -1,7 +1,7 @@
 // src/pages/Register/Register.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "./Register.css"; // o la ruta correcta
+import "./Register.css";
 
 
 function Register() {
@@ -21,7 +21,7 @@ function Register() {
       const res = await fetch("http://localhost:8080/api/usuarios/registrar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, contrasena }), // ⬅ aquí usamos 'contrasena'
+        body: JSON.stringify({ nombre, email, contrasena }),
       });
 
       const data = await res.json();
@@ -42,27 +42,30 @@ function Register() {
   };
 
  return (
-    <div className="login-page">
+    <div className="register-page">
 
       {/* ==========================
           LADO IZQUIERDO (Branding)
       =========================== */}
-      <div className="login-left">
-        <div className="overlay">
-          <div className="brand">
-            <h1>⚽ SportsMatch</h1>
+      <div className="register-left">
+        <div className="register-overlay">
+          <div className="register-brand">
+            <div className="register-brand-header">
+              <span className="register-brand-icon">⚽</span>
+              <h1>SportsMatch</h1>
+            </div>
             <span>¡Disfruta de tu pasión!</span>
           </div>
 
           <h2>Únete a nuestra comunidad deportiva.</h2>
 
           <p>
-            Crea tu cuenta en pocos segundos para reservar tus canchas favoritas, 
+            Crea tu cuenta en pocos segundos para reservar tus canchas favoritas,
             consultar disponibilidad en tiempo real y organizar tus partidos.
           </p>
 
-          <div className="features">
-            <div className="feature">
+          <div className="register-features">
+            <div className="register-feature">
               <span>🚀</span>
               <div>
                 <h4>Registro rápido</h4>
@@ -70,7 +73,7 @@ function Register() {
               </div>
             </div>
 
-            <div className="feature">
+            <div className="register-feature">
               <span>📅</span>
               <div>
                 <h4>Reservas en tiempo real</h4>
@@ -78,7 +81,7 @@ function Register() {
               </div>
             </div>
 
-            <div className="feature">
+            <div className="register-feature">
               <span>💳</span>
               <div>
                 <h4>Pagos seguros</h4>
@@ -92,13 +95,12 @@ function Register() {
       {/* ==========================
           LADO DERECHO (Formulario)
       =========================== */}
-      <div className="login-right">
+      <div className="register-right">
 
-        {/* Botón Volver posicionado en la parte superior derecha */}
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="back-btn-right"
+          className="register-back-btn"
         >
           ← Volver
         </button>
@@ -107,7 +109,7 @@ function Register() {
           <h2 className="register-title">Crear Cuenta</h2>
 
           <form className="register-form" onSubmit={handleSubmit}>
-            <div className="form-group">
+            <div className="register-form-group">
               <label>Nombre</label>
               <input
                 type="text"
@@ -119,7 +121,7 @@ function Register() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="register-form-group">
               <label>Correo Electrónico</label>
               <input
                 type="email"
@@ -131,7 +133,7 @@ function Register() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="register-form-group">
               <label>Contraseña</label>
               <input
                 type="password"
@@ -143,14 +145,14 @@ function Register() {
               />
             </div>
 
-            {error && <p className="error-message">{error}</p>}
+            {error && <p className="register-error-message">{error}</p>}
 
             <button type="submit" className="register-button" disabled={loading}>
               {loading ? "Registrando..." : "Registrar"}
             </button>
           </form>
 
-          <p className="login-link">
+          <p className="register-login-link">
             ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
           </p>
         </div>

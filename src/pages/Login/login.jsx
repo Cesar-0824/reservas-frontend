@@ -74,9 +74,12 @@ return (
       <div className="overlay">
 
         <div className="brand">
-          <h1>⚽ SportsMatch</h1>
-          <span>¡Disfruta de tu pasión!</span>
-        </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <span style={{ fontSize: "2.8rem", display: "inline-block" }}>⚽</span>
+    <h1>SportsMatch</h1>
+  </div>
+  <span>¡Disfruta de tu pasión!</span>
+</div>
 
         <h2>Reserva tu cancha en cualquier momento.</h2>
 

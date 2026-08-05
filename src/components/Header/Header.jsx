@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 import logoImage from '../../assets/logo.png';
-import { FaFacebookF, FaGooglePlusG, FaTwitter, FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 function Header() {
-    // 🆕 estado del menú hamburguesa
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Lleva a una seccion de la Home haciendo scroll suave.
+    // Si ya estamos en "/", solo hace scroll. Si estamos en otra pagina,
+    // navega a "/" con el hash y Home.jsx se encarga de hacer scroll al montar.
+    const goToSection = (id) => (e) => {
+        e.preventDefault();
+        closeMenu();
+
+        if (location.pathname === '/') {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            navigate(`/#${id}`);
+        }
+    };
 
     return (
         <header className="header">
@@ -17,26 +36,24 @@ function Header() {
                 {/* IZQUIERDA */}
                 <div className="header-left">
                     <Link to="/" className="header-logo-link">
-                        <img 
-                            src={logoImage} 
-                            alt="Logo" 
-                            className="header-logo-img" 
-                        />
+                        <span className="header-logo-badge">
+                            <img
+                                src={logoImage}
+                                alt="Logo"
+                                className="header-logo-img"
+                            />
+                        </span>
                     </Link>
 
                     <div className="header-info">
                         <span className="header-app-name">
                             SportsMatch
                         </span>
-
-                        <span className="header-tagline">
-                            ¡Disfruta de tu pasión!
-                        </span>
                     </div>
                 </div>
 
 
-                {/* 🆕 BOTÓN HAMBURGUESA (solo visible en móvil vía CSS) */}
+                {/* BOTÓN HAMBURGUESA (solo visible en móvil vía CSS) */}
                 <button
                     className="hamburger-btn"
                     onClick={() => setMenuOpen(!menuOpen)}
@@ -51,50 +68,34 @@ function Header() {
                 <nav>
                     <ul className={menuOpen ? 'menu-links open' : 'menu-links'}>
                         <li>
-                            <Link to="/servicios" onClick={closeMenu}>
+                            <a href="#servicios" onClick={goToSection('servicios')}>
                                 Servicios
-                            </Link>
+                            </a>
                         </li>
 
                         <li>
-                            <Link to="/informacion" onClick={closeMenu}>
+                            <a href="#informacion" onClick={goToSection('informacion')}>
                                 Información
-                            </Link>
+                            </a>
                         </li>
 
                         <li>
-                            <Link to="/contacto" onClick={closeMenu}>
+                            <a href="#contacto" onClick={goToSection('contacto')}>
                                 Contacto
-                            </Link>
+                            </a>
                         </li>
                     </ul>
                 </nav>
 
 
                 {/* DERECHA */}
-                <div className={menuOpen ? 'header-social open' : 'header-social'}>
-
-                    <a href="https://facebook.com" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       className="social-icon facebook">
-                        <FaFacebookF />
-                    </a>
-
-                    <a href="https://plus.google.com" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       className="social-icon google">
-                        <FaGooglePlusG />
-                    </a>
-
-                    <a href="https://twitter.com" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       className="social-icon twitter">
-                        <FaTwitter />
-                    </a>
-
+                <div className={menuOpen ? 'header-auth open' : 'header-auth'}>
+                    <Link to="/login" className="header-btn-login" onClick={closeMenu}>
+                        Iniciar sesión
+                    </Link>
+                    <Link to="/registrar" className="header-btn-register" onClick={closeMenu}>
+                        Registrarse
+                    </Link>
                 </div>
 
             </div>

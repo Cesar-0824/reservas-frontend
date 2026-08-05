@@ -28,8 +28,7 @@
   position: relative;
 
   background:
-    linear-gradient(rgba(9, 33, 70, .82),
-    rgba(0, 90, 55, .75)),
+    linear-gradient(135deg, rgba(14, 44, 18, 0.88), rgba(11, 31, 20, 0.82)),
     url("https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1600&q=80");
 
   background-size: cover;
@@ -44,7 +43,7 @@
 
 .overlay {
   max-width: 520px;
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 .brand {
@@ -128,13 +127,10 @@
 
 .login-right {
   flex: 1;
-
-  background: #f4f7fb;
-
+  background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
   display: flex;
   justify-content: center;
   align-items: center;
-
   padding: 40px;
 }
 
@@ -179,7 +175,7 @@
 
     text-align:center;
 
-    color:#183153;
+    color:#0e3b16;
 
     margin-bottom:8px;
 }
@@ -188,7 +184,7 @@
 
     text-align:center;
 
-    color:#777;
+    color:#161616;
 
     margin-bottom:35px;
 }
@@ -232,7 +228,7 @@
 
     outline:none;
 
-    border-color:#2ecc71;
+    border-color:#360812;
 
     box-shadow:0 0 0 4px rgba(46,204,113,.18);
 }
@@ -254,7 +250,7 @@
 
     text-decoration:none;
 
-    color:#2ecc71;
+    color:#0e3b16;
 
     font-weight:600;
 }
@@ -278,7 +274,7 @@
 
     border-radius:12px;
 
-    background:linear-gradient(135deg,#2ecc71,#27ae60);
+    background: linear-gradient(135deg, #0e3b16, #27662f);
 
     color:white;
 
@@ -295,7 +291,7 @@
 
     transform:translateY(-3px);
 
-    box-shadow:0 15px 35px rgba(39,174,96,.35);
+    box-shadow:0 15px 35px rgba(12, 58, 20, 0.541);
 }
 
 .login-button:disabled{
@@ -324,12 +320,12 @@
 
     text-align:center;
 
-    color:#666;
+    color:#020101;
 }
 
 .register-link a{
 
-    color:#27ae60;
+    color:#0e3b16;
 
     text-decoration:none;
 
@@ -417,7 +413,7 @@
   right: 40px;
   background: transparent;
   border: none;
-  color: #183153; /* Color oscuro acorde al título para que sea legible */
+  color: #2c4977; /* Color oscuro acorde al título para que sea legible */
   font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
@@ -427,6 +423,7 @@
 }
 
 .back-btn-right:hover {
-  color: #2ecc71; /* Pasa a color verde al poner el cursor encima */
+  color: #020b11; /* Pasa a color verde al poner el cursor encima */
   text-decoration: underline;
 }
+

@@ -27,17 +27,11 @@ html, body, #root, .App {
    (usado por Home y cualquier otra página normal)
 =========================== */
 .main-content {
-  flex: 1; /* ocupa todo el espacio restante, empuja el footer hacia abajo */
+  flex: 1;
   display: flex;
   flex-direction: column;
-  /* 🔧 quitamos justify-content/align-items: center de aquí —
-     eran lo que forzaba a .home-container a encogerse y
-     desbordarse por los costados en vez de estirarse al 100% */
-  max-width: 1200px;
   width: 100%;
-  margin: 0 auto;
-  padding: 20px;
-  box-sizing: border-box;
+  padding: 0;
 }
  
 /* ===========================

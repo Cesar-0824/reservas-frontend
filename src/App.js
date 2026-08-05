@@ -7,9 +7,6 @@ import Footer from './components/Footer/Footer';
 import Home from './pages/Home/Home';
 import UserDashboard from './pages/Reservas/UserDashboard';
 import Login from './pages/Login/login';
-import Servicios from './pages/Servicios/Servicios';
-import Informacion from './pages/Informacion/Informacion';
-import Contacto from './pages/Contacto/Contacto';
 import Register from './pages/Register/Register';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
@@ -79,9 +76,6 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
             <main className={hideHeaderAndFooter ? '' : 'main-content'}>
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/servicios" element={<Servicios />} />
-                    <Route path="/informacion" element={<Informacion />} />
-                    <Route path="/contacto" element={<Contacto />} />
                     <Route path="/registrar" element={<Register />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
 
