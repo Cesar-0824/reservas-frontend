@@ -12,8 +12,8 @@ html, body, #root, .App {
   width: 100%;
   max-width: 100%;
   font-family: 'Poppins', sans-serif;
-  background-color: var(--background-light);
-  color: var(--text-dark);
+  background-color: var(--bg-dark, #0b0f0c);
+  color: var(--text-main, #ffffff);
 }
  
 .App {

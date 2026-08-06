@@ -11,9 +11,6 @@ function Header() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Lleva a una seccion de la Home haciendo scroll suave.
-    // Si ya estamos en "/", solo hace scroll. Si estamos en otra pagina,
-    // navega a "/" con el hash y Home.jsx se encarga de hacer scroll al montar.
     const goToSection = (id) => (e) => {
         e.preventDefault();
         closeMenu();
@@ -64,38 +61,42 @@ function Header() {
                 </button>
 
 
-                {/* CENTRO */}
-                <nav>
-                    <ul className={menuOpen ? 'menu-links open' : 'menu-links'}>
-                        <li>
-                            <a href="#servicios" onClick={goToSection('servicios')}>
-                                Servicios
-                            </a>
-                        </li>
+                {/* 🆕 WRAPPER: agrupa menu + auth para que se desplieguen juntos, sin huecos */}
+                <div className={menuOpen ? 'mobile-menu-wrapper open' : 'mobile-menu-wrapper'}>
 
-                        <li>
-                            <a href="#informacion" onClick={goToSection('informacion')}>
-                                Información
-                            </a>
-                        </li>
+                    {/* CENTRO */}
+                    <nav>
+                        <ul className="menu-links">
+                            <li>
+                                <a href="#servicios" onClick={goToSection('servicios')}>
+                                    Servicios
+                                </a>
+                            </li>
 
-                        <li>
-                            <a href="#contacto" onClick={goToSection('contacto')}>
-                                Contacto
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                            <li>
+                                <a href="#informacion" onClick={goToSection('informacion')}>
+                                    Información
+                                </a>
+                            </li>
 
+                            <li>
+                                <a href="#contacto" onClick={goToSection('contacto')}>
+                                    Contacto
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
 
-                {/* DERECHA */}
-                <div className={menuOpen ? 'header-auth open' : 'header-auth'}>
-                    <Link to="/login" className="header-btn-login" onClick={closeMenu}>
-                        Iniciar sesión
-                    </Link>
-                    <Link to="/registrar" className="header-btn-register" onClick={closeMenu}>
-                        Registrarse
-                    </Link>
+                    {/* DERECHA */}
+                    <div className="header-auth">
+                        <Link to="/login" className="header-btn-login" onClick={closeMenu}>
+                            Iniciar sesión
+                        </Link>
+                        <Link to="/registrar" className="header-btn-register" onClick={closeMenu}>
+                            Registrarse
+                        </Link>
+                    </div>
+
                 </div>
 
             </div>

@@ -28,7 +28,7 @@
     align-items: center;
     justify-content: space-between;
 
-    padding: 16px 40px;
+    padding: 14px 40px;
 
     max-width: 100%;
     margin: auto;
@@ -92,6 +92,16 @@
     color: var(--text-main);
     white-space: nowrap;
     transition: color 0.4s ease;
+}
+
+
+/* ===============================
+   🆕 WRAPPER MÓVIL (agrupa menu-links + header-auth)
+================================ */
+
+.mobile-menu-wrapper {
+    /* En escritorio: invisible para el layout, no cambia nada del diseño actual */
+    display: contents;
 }
 
 
@@ -273,28 +283,14 @@ html.light-theme .header-btn-login {
    RESPONSIVE
 ================================ */
 
-/* Tablet */
+
+/* Tablet Y Móvil: el menú centrado por posicion absoluta no escala bien
+   en anchos intermedios (se superpone con los botones de auth), asi que
+   activamos el modo hamburguesa desde 1024px en vez de 768px */
 @media (max-width: 1024px) {
 
     .main-header {
-        padding: 14px 24px;
-    }
-
-    .menu-links {
-        gap: 24px;
-    }
-
-    .header-app-name {
-        font-size: 18px;
-    }
-}
-
-
-/* Móvil */
-@media (max-width: 768px) {
-
-    .main-header {
-        padding: 12px 18px;
+        padding: 12px 24px;
         flex-wrap: nowrap;
     }
 
@@ -318,17 +314,15 @@ html.light-theme .header-btn-login {
         order: 3;
     }
 
-    /* Menú móvil adaptado a la transparencia en modo claro y oscuro */
-    .menu-links {
+    /* El wrapper deja de ser "invisible" y pasa a ser el dropdown real,
+       que agrupa menu-links + header-auth como un solo bloque sin huecos */
+    .mobile-menu-wrapper {
+        display: block;
+
         position: absolute;
         top: 100%;
         left: 0;
-        transform: none;
-
         width: 100%;
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
 
         background: var(--bg-card);
         backdrop-filter: blur(16px);
@@ -342,9 +336,23 @@ html.light-theme .header-btn-login {
         transition: max-height 0.3s ease, opacity 0.25s ease, background-color 0.4s ease;
     }
 
-    .menu-links.open {
-        max-height: 300px;
+    .mobile-menu-wrapper.open {
+        max-height: 500px; /* suficiente para menu + botones, con margen de sobra */
         opacity: 1;
+    }
+
+    /* menu-links y header-auth ya no necesitan su propio position/background/animacion:
+       el wrapper de arriba se encarga de todo eso ahora */
+
+    .menu-links {
+        position: static;
+        transform: none;
+
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+
         padding: 10px 0;
     }
 
@@ -355,38 +363,15 @@ html.light-theme .header-btn-login {
 
     .menu-links a {
         display: block;
+        height: auto;
         padding: 14px 20px;
     }
 
     .header-auth {
-        position: absolute;
-        top: 100%;
-        left: 0;
-
         width: 100%;
         flex-direction: column;
         gap: 10px;
-        padding: 0 20px;
-
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-
-        transition: max-height 0.3s ease, opacity 0.25s ease, background-color 0.4s ease;
-        transition-delay: 0.05s;
-
-        background: var(--bg-card);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-    }
-
-    .header-auth.open {
-        max-height: 160px;
-        opacity: 1;
-        padding-top: 4px;
-        padding-bottom: 16px;
-
-        margin-top: 300px;
+        padding: 4px 20px 16px;
     }
 
     .header-btn-login,

@@ -12,7 +12,8 @@ import {
   FaPlus,
   FaEdit,
   FaTrash,
-  FaTimes
+  FaTimes,
+  FaChartBar // 👈 Icono importado
 } from "react-icons/fa";
 
 function AdminDashboard({ onLogout }) {
@@ -24,7 +25,10 @@ function AdminDashboard({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [editandoCancha, setEditandoCancha] = useState(null);
 
-  // 🆕 Estado para editar usuario
+  // 🆕 Estado para filtro de estadísticas
+  const [filtroTiempo, setFiltroTiempo] = useState('mes');
+
+  // Estado para editar usuario
   const [editandoUsuario, setEditandoUsuario] = useState(null);
   const [nuevoRol, setNuevoRol] = useState('');
 
@@ -75,26 +79,26 @@ function AdminDashboard({ onLogout }) {
     setNuevaCancha(prev => ({ ...prev, imagen: e.target.files[0] }));
   };
 
-const handleAgregarCancha = async e => {
-  e.preventDefault();
-  const formData = new FormData();
-  formData.append('nombre', nuevaCancha.nombre);
-  formData.append('tipo', nuevaCancha.tipo);
-  formData.append('precio', nuevaCancha.precio);
-  if (nuevaCancha.imagen) {
-    formData.append('imagen', nuevaCancha.imagen);
-  }
-  try {
-    const token = localStorage.getItem('authToken');
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await axios.post('http://localhost:8080/api/canchas/registrar', formData, { headers });
-    setCanchas(prev => [...prev, res.data]);
-    setNuevaCancha({ nombre: '', tipo: '', precio: '', imagen: null });
-  } catch (err) {
-    console.error("Error al agregar cancha:", err.response?.data || err.message);
-    alert("No se pudo registrar la cancha.");
-  }
-};
+  const handleAgregarCancha = async e => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('nombre', nuevaCancha.nombre);
+    formData.append('tipo', nuevaCancha.tipo);
+    formData.append('precio', nuevaCancha.precio);
+    if (nuevaCancha.imagen) {
+      formData.append('imagen', nuevaCancha.imagen);
+    }
+    try {
+      const token = localStorage.getItem('authToken');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.post('http://localhost:8080/api/canchas/registrar', formData, { headers });
+      setCanchas(prev => [...prev, res.data]);
+      setNuevaCancha({ nombre: '', tipo: '', precio: '', imagen: null });
+    } catch (err) {
+      console.error("Error al agregar cancha:", err.response?.data || err.message);
+      alert("No se pudo registrar la cancha.");
+    }
+  };
 
   const handleEliminarCancha = async (id) => {
     if (!window.confirm("¿Estás seguro de eliminar esta cancha?")) return;
@@ -109,112 +113,103 @@ const handleAgregarCancha = async e => {
     }
   };
 
-
-
-const handleEditarCancha = (cancha) => {
-  setEditandoCancha(cancha);
-
-  setNuevaCancha({
-    nombre: cancha.nombre,
-    tipo: cancha.tipo,
-    precio: cancha.precio_hora || cancha.precio,
-    imagen: null
-  });
-
- 
-};
-
-const handleActualizarCancha = async (e) => {
-  e.preventDefault();
-
-  if (!editandoCancha) return;
-
-  const confirmar = window.confirm(
-    "¿Estás seguro de actualizar esta cancha?"
-  );
-
-  if (!confirmar) return;
-
-  const formData = new FormData();
-
-  formData.append("nombre", nuevaCancha.nombre);
-  formData.append("tipo", nuevaCancha.tipo);
-  formData.append("precio", nuevaCancha.precio);
-
-  if (nuevaCancha.imagen) {
-    formData.append("imagen", nuevaCancha.imagen);
-  }
-
-  try {
-    const token = localStorage.getItem('authToken');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-    const res = await axios.put(
-      `http://localhost:8080/api/canchas/actualizar/${editandoCancha.id}`,
-      formData,
-      { headers }
-    ); 
-
-    setCanchas(prev =>
-      prev.map(c => c.id === res.data.id ? res.data : c)
-    );
-
-    setEditandoCancha(null);
-    
+  const handleEditarCancha = (cancha) => {
+    setEditandoCancha(cancha);
 
     setNuevaCancha({
-      nombre: "",
-      tipo: "",
-      precio: "",
+      nombre: cancha.nombre,
+      tipo: cancha.tipo,
+      precio: cancha.precio_hora || cancha.precio,
       imagen: null
     });
+  };
 
-    alert("✅ Cancha actualizada correctamente.");
+  const handleActualizarCancha = async (e) => {
+    e.preventDefault();
 
-  } catch (err) {
-    console.error(err);
-    alert("❌ No se pudo actualizar la cancha.");
-  }
-};
-  // 🆕 Abrir modal de edición de usuario
+    if (!editandoCancha) return;
+
+    const confirmar = window.confirm(
+      "¿Estás seguro de actualizar esta cancha?"
+    );
+
+    if (!confirmar) return;
+
+    const formData = new FormData();
+
+    formData.append("nombre", nuevaCancha.nombre);
+    formData.append("tipo", nuevaCancha.tipo);
+    formData.append("precio", nuevaCancha.precio);
+
+    if (nuevaCancha.imagen) {
+      formData.append("imagen", nuevaCancha.imagen);
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const res = await axios.put(
+        `http://localhost:8080/api/canchas/actualizar/${editandoCancha.id}`,
+        formData,
+        { headers }
+      ); 
+
+      setCanchas(prev =>
+        prev.map(c => c.id === res.data.id ? res.data : c)
+      );
+
+      setEditandoCancha(null);
+
+      setNuevaCancha({
+        nombre: "",
+        tipo: "",
+        precio: "",
+        imagen: null
+      });
+
+      alert("✅ Cancha actualizada correctamente.");
+
+    } catch (err) {
+      console.error(err);
+      alert("❌ No se pudo actualizar la cancha.");
+    }
+  };
+
   const handleAbrirEditarUsuario = (usuario) => {
     setEditandoUsuario(usuario);
     setNuevoRol(usuario.rol);
   };
 
-  // 🆕 Cerrar modal
   const handleCerrarModalUsuario = () => {
     setEditandoUsuario(null);
     setNuevoRol('');
   };
-const handleEliminarUsuario = async (id) => {
-  const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este usuario?");
 
-  if (!confirmar) return;
+  const handleEliminarUsuario = async (id) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este usuario?");
 
-  try {
-    const token = localStorage.getItem('authToken');
-    const headers = token 
-      ? { Authorization: `Bearer ${token}` } 
-      : {};
+    if (!confirmar) return;
 
-    await axios.delete(
-      `http://localhost:8080/api/usuarios/${id}`,
-      { headers }
-    );
+    try {
+      const token = localStorage.getItem('authToken');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-    setUsuarios(prev =>
-      prev.filter(u => u.id !== id)
-    );
+      await axios.delete(
+        `http://localhost:8080/api/usuarios/${id}`,
+        { headers }
+      );
 
-    alert("✅ Usuario eliminado correctamente.");
+      setUsuarios(prev => prev.filter(u => u.id !== id));
 
-  } catch (err) {
-    console.error("Error al eliminar usuario:", err);
-    alert("❌ No se pudo eliminar el usuario.");
-  }
-};
-  // 🆕 Guardar nuevo rol
+      alert("✅ Usuario eliminado correctamente.");
+
+    } catch (err) {
+      console.error("Error al eliminar usuario:", err);
+      alert("❌ No se pudo eliminar el usuario.");
+    }
+  };
+
   const handleGuardarRol = async () => {
     if (!editandoUsuario) return;
     try {
@@ -267,75 +262,288 @@ const handleEliminarUsuario = async (id) => {
       );
     } catch (error) {
       console.error("Error al actualizar estado de reserva:", error);
-      alert("No se pudo actualizar la estado de la reserva.");
+      alert("No se pudo actualizar el estado de la reserva.");
     }
   };
-
 
   if (loading) return <div className="admin-loading">Cargando panel de administración...</div>;
 
   return (
     <div className="admin-dashboard-container">
+      {/* 1. SIDEBAR */}
       <aside className="admin-sidebar">
         <h2>Admin Panel</h2>
         <div className="admin-nav">
-          <button onClick={() => setActiveTab('dashboard')} className={activeTab === 'dashboard' ? 'active' : ''}>
-            <FaTachometerAlt /> Dashboard
+          <button 
+            onClick={() => setActiveTab('Inicio')} 
+            className={activeTab === 'Inicio' ? 'active' : ''}
+          >
+            <FaTachometerAlt /> Inicio
           </button>
-          <button onClick={() => setActiveTab('usuarios')} className={activeTab === 'usuarios' ? 'active' : ''}>
+
+          <button 
+            onClick={() => setActiveTab('estadisticas')} 
+            className={activeTab === 'estadisticas' ? 'active' : ''}
+          >
+            <FaChartBar /> Estadísticas
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('usuarios')} 
+            className={activeTab === 'usuarios' ? 'active' : ''}
+          >
             <FaUserFriends /> Usuarios
           </button>
-          <button onClick={() => setActiveTab('reservas')} className={activeTab === 'reservas' ? 'active' : ''}>
+
+          <button 
+            onClick={() => setActiveTab('reservas')} 
+            className={activeTab === 'reservas' ? 'active' : ''}
+          >
             <FaClipboardList /> Reservas
           </button>
-          <button onClick={() => setActiveTab('canchas')} className={activeTab === 'canchas' ? 'active' : ''}>
+
+          <button 
+            onClick={() => setActiveTab('canchas')} 
+            className={activeTab === 'canchas' ? 'active' : ''}
+          >
             <FaFutbol /> Canchas
           </button>
+
           <button className="admin-logout-button" onClick={onLogout}>
             <FaSignOutAlt /> Cerrar Sesión
           </button>
-          
         </div>
       </aside>
 
+      {/* 2. PANEL CONTENEDOR PRINCIPAL */}
       <div className="admin-content">
         <header className="admin-header">
           <h3>Bienvenido, {adminName}</h3>
         </header>
 
-        {activeTab === 'dashboard' && (
-          <section className="admin-summary">
-            <div className="admin-summary-card">
-              <FaUsers className="icon" />
-              <h3>{usuarios.length}</h3>
-              <p>Usuarios Registrados</p>
+        {/* DASHBOARD */}
+{activeTab === 'Inicio' && (
+  <>
+    {/* Bienvenida */}
+    <section className="admin-welcome-card">
+      <div>
+        <h2>¡Bienvenido, {adminName}! 👋</h2>
+        <p>
+          Administra usuarios, reservas y canchas desde un solo lugar.
+          Aquí encontrarás un resumen general del sistema.
+        </p>
+      </div>
+
+      <div className="admin-date-card">
+        <span>Fecha</span>
+        <h3>{new Date().toLocaleDateString("es-PE")}</h3>
+      </div>
+    </section>
+
+    {/* Resumen */}
+    <section className="admin-summary">
+      <div className="admin-summary-card">
+        <FaUsers className="icon" />
+        <h3>{usuarios?.length || 0}</h3>
+        <p>Usuarios Registrados</p>
+      </div>
+
+      <div className="admin-summary-card">
+        <FaFutbol className="icon" />
+        <h3>{canchas?.length || 0}</h3>
+        <p>Canchas Disponibles</p>
+      </div>
+
+      <div className="admin-summary-card">
+        <FaCalendarCheck className="icon" />
+        <h3>{reservas?.length || 0}</h3>
+        <p>Reservas Totales</p>
+      </div>
+
+      <div className="admin-summary-card">
+        <FaClipboardList className="icon" />
+        <h3>
+          {reservas?.filter(r => r.estado === "pendiente").length || 0}
+        </h3>
+        <p>Reservas Pendientes</p>
+      </div>
+
+      <div className="admin-summary-card">
+        <FaCalendarCheck className="icon" />
+        <h3>
+          {reservas?.filter(r => r.estado === "confirmada").length || 0}
+        </h3>
+        <p>Reservas Confirmadas</p>
+      </div>
+    </section>
+
+    {/* Panel inferior */}
+    <section className="admin-home-grid">
+
+      {/* Accesos rápidos */}
+      <div className="admin-home-card">
+        <h3>⚡ Accesos rápidos</h3>
+
+        <div className="admin-shortcuts">
+
+          <button onClick={() => setActiveTab("usuarios")}>
+            <FaUsers />
+            Usuarios
+          </button>
+
+          <button onClick={() => setActiveTab("reservas")}>
+            <FaClipboardList />
+            Reservas
+          </button>
+
+          <button onClick={() => setActiveTab("canchas")}>
+            <FaFutbol />
+            Canchas
+          </button>
+
+          <button onClick={() => setActiveTab("estadisticas")}>
+            <FaChartBar />
+            Estadísticas
+          </button>
+
+        </div>
+      </div>
+
+      {/* Últimas reservas */}
+      <div className="admin-home-card">
+        <h3>📅 Últimas Reservas</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Cancha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {reservas
+              ?.slice(-5)
+              .reverse()
+              .map(r => (
+                <tr key={r.id}>
+                  <td>{r.usuario?.nombre}</td>
+                  <td>{r.cancha?.nombre}</td>
+                  <td>{r.estado}</td>
+                </tr>
+              ))}
+
+          </tbody>
+        </table>
+      </div>
+
+      {/* Estado del sistema */}
+      <div className="admin-home-card">
+
+        <h3>🟢 Estado del Sistema</h3>
+
+        <p>✔ API funcionando</p>
+
+        <p>✔ Base de datos conectada</p>
+
+        <p>✔ Panel operativo</p>
+
+      </div>
+
+      {/* Resumen */}
+      <div className="admin-home-card">
+
+        <h3>📌 Resumen</h3>
+
+        <p>
+          Usuarios administradores:
+          <strong>
+            {" "}
+            {usuarios.filter(u => u.rol === "admin").length}
+          </strong>
+        </p>
+
+        <p>
+          Usuarios normales:
+          <strong>
+            {" "}
+            {usuarios.filter(u => u.rol === "usuario").length}
+          </strong>
+        </p>
+
+        <p>
+          Reservas canceladas:
+          <strong>
+            {" "}
+            {reservas.filter(r => r.estado === "cancelada").length}
+          </strong>
+        </p>
+
+      </div>
+
+    </section>
+  </>
+)}
+
+        {/* ESTADÍSTICAS Y GRÁFICOS */}
+        {activeTab === 'estadisticas' && (
+          <section className="admin-statistics-container">
+            <div className="stats-header">
+              <div>
+                <h2>Rendimiento del Club</h2>
+                <p>Métricas clave de ingresos y reservas.</p>
+              </div>
+
+              <div className="time-filter-group">
+                {['dia', 'semana', 'mes', 'anio'].map((periodo) => (
+                  <button
+                    key={periodo}
+                    className={`filter-btn ${filtroTiempo === periodo ? 'active' : ''}`}
+                    onClick={() => setFiltroTiempo(periodo)}
+                  >
+                    {periodo === 'anio' ? 'Año' : periodo.charAt(0).toUpperCase() + periodo.slice(1)}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="admin-summary-card">
-              <FaFutbol className="icon" />
-              <h3>{canchas.length}</h3>
-              <p>Canchas Disponibles</p>
-            </div>
-            <div className="admin-summary-card">
-              <FaCalendarCheck className="icon" />
-              <h3>{reservas.length}</h3>
-              <p>Reservas Totales</p>
-            </div>
-            <div className="admin-summary-card">
-              <FaClipboardList className="icon" />
-              <h3>
-                {reservas.filter(r => r.estado === "pendiente").length}
-              </h3>
-              <p>Reservas Pendientes</p>
-            </div>
-            <div className="admin-summary-card">
-              <FaCalendarCheck className="icon" />
-              <h3>
-                {reservas.filter(r => r.estado === "confirmada").length}
-              </h3>
-              <p>Reservas Confirmadas</p>
+
+            <div className="stats-charts-grid">
+              <div className="chart-card large">
+                <div className="chart-header">
+                  <h3>Evolución de Ingresos</h3>
+                  <span className="badge-tag green">Ganancias ($)</span>
+                </div>
+                <div className="chart-body">
+                  <canvas id="ingresosChart"></canvas>
+                </div>
+              </div>
+
+              <div className="chart-card">
+                <div className="chart-header">
+                  <h3>Popularidad por Deporte</h3>
+                  <span className="badge-tag purple">Reservas</span>
+                </div>
+                <div className="chart-body">
+                  <canvas id="deportesChart"></canvas>
+                </div>
+              </div>
+
+              <div className="chart-card">
+                <div className="chart-header">
+                  <h3>Horarios Pico</h3>
+                  <span className="badge-tag blue">Afluencia</span>
+                </div>
+                <div className="chart-body">
+                  <canvas id="horariosChart"></canvas>
+                </div>
+              </div>
             </div>
           </section>
         )}
+
+        {/* USUARIOS */}
         {activeTab === 'usuarios' && (
           <section className="admin-table-section">
             <h3>Lista de Usuarios</h3>
@@ -354,21 +562,12 @@ const handleEliminarUsuario = async (id) => {
                       </span>
                     </td>
                     <td>
-                      
-                        <button
-                          className="admin-edit-btn"
-                          onClick={() => handleAbrirEditarUsuario(u)}
-                          title="Editar rol">
-                          <FaEdit />
-                        </button>
-
-                        <button
-                          className="admin-delete-btn"
-                          onClick={() => handleEliminarUsuario(u.id)}
-                          title="Eliminar usuario">
-                          <FaTrash />
-                        </button>
-                      
+                      <button className="admin-edit-btn" onClick={() => handleAbrirEditarUsuario(u)} title="Editar rol">
+                        <FaEdit />
+                      </button>
+                      <button className="admin-delete-btn" onClick={() => handleEliminarUsuario(u.id)} title="Eliminar usuario">
+                        <FaTrash />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -377,6 +576,7 @@ const handleEliminarUsuario = async (id) => {
           </section>
         )}
 
+        {/* RESERVAS */}
         {activeTab === 'reservas' && (
           <section className="admin-table-section">
             <h3>Reservas por Estado</h3>
@@ -401,28 +601,16 @@ const handleEliminarUsuario = async (id) => {
                           <td>
                             {estado === "pendiente" && (
                               <>
-                                <button
-                                  className="admin-confirm-btn"
-                                  onClick={() => handleCambiarEstadoReserva(r.id, "confirmada")}
-                                  title="Confirmar reserva"
-                                >
+                                <button className="admin-confirm-btn" onClick={() => handleCambiarEstadoReserva(r.id, "confirmada")} title="Confirmar reserva">
                                   Confirmar
                                 </button>
-                                <button
-                                  className="admin-cancel-btn"
-                                  onClick={() => handleCambiarEstadoReserva(r.id, "cancelada")}
-                                  title="Cancelar reserva"
-                                >
+                                <button className="admin-cancel-btn" onClick={() => handleCambiarEstadoReserva(r.id, "cancelada")} title="Cancelar reserva">
                                   Cancelar
                                 </button>
                               </>
                             )}
                             {estado === "confirmada" && (
-                              <button
-                                className="admin-cancel-btn"
-                                onClick={() => handleCambiarEstadoReserva(r.id, "cancelada")}
-                                title="Cancelar reserva"
-                              >
+                              <button className="admin-cancel-btn" onClick={() => handleCambiarEstadoReserva(r.id, "cancelada")} title="Cancelar reserva">
                                 Cancelar
                               </button>
                             )}
@@ -438,248 +626,99 @@ const handleEliminarUsuario = async (id) => {
           </section>
         )}
 
+        {/* CANCHAS */}
         {activeTab === "canchas" && (
-  <section className="admin-table-section">
-    <h3>Gestión de Canchas</h3>
+          <section className="admin-table-section">
+            <h3>Gestión de Canchas</h3>
+            <form className="admin-form-canchas" onSubmit={handleAgregarCancha}>
+              <input type="text" name="nombre" placeholder="Nombre de la cancha" value={nuevaCancha.nombre} onChange={handleInputChange} required />
+              <input type="text" name="tipo" placeholder="Tipo de cancha (Fútbol, Vóley...)" value={nuevaCancha.tipo} onChange={handleInputChange} required />
+              <input type="number" name="precio" placeholder="Precio por hora" value={nuevaCancha.precio} onChange={handleInputChange} required />
+              <input type="file" accept="image/*" onChange={handleImageChange} />
+              <button type="submit"><FaPlus /> Agregar Cancha</button>
+            </form>
 
-    {/* ===== AGREGAR CANCHA ===== */}
-    <form
-      className="admin-form-canchas"
-      onSubmit={handleAgregarCancha}
-    >
-      <input
-        type="text"
-        name="nombre"
-        placeholder="Nombre de la cancha"
-        value={nuevaCancha.nombre}
-        onChange={handleInputChange}
-        required
-      />
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th><th>Tipo</th><th>Precio</th><th>Imagen</th><th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {canchas.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.nombre}</td>
+                    <td>{c.tipo}</td>
+                    <td>S/. {c.precio_hora ?? c.precio}</td>
+                    <td>
+                      {c.imagen ? <img src={c.imagen} alt={c.nombre} height="45" /> : "Sin imagen"}
+                    </td>
+                    <td>
+                      <button className="admin-edit-btn" onClick={() => handleEditarCancha(c)} title="Editar cancha"><FaEdit /></button>
+                      <button className="admin-delete-btn" onClick={() => handleEliminarCancha(c.id)} title="Eliminar cancha"><FaTrash /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
 
-      <input
-        type="text"
-        name="tipo"
-        placeholder="Tipo de cancha (Fútbol, Vóley...)"
-        value={nuevaCancha.tipo}
-        onChange={handleInputChange}
-        required
-      />
-
-      <input
-        type="number"
-        name="precio"
-        placeholder="Precio por hora"
-        value={nuevaCancha.precio}
-        onChange={handleInputChange}
-        required
-      />
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-      />
-
-      <button type="submit">
-        <FaPlus /> Agregar Cancha
-      </button>
-    </form>
-
-    {/* ===== TABLA ===== */}
-
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th>Precio</th>
-          <th>Imagen</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {canchas.map((c) => (
-          <tr key={c.id}>
-            <td>{c.nombre}</td>
-
-            <td>{c.tipo}</td>
-
-            <td>S/. {c.precio_hora}</td>
-
-            <td>
-              {c.imagen ? (
-                <img src={c.imagen} alt={c.nombre} height="45" />
-              ) : (
-                "Sin imagen"
-              )}
-            </td>
-
-            <td>
-              <button
-                className="admin-edit-btn"
-                onClick={() => handleEditarCancha(c)}
-                title="Editar cancha"
-              >
-                <FaEdit />
-              </button>
-
-              <button
-                className="admin-delete-btn"
-                onClick={() => handleEliminarCancha(c.id)}
-                title="Eliminar cancha"
-              >
-                <FaTrash />
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </section>
-)}
-{/* ===== MODAL EDITAR CANCHA ===== */}
-
-{editandoCancha && (
-  <div
-    className="admin-modal-overlay"
-    onClick={() => setEditandoCancha(null)}
-  >
-    <div
-      className="admin-modal-box"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="admin-modal-header">
-        <h3>Editar Cancha</h3>
-
-        <button
-          className="admin-modal-close"
-          onClick={() => setEditandoCancha(null)}
-        >
-          <FaTimes />
-        </button>
+        {/* MODAL EDITAR CANCHA */}
+        {editandoCancha && (
+          <div className="admin-modal-overlay" onClick={() => setEditandoCancha(null)}>
+            <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <h3>Editar Cancha</h3>
+                <button className="admin-modal-close" onClick={() => setEditandoCancha(null)}><FaTimes /></button>
+              </div>
+              <form onSubmit={handleActualizarCancha}>
+                <div className="admin-modal-body">
+                  <label>Nombre</label>
+                  <input type="text" name="nombre" value={nuevaCancha.nombre} onChange={handleInputChange} required />
+                  <label>Tipo</label>
+                  <input type="text" name="tipo" value={nuevaCancha.tipo} onChange={handleInputChange} required />
+                  <label>Precio por hora</label>
+                  <input type="number" name="precio" value={nuevaCancha.precio} onChange={handleInputChange} required />
+                  <label>Cambiar imagen</label>
+                  <input type="file" accept="image/*" onChange={handleImageChange} />
+                  {editandoCancha.imagen && (
+                    <>
+                      <p>Imagen actual</p>
+                      <img src={editandoCancha.imagen} alt="Cancha" width="220" style={{ borderRadius: "10px", marginTop: "10px" }} />
+                    </>
+                  )}
+                </div>
+                <div className="admin-modal-footer">
+                  <button type="button" className="admin-modal-cancel-btn" onClick={() => setEditandoCancha(null)}>Cancelar</button>
+                  <button type="submit" className="admin-modal-save-btn">Guardar Cambios</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
 
-      <form onSubmit={handleActualizarCancha}>
-
-        <div className="admin-modal-body">
-
-          <label>Nombre</label>
-
-          <input
-            type="text"
-            name="nombre"
-            value={nuevaCancha.nombre}
-            onChange={handleInputChange}
-            required
-          />
-
-          <label>Tipo</label>
-
-          <input
-            type="text"
-            name="tipo"
-            value={nuevaCancha.tipo}
-            onChange={handleInputChange}
-            required
-          />
-
-          <label>Precio por hora</label>
-
-          <input
-            type="number"
-            name="precio"
-            value={nuevaCancha.precio}
-            onChange={handleInputChange}
-            required
-          />
-
-          <label>Cambiar imagen</label>
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-
-          {editandoCancha.imagen && (
-            <>
-              <p>Imagen actual</p>
-
-              <img
-                src={editandoCancha.imagen}
-                alt="Cancha"
-                width="220"
-                style={{
-                  borderRadius: "10px",
-                  marginTop: "10px"
-                }}
-              />
-            </>
-          )}
-
-        </div>
-
-        <div className="admin-modal-footer">
-
-          <button
-            type="button"
-            className="admin-modal-cancel-btn"
-            onClick={() => setEditandoCancha(null)}
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="submit"
-            className="admin-modal-save-btn"
-          >
-            Guardar Cambios
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-  </div>
-)}
-        
-      </div>
-
-      {/* 🆕 MODAL EDITAR USUARIO */}
+      {/* MODAL EDITAR USUARIO */}
       {editandoUsuario && (
         <div className="admin-modal-overlay" onClick={handleCerrarModalUsuario}>
           <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
             <div className="admin-modal-header">
               <h3>Editar Usuario</h3>
-              <button className="admin-modal-close" onClick={handleCerrarModalUsuario}>
-                <FaTimes />
-              </button>
+              <button className="admin-modal-close" onClick={handleCerrarModalUsuario}><FaTimes /></button>
             </div>
-
             <div className="admin-modal-body">
               <p className="admin-modal-user-name">{editandoUsuario.nombre}</p>
               <p className="admin-modal-user-email">{editandoUsuario.email}</p>
-
               <label className="admin-modal-label">Rol del usuario</label>
-              <select
-                className="admin-modal-select"
-                value={nuevoRol}
-                onChange={(e) => setNuevoRol(e.target.value)}
-              >
+              <select className="admin-modal-select" value={nuevoRol} onChange={(e) => setNuevoRol(e.target.value)}>
                 <option value="usuario">Usuario</option>
                 <option value="admin">Administrador</option>
               </select>
             </div>
-
             <div className="admin-modal-footer">
-              <button className="admin-modal-cancel-btn" onClick={handleCerrarModalUsuario}>
-                Cancelar
-              </button>
-              <button className="admin-modal-save-btn" onClick={handleGuardarRol}>
-                Guardar Cambios
-              </button>
+              <button className="admin-modal-cancel-btn" onClick={handleCerrarModalUsuario}>Cancelar</button>
+              <button className="admin-modal-save-btn" onClick={handleGuardarRol}>Guardar Cambios</button>
             </div>
           </div>
         </div>

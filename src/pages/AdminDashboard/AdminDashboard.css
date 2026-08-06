@@ -1,21 +1,37 @@
 /* ===========================
-   VARIABLES
+   VARIABLES (Sidebar Verde + Panel Claro Multicolor)
 =========================== */
 :root {
-  --admin-sidebar-bg: #1e2a38;
-  --admin-sidebar-active: #1abc9c;
-  --admin-primary: #3498db;
-  --admin-danger: #e74c3c;
-  --admin-danger-dark: #c0392b;
-  --admin-success: #1abc9c;
-  --admin-success-dark: #16a085;
-  --admin-text-dark: #1f2937;
-  --admin-text-muted: #8b95a1;
-  --admin-border-light: #eef0f2;
-  --admin-bg-page: #f6f8fa;
-  --admin-radius: 14px;
-  --admin-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
-  --admin-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  /* SIDEBAR IZQUIERDO (Verde Bosque Deportivo) */
+  --admin-sidebar-bg: #0d1a12;          /* Verde bosque oscuro para la barra lateral */
+  --admin-sidebar-active: #3161fffa;      /* Verde brillante para item seleccionado */
+  
+  /* PANEL PRINCIPAL DERECHO (Fondo Blanco / Claro) */
+  --admin-bg-page: #f4f6f8;             /* Fondo gris claro muy limpio */
+  --admin-card-bg: #ffffff;             /* Tarjetas e ítemes en blanco puro */
+  --admin-card-bg-solid: #ffffff;       /* Fondo de Modales blanco */
+
+  /* ROLES Y ESTADOS MULTICOLOR */
+  --admin-primary: #15803d;             /* Verde deportivo principal */
+  --admin-success: #388f58;             /* Verde de éxito / confirmar */
+  --admin-success-dark: #26914d;
+
+  --admin-blue: #3b82f6;                /* AZUL: Métricas de Usuarios / Canchas */
+  --admin-warning: #f59e0b;             /* AMARILLO/ORO: Pendientes */
+  --admin-purple: #8b5cf6;              /* MORADO: Estadísticas */
+  
+  --admin-danger: #ef4444;              /* ROJO: Cancelar / Eliminar */
+  --admin-danger-dark: #dc2626;
+
+  /* TEXTOS Y BORDES (Para fondo claro) */
+  --admin-text-dark: #111827;           /* Texto Negro / Gris muy oscuro */
+  --admin-text-muted: #6b7280;          /* Gris medio para textos secundarios */
+  --admin-border-light: #e5e7eb;        /* Bordes grises finos y limpios */
+
+  /* SOMBRAS Y RADIOS */
+  --admin-radius: 12px;
+  --admin-shadow-sm: 0 2px 8px rgba(24, 17, 17, 0.05);
+  --admin-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* ===========================
@@ -32,16 +48,17 @@
 }
 
 /* ===========================
-   SIDEBAR
+   SIDEBAR (IZQUIERDO - VERDE)
 =========================== */
 .admin-sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #1e2a38 0%, #16202c 100%);
+  background: linear-gradient(180deg, #122419 0%, #0a140e 100%);
   color: white;
   padding: 24px 18px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .admin-sidebar h2 {
@@ -52,6 +69,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 16px;
   letter-spacing: 0.3px;
+  color: #ffffff;
 }
 
 .admin-nav {
@@ -63,7 +81,7 @@
 .admin-nav button {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.95rem;
   font-weight: 500;
   padding: 12px 14px;
@@ -81,12 +99,13 @@
 
 .admin-nav .active {
   background-color: var(--admin-sidebar-active);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(26, 188, 156, 0.35);
+  color: #0b130e !important; /* Texto negro sobre verde para máxima legibilidad */
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
 }
 
 /* ===========================
-   CONTENIDO
+   CONTENIDO PRINCIPAL (BLANCO)
 =========================== */
 .admin-content {
   flex: 1;
@@ -137,7 +156,7 @@
 }
 
 /* ===========================
-   RESUMEN (TARJETAS)
+   RESUMEN (TARJETAS MULTICOLOR)
 =========================== */
 .admin-summary {
   display: flex;
@@ -148,29 +167,27 @@
 }
 
 .admin-summary-card {
-  background-color: white;
+  background-color: var(--admin-card-bg);
   border-radius: var(--admin-radius);
   padding: 24px;
   flex: 1;
   min-width: 220px;
   box-shadow: var(--admin-shadow-sm);
   text-align: center;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   border: 1px solid var(--admin-border-light);
 }
 
 .admin-summary-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   box-shadow: var(--admin-shadow-md);
 }
 
 .admin-summary-card .icon {
-  font-size: 2rem;
-  color: var(--admin-primary);
+  font-size: 1.8rem;
   margin-bottom: 12px;
-  background: rgba(52, 152, 219, 0.1);
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,6 +195,12 @@
   margin-inline: auto;
 }
 
+/* Colores dinámicos por tarjeta */
+.admin-summary-card:nth-child(1) .icon { color: #418058; background: rgba(34, 197, 94, 0.12); } /* Verde */
+.admin-summary-card:nth-child(2) .icon { color: #3b82f6; background: rgba(59, 130, 246, 0.12); } /* Azul */
+.admin-summary-card:nth-child(3) .icon { color: #f59e0b; background: rgba(245, 158, 11, 0.12); } /* Amarillo */
+.admin-summary-card:nth-child(4) .icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.12); } /* Morado */
+.admin-summary-card:nth-child(5) .icon { color: #16a34a; background: rgba(34, 197, 94, 0.15); }
 .admin-summary-card h3 {
   font-size: 1.9rem;
   margin: 4px 0;
@@ -192,10 +215,10 @@
 }
 
 /* ===========================
-   TABLA
+   TABLA EN FONDO BLANCO
 =========================== */
 .admin-table-section {
-  background-color: white;
+  background-color: var(--admin-card-bg);
   padding: 24px;
   margin-bottom: 30px;
   border-radius: var(--admin-radius);
@@ -213,15 +236,13 @@
   font-weight: 700;
 }
 
-/* Escopado a .admin-table-section para no afectar tablas de otras páginas */
 .admin-table-section table {
   width: 100%;
   border-collapse: collapse;
 }
 
 .admin-table-section thead {
-  background-color: #f8fafc;
-  color: var(--admin-text-dark);
+  background-color: #f9fafb;
 }
 
 .admin-table-section th {
@@ -238,14 +259,11 @@
   border-bottom: 1px solid var(--admin-border-light);
   text-align: left;
   font-size: 0.92rem;
-}
-
-.admin-table-section tbody tr {
-  transition: background 0.2s ease;
+  color: var(--admin-text-dark);
 }
 
 .admin-table-section tbody tr:hover {
-  background-color: #f8fafc;
+  background-color: #f9fafb;
 }
 
 .admin-table-section tbody tr:last-child td {
@@ -253,46 +271,25 @@
 }
 
 /* ===========================
-   ESTADO DE CARGA
+   BADGES DE ROL (MULTICOLOR)
 =========================== */
-.admin-loading {
-  text-align: center;
-  padding: 60px;
-  font-size: 1.3rem;
-  color: var(--admin-text-muted);
-  width: 100%;
-}
-
-/* ===========================
-   GRID DE RESERVAS
-=========================== */
-.admin-reservas-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  margin-top: 20px;
-  width: 100%;
-}
-
-.admin-reservas-card {
-  background-color: white;
-  padding: 22px;
-  border-radius: var(--admin-radius);
-  box-shadow: var(--admin-shadow-sm);
-  overflow-x: auto;
-  border: 1px solid var(--admin-border-light);
-  transition: box-shadow 0.25s ease;
-}
-
-.admin-reservas-card:hover {
-  box-shadow: var(--admin-shadow-md);
-}
-
-.admin-reservas-card h4 {
-  margin-bottom: 16px;
-  color: var(--admin-text-dark);
-  font-size: 1.05rem;
+.admin-rol-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
   font-weight: 700;
+  text-transform: capitalize;
+}
+
+.admin-rol-admin {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #15803d; /* Verde oscuro */
+}
+
+.admin-rol-usuario {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8; /* Azul */
 }
 
 /* ===========================
@@ -303,10 +300,11 @@
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 24px;
-  background: white;
+  background: var(--admin-card-bg);
   padding: 18px;
   border-radius: var(--admin-radius);
   border: 1px solid var(--admin-border-light);
+  box-shadow: var(--admin-shadow-sm);
 }
 
 .admin-form-canchas input[type="text"],
@@ -315,7 +313,9 @@
   padding: 10px 12px;
   font-size: 0.92rem;
   border-radius: 10px;
-  border: 1px solid #dde1e6;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: var(--admin-text-dark);
   flex: 1 1 200px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
@@ -324,7 +324,7 @@
 .admin-form-canchas input[type="text"]:focus,
 .admin-form-canchas input[type="number"]:focus {
   border-color: var(--admin-primary);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
 }
 
 .admin-form-canchas button {
@@ -340,17 +340,15 @@
   font-weight: 600;
   font-size: 0.9rem;
   transition: background 0.25s ease, transform 0.2s ease;
-  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.25);
 }
 
 .admin-form-canchas button:hover {
   background-color: var(--admin-success-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(22, 160, 133, 0.35);
 }
 
 /* ===========================
-   BOTONES EDITAR / ELIMINAR (tabla)
+   BOTONES TABLA
 =========================== */
 .admin-edit-btn,
 .admin-delete-btn {
@@ -365,111 +363,71 @@
 }
 
 .admin-edit-btn {
-  color: var(--admin-primary);
-  background-color: rgba(52, 152, 219, 0.08);
+  color: var(--admin-blue);
+  background-color: rgba(59, 130, 246, 0.1);
 }
 
 .admin-edit-btn:hover {
-  background-color: var(--admin-primary);
+  background-color: var(--admin-blue);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
 }
 
 .admin-delete-btn {
   color: var(--admin-danger);
-  background-color: rgba(231, 76, 60, 0.08);
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 .admin-delete-btn:hover {
   background-color: var(--admin-danger);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
-}
-
-.admin-table-section table img {
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-/* ===========================
-   MENSAJE DE ERROR
-=========================== */
-.admin-error-box {
-  background-color: #fdecea;
-  color: var(--admin-danger-dark);
-  border: 1px solid #f5c6cb;
-  padding: 12px 16px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.92rem;
-}
-
-/* ===========================
-   BADGES DE ROL
-=========================== */
-.admin-rol-badge {
-  display: inline-block;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
-.admin-rol-admin {
-  background-color: rgba(155, 89, 182, 0.12);
-  color: #8e44ad;
-}
-
-.admin-rol-usuario {
-  background-color: rgba(52, 152, 219, 0.12);
-  color: #2980b9;
-}
-
-/* ===========================
-   BOTONES CONFIRMAR / CANCELAR (tabla reservas)
-=========================== */
-.admin-confirm-btn,
-.admin-cancel-btn {
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 6px;
-  transition: all 0.25s ease;
 }
 
 .admin-confirm-btn {
-  background-color: #1abc9c;
+  background-color: var(--admin-success);
   color: white;
-}
-
-.admin-confirm-btn:hover {
-  background-color: #16a085;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 .admin-cancel-btn {
-  background-color: #fdecea;
-  color: #c0392b;
-  border: 1px solid #f5c6cb;
-}
-
-.admin-cancel-btn:hover {
-  background-color: #e74c3c;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--admin-danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 /* ===========================
-   MODAL (editar usuario / canchas)
+   GRID DE RESERVAS
+=========================== */
+.admin-reservas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.admin-reservas-card {
+  background-color: var(--admin-card-bg);
+  padding: 22px;
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow-sm);
+  border: 1px solid var(--admin-border-light);
+}
+
+.admin-reservas-card h4 {
+  margin-bottom: 16px;
+  color: var(--admin-text-dark);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* ===========================
+   MODAL
 =========================== */
 .admin-modal-overlay {
   position: fixed;
@@ -477,34 +435,21 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(2px);
-  animation: adminFadeIn 0.2s ease;
-}
-
-@keyframes adminFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  backdrop-filter: blur(3px);
 }
 
 .admin-modal-box {
-  background: #ffffff;
+  background: var(--admin-card-bg-solid);
+  border: 1px solid var(--admin-border-light);
   border-radius: 12px;
   width: 100%;
   max-width: 420px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
-  animation: adminSlideUp 0.25s ease;
-}
-
-@keyframes adminSlideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .admin-modal-header {
@@ -512,32 +457,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px 22px;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid var(--admin-border-light);
 }
 
 .admin-modal-header h3 {
   margin: 0;
   font-size: 1.15rem;
-  color: #1f2937;
-}
-
-.admin-modal-close {
-  background: none;
-  border: none;
-  font-size: 1.1rem;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.admin-modal-close:hover {
-  background: #f3f4f6;
-  color: #111827;
+  color: var(--admin-text-dark);
 }
 
 .admin-modal-body {
@@ -547,90 +473,12 @@
   padding: 20px 22px;
 }
 
-.admin-modal-body label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #374151;
-  margin-top: 10px;
-}
-
-.admin-modal-body label:first-child {
-  margin-top: 0;
-}
-
-.admin-modal-body input[type="text"],
-.admin-modal-body input[type="number"],
-.admin-modal-body input[type="file"] {
-  padding: 9px 12px;
+.admin-modal-body input, .admin-modal-select {
+  padding: 10px 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.admin-modal-body input[type="text"]:focus,
-.admin-modal-body input[type="number"]:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.admin-modal-body input[type="file"] {
-  padding: 6px;
-  cursor: pointer;
-  background: #f9fafb;
-}
-
-.admin-modal-body p {
-  margin: 10px 0 4px;
-  font-size: 0.82rem;
-  color: #6b7280;
-}
-
-.admin-modal-body img {
-  display: block;
-  max-width: 100%;
-  border: 1px solid #e5e7eb;
-}
-
-.admin-modal-user-name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 2px;
-}
-
-.admin-modal-user-email {
-  font-size: 0.88rem;
-  color: #8b95a1;
-  margin: 0 0 20px;
-}
-
-.admin-modal-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.admin-modal-select {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid #dde1e6;
-  font-size: 0.95rem;
-  color: #1f2937;
-  background: white;
-  cursor: pointer;
-  outline: none;
-  transition: 0.2s ease;
-  box-sizing: border-box;
-}
-
-.admin-modal-select:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+  background: #ffffff;
+  color: var(--admin-text-dark);
 }
 
 .admin-modal-footer {
@@ -638,41 +486,25 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 22px;
-  border-top: 1px solid #eaeaea;
-}
-
-.admin-modal-cancel-btn,
-.admin-modal-save-btn {
-  padding: 9px 18px;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  border-top: 1px solid var(--admin-border-light);
 }
 
 .admin-modal-cancel-btn {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-.admin-modal-cancel-btn:hover {
   background: #e5e7eb;
+  color: #374151;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 .admin-modal-save-btn {
-  background: #2563eb;
+  background: var(--admin-success);
   color: #ffffff;
-}
-
-.admin-modal-save-btn:hover {
-  background: #1d4ed8;
-}
-
-.admin-modal-cancel-btn:active,
-.admin-modal-save-btn:active {
-  transform: scale(0.97);
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 /* ===========================
@@ -688,6 +520,8 @@
     flex-direction: row;
     overflow-x: auto;
     padding: 14px;
+    border-right: none;
+    border-bottom: 1px solid var(--admin-border-light);
   }
 
   .admin-sidebar h2 {
@@ -706,4 +540,281 @@
   .admin-reservas-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ===========================
+   PANEL DE ESTADÍSTICAS
+=========================== */
+.admin-statistics-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.stats-header h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--admin-text-dark);
+}
+
+.stats-header p {
+  margin: 4px 0 0 0;
+  color: var(--admin-text-muted);
+  font-size: 0.9rem;
+}
+
+/* FILTROS DE TIEMPO */
+.time-filter-group {
+  background: #ffffff;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--admin-border-light);
+  display: flex;
+  gap: 4px;
+  box-shadow: var(--admin-shadow-sm);
+}
+
+.filter-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  color: var(--admin-text-dark);
+}
+
+.filter-btn.active {
+  background-color: var(--admin-primary); /* Verde */
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* KPIS (TARJETAS CLAVE) */
+.stats-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: var(--admin-radius);
+  border: 1px solid var(--admin-border-light);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--admin-shadow-sm);
+}
+
+.kpi-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.kpi-card.green .kpi-icon { background: rgba(34, 197, 94, 0.12); color: #16a34a; }
+.kpi-card.blue .kpi-icon  { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+.kpi-card.yellow .kpi-icon{ background: rgba(245, 158, 11, 0.12); color: #d97706; }
+.kpi-card.purple .kpi-icon{ background: rgba(139, 92, 246, 0.12); color: #7c3aed; }
+
+.kpi-data span {
+  font-size: 0.82rem;
+  color: var(--admin-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.kpi-data h3 {
+  margin: 4px 0;
+  font-size: 1.5rem;
+  color: var(--admin-text-dark);
+}
+
+.trend {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.trend.up { color: #16a34a; }
+.trend.neutral { color: #6b7280; }
+
+/* GRID DE GRÁFICOS */
+.stats-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.chart-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: var(--admin-radius);
+  border: 1px solid var(--admin-border-light);
+  box-shadow: var(--admin-shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card.large {
+  grid-column: span 2; /* El gráfico de ingresos ocupa toda la fila */
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--admin-text-dark);
+}
+
+.badge-tag {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.badge-tag.green { background: rgba(34, 197, 94, 0.12); color: #15803d; }
+.badge-tag.purple { background: rgba(139, 92, 246, 0.12); color: #6d28d9; }
+.badge-tag.blue { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; }
+.badge-tag.yellow { background: rgba(245, 158, 11, 0.12); color: #b45309; }
+
+.chart-body {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .stats-charts-grid { grid-template-columns: 1fr; }
+  .chart-card.large { grid-column: span 1; }
+}
+/* ========= HOME ========= */
+
+.admin-welcome-card{
+    background:white;
+    border-radius:18px;
+    padding:28px;
+    margin-bottom:30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border:1px solid #e5e7eb;
+    box-shadow:var(--admin-shadow-sm);
+}
+
+.admin-welcome-card h2{
+    margin-bottom:8px;
+}
+
+.admin-welcome-card p{
+    color:#6b7280;
+}
+
+.admin-date-card{
+    text-align:right;
+}
+
+.admin-date-card span{
+    color:#9ca3af;
+    font-size:.9rem;
+}
+
+.admin-home-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:22px;
+    margin-top:10px;
+}
+
+.admin-home-card{
+    background:white;
+    border-radius:18px;
+    padding:22px;
+    border:1px solid #e5e7eb;
+    box-shadow:var(--admin-shadow-sm);
+}
+
+.admin-home-card h3{
+    margin-bottom:18px;
+}
+
+.admin-shortcuts{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+}
+
+.admin-shortcuts button{
+    border:none;
+    background:#16a34a;
+    color:white;
+    border-radius:12px;
+    padding:14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.admin-shortcuts button:hover{
+    background:#15803d;
+    transform:translateY(-2px);
+}
+
+.admin-home-card table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.admin-home-card th,
+.admin-home-card td{
+    padding:10px;
+    border-bottom:1px solid #eee;
+    text-align:left;
+}
+
+@media(max-width:900px){
+
+.admin-home-grid{
+    grid-template-columns:1fr;
+}
+
+.admin-welcome-card{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:20px;
+}
+
+.admin-date-card{
+    text-align:left;
+}
+
 }
