@@ -245,7 +245,7 @@ useEffect(() => {
                       <span className="precio-label">Por hora</span>
                       <span className="precio-actual">S/ {cancha.precio_hora}</span>
                     </div>
-
+              
                     <button
                       className="btn-reservar"
                       onClick={() => navigate("/login")}

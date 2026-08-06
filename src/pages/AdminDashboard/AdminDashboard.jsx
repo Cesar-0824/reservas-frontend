@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { Chart } from 'chart.js/auto';
 import './AdminDashboard.css';
 import {
   FaUsers,
@@ -13,7 +14,7 @@ import {
   FaEdit,
   FaTrash,
   FaTimes,
-  FaChartBar // 👈 Icono importado
+  FaChartBar
 } from "react-icons/fa";
 
 function AdminDashboard({ onLogout }) {
@@ -25,7 +26,7 @@ function AdminDashboard({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [editandoCancha, setEditandoCancha] = useState(null);
 
-  // 🆕 Estado para filtro de estadísticas
+  // Estado para filtro de estadísticas
   const [filtroTiempo, setFiltroTiempo] = useState('mes');
 
   // Estado para editar usuario
@@ -38,6 +39,16 @@ function AdminDashboard({ onLogout }) {
     precio: '',
     imagen: null
   });
+
+  // 👇 Refs para los canvas de los gráficos
+  const ingresosChartRef = useRef(null);
+  const deportesChartRef = useRef(null);
+  const horariosChartRef = useRef(null);
+
+  // 👇 Refs para guardar las instancias de Chart.js (y poder destruirlas)
+  const ingresosChartInstance = useRef(null);
+  const deportesChartInstance = useRef(null);
+  const horariosChartInstance = useRef(null);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('currentUser'));
@@ -69,6 +80,132 @@ function AdminDashboard({ onLogout }) {
 
     fetchData();
   }, [onLogout]);
+
+  // 👇 Función auxiliar para filtrar reservas según el filtro de tiempo elegido
+  const filtrarPorTiempo = (reservasList, filtro) => {
+    const ahora = new Date();
+    return reservasList.filter(r => {
+      if (!r.fechaReserva) return false;
+      const fecha = new Date(r.fechaReserva);
+      switch (filtro) {
+        case 'dia':
+          return fecha.toDateString() === ahora.toDateString();
+        case 'semana': {
+          const inicioSemana = new Date(ahora);
+          inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+          inicioSemana.setHours(0, 0, 0, 0);
+          return fecha >= inicioSemana;
+        }
+        case 'mes':
+          return fecha.getMonth() === ahora.getMonth() && fecha.getFullYear() === ahora.getFullYear();
+        case 'anio':
+          return fecha.getFullYear() === ahora.getFullYear();
+        default:
+          return true;
+      }
+    });
+  };
+
+  // 👇 useEffect que crea/actualiza los 3 gráficos cuando corresponde
+  useEffect(() => {
+    if (activeTab !== 'estadisticas' || !reservas.length) return;
+
+    const reservasFiltradas = filtrarPorTiempo(reservas, filtroTiempo);
+
+    // ===== GRÁFICO 1: Evolución de Ingresos (línea) =====
+    const ingresosPorFecha = {};
+    reservasFiltradas.forEach(r => {
+      if (r.estado !== 'pagada' && r.estado !== 'confirmada') return;
+      const fecha = r.fechaReserva;
+      ingresosPorFecha[fecha] = (ingresosPorFecha[fecha] || 0) + (Number(r.montoTotal) || 0);
+    });
+    const fechasOrdenadas = Object.keys(ingresosPorFecha).sort();
+
+    if (ingresosChartInstance.current) ingresosChartInstance.current.destroy();
+    if (ingresosChartRef.current) {
+      ingresosChartInstance.current = new Chart(ingresosChartRef.current.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: fechasOrdenadas,
+          datasets: [{
+            label: 'Ingresos (S/.)',
+            data: fechasOrdenadas.map(f => ingresosPorFecha[f]),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // ===== GRÁFICO 2: Popularidad por Deporte (dona) =====
+    const conteoPorTipo = {};
+    reservasFiltradas.forEach(r => {
+      const tipo = r.cancha?.tipo || 'Otro';
+      conteoPorTipo[tipo] = (conteoPorTipo[tipo] || 0) + 1;
+    });
+
+    if (deportesChartInstance.current) deportesChartInstance.current.destroy();
+    if (deportesChartRef.current) {
+      deportesChartInstance.current = new Chart(deportesChartRef.current.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(conteoPorTipo),
+          datasets: [{
+            data: Object.values(conteoPorTipo),
+            backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    // ===== GRÁFICO 3: Horarios Pico (barras) =====
+    const conteoPorHora = {};
+    reservasFiltradas.forEach(r => {
+      if (!r.horaInicio) return;
+      const hora = r.horaInicio.split(':')[0] + ':00';
+      conteoPorHora[hora] = (conteoPorHora[hora] || 0) + 1;
+    });
+    const horasOrdenadas = Object.keys(conteoPorHora).sort();
+
+    if (horariosChartInstance.current) horariosChartInstance.current.destroy();
+    if (horariosChartRef.current) {
+      horariosChartInstance.current = new Chart(horariosChartRef.current.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: horasOrdenadas,
+          datasets: [{
+            label: 'Reservas',
+            data: horasOrdenadas.map(h => conteoPorHora[h]),
+            backgroundColor: '#3b82f6'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // Limpieza al desmontar o antes de re-ejecutar el efecto
+    return () => {
+      if (ingresosChartInstance.current) ingresosChartInstance.current.destroy();
+      if (deportesChartInstance.current) deportesChartInstance.current.destroy();
+      if (horariosChartInstance.current) horariosChartInstance.current.destroy();
+    };
+  }, [activeTab, reservas, filtroTiempo]);
 
   const handleInputChange = e => {
     const { name, value } = e.target;
@@ -321,171 +458,171 @@ function AdminDashboard({ onLogout }) {
           <h3>Bienvenido, {adminName}</h3>
         </header>
 
-        {/* DASHBOARD */}
-{activeTab === 'Inicio' && (
-  <>
-    {/* Bienvenida */}
-    <section className="admin-welcome-card">
-      <div>
-        <h2>¡Bienvenido, {adminName}! 👋</h2>
-        <p>
-          Administra usuarios, reservas y canchas desde un solo lugar.
-          Aquí encontrarás un resumen general del sistema.
-        </p>
-      </div>
+        {/* INICIO */}
+        {activeTab === 'Inicio' && (
+          <>
+            {/* Bienvenida */}
+            <section className="admin-welcome-card">
+              <div>
+                <h2>¡Bienvenido, {adminName}! 👋</h2>
+                <p>
+                  Administra usuarios, reservas y canchas desde un solo lugar.
+                  Aquí encontrarás un resumen general del sistema.
+                </p>
+              </div>
 
-      <div className="admin-date-card">
-        <span>Fecha</span>
-        <h3>{new Date().toLocaleDateString("es-PE")}</h3>
-      </div>
-    </section>
+              <div className="admin-date-card">
+                <span>Fecha</span>
+                <h3>{new Date().toLocaleDateString("es-PE")}</h3>
+              </div>
+            </section>
 
-    {/* Resumen */}
-    <section className="admin-summary">
-      <div className="admin-summary-card">
-        <FaUsers className="icon" />
-        <h3>{usuarios?.length || 0}</h3>
-        <p>Usuarios Registrados</p>
-      </div>
+            {/* Resumen */}
+            <section className="admin-summary">
+              <div className="admin-summary-card">
+                <FaUsers className="icon" />
+                <h3>{usuarios?.length || 0}</h3>
+                <p>Usuarios Registrados</p>
+              </div>
 
-      <div className="admin-summary-card">
-        <FaFutbol className="icon" />
-        <h3>{canchas?.length || 0}</h3>
-        <p>Canchas Disponibles</p>
-      </div>
+              <div className="admin-summary-card">
+                <FaFutbol className="icon" />
+                <h3>{canchas?.length || 0}</h3>
+                <p>Canchas Disponibles</p>
+              </div>
 
-      <div className="admin-summary-card">
-        <FaCalendarCheck className="icon" />
-        <h3>{reservas?.length || 0}</h3>
-        <p>Reservas Totales</p>
-      </div>
+              <div className="admin-summary-card">
+                <FaCalendarCheck className="icon" />
+                <h3>{reservas?.length || 0}</h3>
+                <p>Reservas Totales</p>
+              </div>
 
-      <div className="admin-summary-card">
-        <FaClipboardList className="icon" />
-        <h3>
-          {reservas?.filter(r => r.estado === "pendiente").length || 0}
-        </h3>
-        <p>Reservas Pendientes</p>
-      </div>
+              <div className="admin-summary-card">
+                <FaClipboardList className="icon" />
+                <h3>
+                  {reservas?.filter(r => r.estado === "pendiente").length || 0}
+                </h3>
+                <p>Reservas Pendientes</p>
+              </div>
 
-      <div className="admin-summary-card">
-        <FaCalendarCheck className="icon" />
-        <h3>
-          {reservas?.filter(r => r.estado === "confirmada").length || 0}
-        </h3>
-        <p>Reservas Confirmadas</p>
-      </div>
-    </section>
+              <div className="admin-summary-card">
+                <FaCalendarCheck className="icon" />
+                <h3>
+                  {reservas?.filter(r => r.estado === "confirmada").length || 0}
+                </h3>
+                <p>Reservas Confirmadas</p>
+              </div>
+            </section>
 
-    {/* Panel inferior */}
-    <section className="admin-home-grid">
+            {/* Panel inferior */}
+            <section className="admin-home-grid">
 
-      {/* Accesos rápidos */}
-      <div className="admin-home-card">
-        <h3>⚡ Accesos rápidos</h3>
+              {/* Accesos rápidos */}
+              <div className="admin-home-card">
+                <h3>⚡ Accesos rápidos</h3>
 
-        <div className="admin-shortcuts">
+                <div className="admin-shortcuts">
 
-          <button onClick={() => setActiveTab("usuarios")}>
-            <FaUsers />
-            Usuarios
-          </button>
+                  <button onClick={() => setActiveTab("usuarios")}>
+                    <FaUsers />
+                    Usuarios
+                  </button>
 
-          <button onClick={() => setActiveTab("reservas")}>
-            <FaClipboardList />
-            Reservas
-          </button>
+                  <button onClick={() => setActiveTab("reservas")}>
+                    <FaClipboardList />
+                    Reservas
+                  </button>
 
-          <button onClick={() => setActiveTab("canchas")}>
-            <FaFutbol />
-            Canchas
-          </button>
+                  <button onClick={() => setActiveTab("canchas")}>
+                    <FaFutbol />
+                    Canchas
+                  </button>
 
-          <button onClick={() => setActiveTab("estadisticas")}>
-            <FaChartBar />
-            Estadísticas
-          </button>
+                  <button onClick={() => setActiveTab("estadisticas")}>
+                    <FaChartBar />
+                    Estadísticas
+                  </button>
 
-        </div>
-      </div>
+                </div>
+              </div>
 
-      {/* Últimas reservas */}
-      <div className="admin-home-card">
-        <h3>📅 Últimas Reservas</h3>
+              {/* Últimas reservas */}
+              <div className="admin-home-card">
+                <h3>📅 Últimas Reservas</h3>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Cancha</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Usuario</th>
+                      <th>Cancha</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
 
-          <tbody>
+                  <tbody>
 
-            {reservas
-              ?.slice(-5)
-              .reverse()
-              .map(r => (
-                <tr key={r.id}>
-                  <td>{r.usuario?.nombre}</td>
-                  <td>{r.cancha?.nombre}</td>
-                  <td>{r.estado}</td>
-                </tr>
-              ))}
+                    {reservas
+                      ?.slice(-5)
+                      .reverse()
+                      .map(r => (
+                        <tr key={r.id}>
+                          <td>{r.usuario?.nombre}</td>
+                          <td>{r.cancha?.nombre}</td>
+                          <td>{r.estado}</td>
+                        </tr>
+                      ))}
 
-          </tbody>
-        </table>
-      </div>
+                  </tbody>
+                </table>
+              </div>
 
-      {/* Estado del sistema */}
-      <div className="admin-home-card">
+              {/* Estado del sistema */}
+              <div className="admin-home-card">
 
-        <h3>🟢 Estado del Sistema</h3>
+                <h3>🟢 Estado del Sistema</h3>
 
-        <p>✔ API funcionando</p>
+                <p>✔ API funcionando</p>
 
-        <p>✔ Base de datos conectada</p>
+                <p>✔ Base de datos conectada</p>
 
-        <p>✔ Panel operativo</p>
+                <p>✔ Panel operativo</p>
 
-      </div>
+              </div>
 
-      {/* Resumen */}
-      <div className="admin-home-card">
+              {/* Resumen */}
+              <div className="admin-home-card">
 
-        <h3>📌 Resumen</h3>
+                <h3>📌 Resumen</h3>
 
-        <p>
-          Usuarios administradores:
-          <strong>
-            {" "}
-            {usuarios.filter(u => u.rol === "admin").length}
-          </strong>
-        </p>
+                <p>
+                  Usuarios administradores:
+                  <strong>
+                    {" "}
+                    {usuarios.filter(u => u.rol === "admin").length}
+                  </strong>
+                </p>
 
-        <p>
-          Usuarios normales:
-          <strong>
-            {" "}
-            {usuarios.filter(u => u.rol === "usuario").length}
-          </strong>
-        </p>
+                <p>
+                  Usuarios normales:
+                  <strong>
+                    {" "}
+                    {usuarios.filter(u => u.rol === "usuario").length}
+                  </strong>
+                </p>
 
-        <p>
-          Reservas canceladas:
-          <strong>
-            {" "}
-            {reservas.filter(r => r.estado === "cancelada").length}
-          </strong>
-        </p>
+                <p>
+                  Reservas canceladas:
+                  <strong>
+                    {" "}
+                    {reservas.filter(r => r.estado === "cancelada").length}
+                  </strong>
+                </p>
 
-      </div>
+              </div>
 
-    </section>
-  </>
-)}
+            </section>
+          </>
+        )}
 
         {/* ESTADÍSTICAS Y GRÁFICOS */}
         {activeTab === 'estadisticas' && (
@@ -516,7 +653,7 @@ function AdminDashboard({ onLogout }) {
                   <span className="badge-tag green">Ganancias ($)</span>
                 </div>
                 <div className="chart-body">
-                  <canvas id="ingresosChart"></canvas>
+                  <canvas ref={ingresosChartRef}></canvas>
                 </div>
               </div>
 
@@ -526,7 +663,7 @@ function AdminDashboard({ onLogout }) {
                   <span className="badge-tag purple">Reservas</span>
                 </div>
                 <div className="chart-body">
-                  <canvas id="deportesChart"></canvas>
+                  <canvas ref={deportesChartRef}></canvas>
                 </div>
               </div>
 
@@ -536,7 +673,7 @@ function AdminDashboard({ onLogout }) {
                   <span className="badge-tag blue">Afluencia</span>
                 </div>
                 <div className="chart-body">
-                  <canvas id="horariosChart"></canvas>
+                  <canvas ref={horariosChartRef}></canvas>
                 </div>
               </div>
             </div>
