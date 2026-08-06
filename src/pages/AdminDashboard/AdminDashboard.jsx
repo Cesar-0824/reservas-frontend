@@ -26,6 +26,9 @@ function AdminDashboard({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [editandoCancha, setEditandoCancha] = useState(null); 
   const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
+  const [reservaACancelar, setReservaACancelar] = useState(null);
+const [motivoCancelacion, setMotivoCancelacion] = useState("Trabajo");
+const [notaCancelacion, setNotaCancelacion] = useState("");
 
   // Estado para filtro de estadísticas
   const [filtroTiempo, setFiltroTiempo] = useState('mes');
@@ -720,55 +723,148 @@ const tituloPorTab = {
           </section>
         )}
 
-        {/* RESERVAS */}
-        {activeTab === 'reservas' && (
-          <section className="admin-table-section">
-            <h3>Reservas por Estado</h3>
-            <div className="admin-reservas-grid">
-              {["pendiente", "confirmada", "cancelada"].map(estado => (
-                <div className="admin-reservas-card" key={estado}>
-                  <h4>{estado.charAt(0).toUpperCase() + estado.slice(1)}</h4>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Usuario</th><th>Cancha</th><th>Fecha</th><th>Inicio</th><th>Fin</th><th>Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {reservas.filter(r => r.estado === estado).map(r => (
-                        <tr key={r.id}>
-                          <td>{r.usuario?.nombre}</td>
-                          <td>{r.cancha?.nombre}</td>
-                          <td>{r.fechaReserva}</td>
-                          <td>{r.horaInicio}</td>
-                          <td>{r.horaFin}</td>
-                          <td>
-                            {estado === "pendiente" && (
-                              <>
-                                <button className="admin-confirm-btn" onClick={() => handleCambiarEstadoReserva(r.id, "confirmada")} title="Confirmar reserva">
-                                  Confirmar
-                                </button>
-                                <button className="admin-cancel-btn" onClick={() => handleCambiarEstadoReserva(r.id, "cancelada")} title="Cancelar reserva">
-                                  Cancelar
-                                </button>
-                              </>
-                            )}
-                            {estado === "confirmada" && (
-                              <button className="admin-cancel-btn" onClick={() => handleCambiarEstadoReserva(r.id, "cancelada")} title="Cancelar reserva">
-                                Cancelar
-                              </button>
-                            )}
-                            {estado === "cancelada" && <em>No hay acciones</em>}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+{/* RESERVAS */}
+{activeTab === 'reservas' && (
+  <section className="admin-reservas-section">
+    <h3>Reservas por Estado</h3>
+    <div className="admin-reservas-grid">
+      {["pendiente", "confirmada", "pagada", "cancelada"].map(estado => (
+        <div className="admin-reservas-card" key={estado}>
+          <div className="admin-reservas-card-header">
+            <h4>{estado.charAt(0).toUpperCase() + estado.slice(1)}</h4>
+            <span className={`admin-reservas-badge badge-${estado}`}>
+              {reservas.filter(r => r.estado === estado).length}
+            </span>
+          </div>
+          <table className="admin-reservas-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Cancha</th>
+                <th>Fecha</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Acciones / Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservas.filter(r => r.estado === estado).length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="admin-reservas-empty">Sin reservas en este estado</td>
+                </tr>
+              ) : (
+                reservas.filter(r => r.estado === estado).map(r => (
+                  <tr key={r.id}>
+                    <td>{r.usuario?.nombre}</td>
+                    <td>{r.cancha?.nombre}</td>
+                    <td>{r.fechaReserva}</td>
+                    <td>{r.horaInicio}</td>
+                    <td>{r.horaFin}</td>
+                    <td>
+                      {/* ESTADO: PENDIENTE */}
+                      {estado === "pendiente" && (
+                        <div className="admin-reservas-actions">
+                          <button className="admin-btn-confirmar" onClick={() => handleCambiarEstadoReserva(r.id, "confirmada")}>
+                            Confirmar
+                          </button>
+                          <button className="admin-btn-cancelar" onClick={() => setReservaACancelar(r)}>
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* ESTADO: CONFIRMADA (Esperando pago del cliente) */}
+                      {estado === "confirmada" && (
+                        <div className="admin-reservas-actions">
+                          <span className="admin-text-warning">⏳ Esperando pago del usuario</span>
+                          <button className="admin-btn-cancelar" onClick={() => setReservaACancelar(r)}>
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* ESTADO: PAGADA (Actualizado automáticamente cuando el usuario paga) */}
+                      {estado === "pagada" && (
+                        <span className="admin-text-success">✔ Pagado por el usuario</span>
+                      )}
+
+                      {/* ESTADO: CANCELADA */}
+                      {estado === "cancelada" && (
+                        <span className="admin-text-muted">
+                          {r.motivoCancelacion ? `Motivo: ${r.motivoCancelacion}` : "Cancelada"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </div>
+
+    {/* MODAL DE CANCELACIÓN CON OPCIONES Y NOTA PARA EL USUARIO */}
+    {reservaACancelar && (
+      <div className="admin-canchas-modal-overlay" onClick={() => setReservaACancelar(null)}>
+        <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-canchas-modal-header">
+            <h3>Cancelar Reserva</h3>
+            <button className="admin-canchas-modal-close" onClick={() => setReservaACancelar(null)}>✕</button>
+          </div>
+          <div className="admin-canchas-modal-body">
+            <p><strong>Usuario:</strong> {reservaACancelar.usuario?.nombre}</p>
+            <p><strong>Cancha:</strong> {reservaACancelar.cancha?.nombre} ({reservaACancelar.fechaReserva})</p>
+            
+            <label>Selecciona el motivo principal:</label>
+            <select 
+              className="admin-reservas-select"
+              value={motivoCancelacion} 
+              onChange={(e) => setMotivoCancelacion(e.target.value)}
+            >
+              <option value="Trabajo">Motivos de Trabajo</option>
+              <option value="Estudio">Motivos de Estudio</option>
+              <option value="Mantenimiento">Mantenimiento de Cancha</option>
+              <option value="Clima">Condiciones Climáticas</option>
+              <option value="Personal / Salud">Salud / Emergencia Personal</option>
+              <option value="Otro">Otro motivo</option>
+            </select>
+
+            <label>Mensaje / Detalle para el usuario:</label>
+            <textarea 
+              rows="3"
+              className="admin-reservas-textarea"
+              placeholder="Escribe la razón que se le notificará al usuario..."
+              value={notaCancelacion}
+              onChange={(e) => setNotaCancelacion(e.target.value)}
+            />
+          </div>
+          <div className="admin-canchas-modal-footer">
+            <button 
+              type="button" 
+              className="admin-canchas-modal-cancel-btn" 
+              onClick={() => setReservaACancelar(null)}
+            >
+              Volver
+            </button>
+            <button 
+              type="button" 
+              className="admin-btn-modal-cancel-confirm"
+              onClick={() => {
+                const detalleFinal = `${motivoCancelacion}${notaCancelacion ? `: ${notaCancelacion}` : ''}`;
+                handleCambiarEstadoReserva(reservaACancelar.id, "cancelada", detalleFinal);
+                setReservaACancelar(null);
+                setNotaCancelacion("");
+              }}
+            >
+              Confirmar Cancelación
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </section>
+)}
 
         {/* CANCHAS */}
 {activeTab === "canchas" && (
@@ -776,7 +872,7 @@ const tituloPorTab = {
     {/* ENCABEZADO CON TÍTULO, METRICAS Y BOTÓN PRINCIPAL */}
     <div className="admin-canchas-header">
       <div>
-        <h2>Canchas</h2>
+        
         <p className="admin-canchas-subtitle">
           {canchas.length} registradas
         </p>
@@ -786,7 +882,7 @@ const tituloPorTab = {
         onClick={() => {
           setNuevaCancha({ nombre: '', tipo: '', precio: '', imagen: null });
           setModalCrearAbierto(true);
-        }}
+        }}  
       >
         <FaPlus /> Agregar cancha
       </button>
