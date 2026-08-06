@@ -21,7 +21,7 @@ function AdminDashboard({ onLogout }) {
   const [usuarios, setUsuarios] = useState([]);
   const [canchas, setCanchas] = useState([]);
   const [reservas, setReservas] = useState([]);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('Inicio');
   const [adminName, setAdminName] = useState('');
   const [loading, setLoading] = useState(true);
   const [editandoCancha, setEditandoCancha] = useState(null);
@@ -402,7 +402,13 @@ function AdminDashboard({ onLogout }) {
       alert("No se pudo actualizar el estado de la reserva.");
     }
   };
-
+const tituloPorTab = {
+  Inicio: 'Inicio',
+  estadisticas: 'Estadísticas',
+  usuarios: 'Usuarios',
+  reservas: 'Reservas',
+  canchas: 'Canchas'
+};
   if (loading) return <div className="admin-loading">Cargando panel de administración...</div>;
 
   return (
@@ -455,8 +461,8 @@ function AdminDashboard({ onLogout }) {
       {/* 2. PANEL CONTENEDOR PRINCIPAL */}
       <div className="admin-content">
         <header className="admin-header">
-          <h3>Bienvenido, {adminName}</h3>
-        </header>
+  <h3>{tituloPorTab[activeTab] || 'Panel'}</h3>
+</header>
 
         {/* INICIO */}
         {activeTab === 'Inicio' && (
