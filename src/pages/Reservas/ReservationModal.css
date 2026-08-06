@@ -24,6 +24,14 @@
   position: relative;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   animation: slideIn 0.3s ease;
+  color: #111827;
+}
+
+.modal-content h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111827;
 }
 
 /* --- Botón para cerrar --- */
@@ -49,6 +57,26 @@
   align-items: center;
   gap: 10px;
   font-size: 15px;
+  color: #111827;
+}
+
+.modal-detail-item strong {
+  color: #111827;
+}
+
+.modal-detail-item label {
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-detail-item input[type="number"] {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #111827;
+  width: 70px;
 }
 
 /* --- Acciones (botones) --- */
@@ -68,6 +96,7 @@
   background-color: #ccc;
   border-radius: 6px;
   transition: background-color 0.2s ease;
+  color: #111827;
 }
 .modal-cancel-btn:hover {
   background-color: #bbb;
