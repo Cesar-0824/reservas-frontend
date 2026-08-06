@@ -24,7 +24,8 @@ function AdminDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState('Inicio');
   const [adminName, setAdminName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [editandoCancha, setEditandoCancha] = useState(null);
+  const [editandoCancha, setEditandoCancha] = useState(null); 
+  const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
 
   // Estado para filtro de estadísticas
   const [filtroTiempo, setFiltroTiempo] = useState('mes');
@@ -770,77 +771,179 @@ const tituloPorTab = {
         )}
 
         {/* CANCHAS */}
-        {activeTab === "canchas" && (
-          <section className="admin-table-section">
-            <h3>Gestión de Canchas</h3>
-            <form className="admin-form-canchas" onSubmit={handleAgregarCancha}>
-              <input type="text" name="nombre" placeholder="Nombre de la cancha" value={nuevaCancha.nombre} onChange={handleInputChange} required />
-              <input type="text" name="tipo" placeholder="Tipo de cancha (Fútbol, Vóley...)" value={nuevaCancha.tipo} onChange={handleInputChange} required />
-              <input type="number" name="precio" placeholder="Precio por hora" value={nuevaCancha.precio} onChange={handleInputChange} required />
-              <input type="file" accept="image/*" onChange={handleImageChange} />
-              <button type="submit"><FaPlus /> Agregar Cancha</button>
-            </form>
+{activeTab === "canchas" && (
+  <section className="admin-canchas-section">
+    {/* ENCABEZADO CON TÍTULO, METRICAS Y BOTÓN PRINCIPAL */}
+    <div className="admin-canchas-header">
+      <div>
+        <h2>Canchas</h2>
+        <p className="admin-canchas-subtitle">
+          {canchas.length} registradas
+        </p>
+      </div>
+      <button 
+        className="admin-canchas-btn-agregar" 
+        onClick={() => {
+          setNuevaCancha({ nombre: '', tipo: '', precio: '', imagen: null });
+          setModalCrearAbierto(true);
+        }}
+      >
+        <FaPlus /> Agregar cancha
+      </button>
+    </div>
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Nombre</th><th>Tipo</th><th>Precio</th><th>Imagen</th><th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {canchas.map((c) => (
-                  <tr key={c.id}>
-                    <td>{c.nombre}</td>
-                    <td>{c.tipo}</td>
-                    <td>S/. {c.precio_hora ?? c.precio}</td>
-                    <td>
-                      {c.imagen ? <img src={c.imagen} alt={c.nombre} height="45" /> : "Sin imagen"}
-                    </td>
-                    <td>
-                      <button className="admin-edit-btn" onClick={() => handleEditarCancha(c)} title="Editar cancha"><FaEdit /></button>
-                      <button className="admin-delete-btn" onClick={() => handleEliminarCancha(c.id)} title="Eliminar cancha"><FaTrash /></button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        )}
+    {/* GRID DE TARJETAS DE CANCHAS */}
+    <div className="admin-canchas-grid">
+      {canchas.map((c) => (
+        <div key={c.id} className="admin-canchas-card">
+          {/* IMAGEN DE LA CANCHA */}
+          <div className="admin-canchas-card-image-container">
+            {c.imagen ? (
+              <img src={c.imagen} alt={c.nombre} className="admin-canchas-card-image" />
+            ) : (
+              <div className="admin-canchas-card-no-image">Sin Imagen</div>
+            )}
+          </div>
 
-        {/* MODAL EDITAR CANCHA */}
-        {editandoCancha && (
-          <div className="admin-modal-overlay" onClick={() => setEditandoCancha(null)}>
-            <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
-              <div className="admin-modal-header">
-                <h3>Editar Cancha</h3>
-                <button className="admin-modal-close" onClick={() => setEditandoCancha(null)}><FaTimes /></button>
-              </div>
-              <form onSubmit={handleActualizarCancha}>
-                <div className="admin-modal-body">
-                  <label>Nombre</label>
-                  <input type="text" name="nombre" value={nuevaCancha.nombre} onChange={handleInputChange} required />
-                  <label>Tipo</label>
-                  <input type="text" name="tipo" value={nuevaCancha.tipo} onChange={handleInputChange} required />
-                  <label>Precio por hora</label>
-                  <input type="number" name="precio" value={nuevaCancha.precio} onChange={handleInputChange} required />
-                  <label>Cambiar imagen</label>
-                  <input type="file" accept="image/*" onChange={handleImageChange} />
-                  {editandoCancha.imagen && (
-                    <>
-                      <p>Imagen actual</p>
-                      <img src={editandoCancha.imagen} alt="Cancha" width="220" style={{ borderRadius: "10px", marginTop: "10px" }} />
-                    </>
-                  )}
-                </div>
-                <div className="admin-modal-footer">
-                  <button type="button" className="admin-modal-cancel-btn" onClick={() => setEditandoCancha(null)}>Cancelar</button>
-                  <button type="submit" className="admin-modal-save-btn">Guardar Cambios</button>
-                </div>
-              </form>
+          {/* DETALLES DE LA CANCHA */}
+          <div className="admin-canchas-card-content">
+            <div className="admin-canchas-card-header">
+              <h4 className="admin-canchas-card-title">{c.nombre}</h4>
+              <span className="admin-canchas-card-price">
+                S/ {c.precio_hora ?? c.precio}/h
+              </span>
+            </div>
+
+            <p className="admin-canchas-card-subtext">
+              ⚽ {c.tipo}
+            </p>
+
+            {/* ACCIONES Y BOTONES */}
+            <div className="admin-canchas-card-actions">
+              <button 
+                className="admin-canchas-btn-edit" 
+                onClick={() => handleEditarCancha(c)}
+              >
+                <FaEdit /> Editar
+              </button>
+              <button 
+                className="admin-canchas-btn-delete" 
+                onClick={() => handleEliminarCancha(c.id)}
+              >
+                <FaTrash /> Eliminar
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+{/* MODAL PARA AGREGAR NUEVA CANCHA */}
+{modalCrearAbierto && (
+  <div className="admin-canchas-modal-overlay" onClick={() => setModalCrearAbierto(false)}>
+    <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
+      <div className="admin-canchas-modal-header">
+        <h3>Agregar Nueva Cancha</h3>
+        <button className="admin-canchas-modal-close" onClick={() => setModalCrearAbierto(false)}>
+          <FaTimes />
+        </button>
       </div>
+      <form onSubmit={(e) => {
+        handleAgregarCancha(e);
+        setModalCrearAbierto(false);
+      }}>
+        <div className="admin-canchas-modal-body">
+          <label>Nombre de la cancha</label>
+          <input 
+            type="text" 
+            name="nombre" 
+            placeholder="Ej: Cancha Central" 
+            value={nuevaCancha.nombre} 
+            onChange={handleInputChange} 
+            required 
+          />
+
+          <label>Tipo de cancha</label>
+          <input 
+            type="text" 
+            name="tipo" 
+            placeholder="Ej: Fútbol - Césped Sintético" 
+            value={nuevaCancha.tipo} 
+            onChange={handleInputChange} 
+            required 
+          />
+
+          <label>Precio por hora (S/)</label>
+          <input 
+            type="number" 
+            name="precio" 
+            placeholder="Ej: 85" 
+            value={nuevaCancha.precio} 
+            onChange={handleInputChange} 
+            required 
+          />
+
+          <label>Imagen de la cancha</label>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+        </div>
+        <div className="admin-canchas-modal-footer">
+          <button 
+            type="button" 
+            className="admin-canchas-modal-cancel-btn" 
+            onClick={() => setModalCrearAbierto(false)}
+          >
+            Cancelar
+          </button>
+          <button type="submit" className="admin-canchas-modal-save-btn">
+            Guardar Cancha
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+{/* MODAL EDITAR CANCHA */}
+{editandoCancha && (
+  <div className="admin-canchas-modal-overlay" onClick={() => setEditandoCancha(null)}>
+    <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
+      <div className="admin-canchas-modal-header">
+        <h3>Editar Cancha</h3>
+        <button className="admin-canchas-modal-close" onClick={() => setEditandoCancha(null)}>
+          <FaTimes />
+        </button>
+      </div>
+      <form onSubmit={handleActualizarCancha}>
+        <div className="admin-canchas-modal-body">
+          <label>Nombre</label>
+          <input type="text" name="nombre" value={nuevaCancha.nombre} onChange={handleInputChange} required />
+          
+          <label>Tipo</label>
+          <input type="text" name="tipo" value={nuevaCancha.tipo} onChange={handleInputChange} required />
+          
+          <label>Precio por hora</label>
+          <input type="number" name="precio" value={nuevaCancha.precio} onChange={handleInputChange} required />
+          
+          <label>Cambiar imagen</label>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {editandoCancha.imagen && (
+            <>
+              <p className="admin-canchas-preview-text">Imagen actual:</p>
+              <img src={editandoCancha.imagen} alt="Cancha" className="admin-canchas-preview-img" />
+            </>
+          )}
+        </div>
+        <div className="admin-canchas-modal-footer">
+          <button type="button" className="admin-canchas-modal-cancel-btn" onClick={() => setEditandoCancha(null)}>Cancelar</button>
+          <button type="submit" className="admin-canchas-modal-save-btn">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+</div>
 
       {/* MODAL EDITAR USUARIO */}
       {editandoUsuario && (
