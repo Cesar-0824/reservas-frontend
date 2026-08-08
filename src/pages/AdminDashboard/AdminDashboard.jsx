@@ -24,18 +24,30 @@ function AdminDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState('Inicio');
   const [adminName, setAdminName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [editandoCancha, setEditandoCancha] = useState(null); 
+  const [editandoCancha, setEditandoCancha] = useState(null);
   const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
-  const [reservaACancelar, setReservaACancelar] = useState(null);
-const [motivoCancelacion, setMotivoCancelacion] = useState("Trabajo");
-const [notaCancelacion, setNotaCancelacion] = useState("");
-
+  const [detalleCancelacion, setDetalleCancelacion] = useState(null);
+  const [mostrarModalCancelar, setMostrarModalCancelar] = useState(false);
+  const [reservaCancelar, setReservaCancelar] = useState(null);
+  const [motivoAdmin, setMotivoAdmin] = useState("Mantenimiento de la cancha");
+  const [observacionAdmin, setObservacionAdmin] = useState("");
   // Estado para filtro de estadísticas
   const [filtroTiempo, setFiltroTiempo] = useState('mes');
 
   // Estado para editar usuario
   const [editandoUsuario, setEditandoUsuario] = useState(null);
   const [nuevoRol, setNuevoRol] = useState('');
+
+  const abrirModalCancelar = (reserva) => {
+    setReservaCancelar(reserva);
+    setMostrarModalCancelar(true);
+  };
+  const cerrarModalCancelar = () => {
+    setMostrarModalCancelar(false);
+    setReservaCancelar(null);
+    setMotivoAdmin("Mantenimiento de la cancha");
+    setObservacionAdmin("");
+  };
 
   const [nuevaCancha, setNuevaCancha] = useState({
     nombre: '',
@@ -294,7 +306,7 @@ const [notaCancelacion, setNotaCancelacion] = useState("");
         `http://localhost:8080/api/canchas/actualizar/${editandoCancha.id}`,
         formData,
         { headers }
-      ); 
+      );
 
       setCanchas(prev =>
         prev.map(c => c.id === res.data.id ? res.data : c)
@@ -406,13 +418,63 @@ const [notaCancelacion, setNotaCancelacion] = useState("");
       alert("No se pudo actualizar el estado de la reserva.");
     }
   };
-const tituloPorTab = {
-  Inicio: 'Inicio',
-  estadisticas: 'Estadísticas',
-  usuarios: 'Usuarios',
-  reservas: 'Reservas',
-  canchas: 'Canchas'
-};
+
+  // 👇 NUEVO: confirma la cancelación con motivo, observación y quién canceló
+  const handleConfirmarCancelacion = async () => {
+    if (!reservaCancelar) return;
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const reservaActualizada = {
+        ...reservaCancelar,
+        estado: "cancelada",
+        motivoCancelacion: motivoAdmin,
+        observacionCancelacion: observacionAdmin,
+        canceladoPor: "admin"
+      };
+
+      await axios.put(
+        `http://localhost:8080/api/reservas/actualizar/${reservaCancelar.id}`,
+        reservaActualizada,
+        { headers }
+      );
+
+      setReservas(prev =>
+        prev.map(r =>
+          r.id === reservaCancelar.id
+            ? {
+                ...r,
+                estado: "cancelada",
+                motivoCancelacion: motivoAdmin,
+                observacionCancelacion: observacionAdmin,
+                canceladoPor: "admin"
+              }
+            : r
+        )
+      );
+
+      alert("Reserva cancelada correctamente.");
+      cerrarModalCancelar();
+    } catch (err) {
+      console.error("Error al cancelar reserva:", err);
+      alert("No se pudo cancelar la reserva.");
+    }
+  };
+
+  const tituloPorTab = {
+    Inicio: 'Inicio',
+    estadisticas: 'Estadísticas',
+    usuarios: 'Usuarios',
+    reservas: 'Reservas',
+    canchas: 'Canchas'
+  };
+
+  const handleVerDetalleCancelacion = (reserva) => {
+    setDetalleCancelacion(reserva);
+  };
+
   if (loading) return <div className="admin-loading">Cargando panel de administración...</div>;
 
   return (
@@ -421,36 +483,36 @@ const tituloPorTab = {
       <aside className="admin-sidebar">
         <h2>Admin Panel</h2>
         <div className="admin-nav">
-          <button 
-            onClick={() => setActiveTab('Inicio')} 
+          <button
+            onClick={() => setActiveTab('Inicio')}
             className={activeTab === 'Inicio' ? 'active' : ''}
           >
             <FaTachometerAlt /> Inicio
           </button>
 
-          <button 
-            onClick={() => setActiveTab('estadisticas')} 
+          <button
+            onClick={() => setActiveTab('estadisticas')}
             className={activeTab === 'estadisticas' ? 'active' : ''}
           >
             <FaChartBar /> Estadísticas
           </button>
 
-          <button 
-            onClick={() => setActiveTab('usuarios')} 
+          <button
+            onClick={() => setActiveTab('usuarios')}
             className={activeTab === 'usuarios' ? 'active' : ''}
           >
             <FaUserFriends /> Usuarios
           </button>
 
-          <button 
-            onClick={() => setActiveTab('reservas')} 
+          <button
+            onClick={() => setActiveTab('reservas')}
             className={activeTab === 'reservas' ? 'active' : ''}
           >
             <FaClipboardList /> Reservas
           </button>
 
-          <button 
-            onClick={() => setActiveTab('canchas')} 
+          <button
+            onClick={() => setActiveTab('canchas')}
             className={activeTab === 'canchas' ? 'active' : ''}
           >
             <FaFutbol /> Canchas
@@ -465,8 +527,8 @@ const tituloPorTab = {
       {/* 2. PANEL CONTENEDOR PRINCIPAL */}
       <div className="admin-content">
         <header className="admin-header">
-  <h3>{tituloPorTab[activeTab] || 'Panel'}</h3>
-</header>
+          <h3>{tituloPorTab[activeTab] || 'Panel'}</h3>
+        </header>
 
         {/* INICIO */}
         {activeTab === 'Inicio' && (
@@ -724,322 +786,403 @@ const tituloPorTab = {
         )}
 
 {/* RESERVAS */}
-{activeTab === 'reservas' && (
-  <section className="admin-reservas-section">
-    <h3>Reservas por Estado</h3>
+{activeTab === "reservas" && (
+  <section className="admin-table-section">
+    <h3>Gestión de Reservas</h3>
+
     <div className="admin-reservas-grid">
-      {["pendiente", "confirmada", "pagada", "cancelada"].map(estado => (
-        <div className="admin-reservas-card" key={estado}>
-          <div className="admin-reservas-card-header">
-            <h4>{estado.charAt(0).toUpperCase() + estado.slice(1)}</h4>
-            <span className={`admin-reservas-badge badge-${estado}`}>
-              {reservas.filter(r => r.estado === estado).length}
-            </span>
+      {["pendiente", "confirmada", "pagada", "cancelada"].map((estado) => {
+        const reservasEstado = reservas.filter(
+          (r) => r.estado === estado
+        );
+
+        return (
+          <div className="admin-reservas-card" key={estado}>
+            <h4>
+              {estado.charAt(0).toUpperCase() + estado.slice(1)}{" "}
+              <span>({reservasEstado.length})</span>
+            </h4>
+
+            {reservasEstado.length === 0 ? (
+              <p className="admin-empty-state">
+                No hay reservas {estado}s.
+              </p>
+            ) : (
+              <div className="admin-table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Usuario</th>
+                      <th>Cancha</th>
+                      <th>Fecha</th>
+                      <th>Horario</th>
+
+                      {/* PAGO SOLO EN PENDIENTE Y CONFIRMADA */}
+                      {(estado === "pendiente" ||
+                        estado === "confirmada") && <th>Pago</th>}
+
+                      {/* CANCELADO POR SOLO EN CANCELADAS */}
+                      {estado === "cancelada" && <th>Cancelado por</th>}
+
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {reservasEstado.map((r) => (
+                      <tr key={r.id}>
+                        <td>{r.usuario?.nombre}</td>
+                        <td>{r.cancha?.nombre}</td>
+                        <td>{r.fechaReserva}</td>
+                        <td>
+                          {r.horaInicio} - {r.horaFin}
+                        </td>
+
+                        {/* PAGO */}
+                        {(estado === "pendiente" ||
+                          estado === "confirmada") && (
+                          <td>
+                            <span className="badge badge-sin-pago">
+                              Pendiente
+                            </span>
+                          </td>
+                        )}
+
+                        {/* CANCELADO POR */}
+                        {estado === "cancelada" && (
+                          <td>
+                            <span
+                              className={
+                                r.canceladoPor === "cliente"
+                                  ? "badge badge-sin-pago"
+                                  : "badge badge-admin"
+                              }
+                            >
+                              {r.canceladoPor === "cliente"
+                                ? "Cliente"
+                                : "Admin"}
+                            </span>
+                          </td>
+                        )}
+
+                        {/* ACCIONES */}
+                        <td>
+                          <div className="admin-actions-cell">
+                            {/* PENDIENTE */}
+                            {estado === "pendiente" && (
+                              <>
+                                <button
+                                  className="admin-confirm-btn"
+                                  onClick={() =>
+                                    handleCambiarEstadoReserva(
+                                      r.id,
+                                      "confirmada"
+                                    )
+                                  }
+                                >
+                                  ✔ Confirmar
+                                </button>
+
+                                <button
+                                  className="admin-cancel-btn"
+                                  onClick={() =>
+                                    abrirModalCancelar(r)
+                                  }
+                                >
+                                  ✖ Cancelar
+                                </button>
+                              </>
+                            )}
+
+                            {/* CONFIRMADA */}
+                            {estado === "confirmada" && (
+                              <button
+                                className="admin-cancel-btn"
+                                onClick={() =>
+                                  abrirModalCancelar(r)
+                                }
+                              >
+                                ✖ Cancelar
+                              </button>
+                            )}
+
+                            {/* PAGADA */}
+                            {estado === "pagada" && (
+                              <span className="badge badge-pagado">
+                                ✔ Pagada
+                              </span>
+                            )}
+
+                            {/* CANCELADA */}
+                            {estado === "cancelada" && (
+                              <button
+                                className="admin-view-btn"
+                                onClick={() =>
+                                  handleVerDetalleCancelacion(r)
+                                }
+                              >
+                                👁 Ver detalle
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-          <table className="admin-reservas-table">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Cancha</th>
-                <th>Fecha</th>
-                <th>Inicio</th>
-                <th>Fin</th>
-                <th>Acciones / Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reservas.filter(r => r.estado === estado).length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="admin-reservas-empty">Sin reservas en este estado</td>
-                </tr>
-              ) : (
-                reservas.filter(r => r.estado === estado).map(r => (
-                  <tr key={r.id}>
-                    <td>{r.usuario?.nombre}</td>
-                    <td>{r.cancha?.nombre}</td>
-                    <td>{r.fechaReserva}</td>
-                    <td>{r.horaInicio}</td>
-                    <td>{r.horaFin}</td>
-                    <td>
-                      {/* ESTADO: PENDIENTE */}
-                      {estado === "pendiente" && (
-                        <div className="admin-reservas-actions">
-                          <button className="admin-btn-confirmar" onClick={() => handleCambiarEstadoReserva(r.id, "confirmada")}>
-                            Confirmar
-                          </button>
-                          <button className="admin-btn-cancelar" onClick={() => setReservaACancelar(r)}>
-                            Cancelar
-                          </button>
-                        </div>
-                      )}
-
-                      {/* ESTADO: CONFIRMADA (Esperando pago del cliente) */}
-                      {estado === "confirmada" && (
-                        <div className="admin-reservas-actions">
-                          <span className="admin-text-warning">⏳ Esperando pago del usuario</span>
-                          <button className="admin-btn-cancelar" onClick={() => setReservaACancelar(r)}>
-                            Cancelar
-                          </button>
-                        </div>
-                      )}
-
-                      {/* ESTADO: PAGADA (Actualizado automáticamente cuando el usuario paga) */}
-                      {estado === "pagada" && (
-                        <span className="admin-text-success">✔ Pagado por el usuario</span>
-                      )}
-
-                      {/* ESTADO: CANCELADA */}
-                      {estado === "cancelada" && (
-                        <span className="admin-text-muted">
-                          {r.motivoCancelacion ? `Motivo: ${r.motivoCancelacion}` : "Cancelada"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      ))}
+        );
+      })}
     </div>
-
-    {/* MODAL DE CANCELACIÓN CON OPCIONES Y NOTA PARA EL USUARIO */}
-    {reservaACancelar && (
-      <div className="admin-canchas-modal-overlay" onClick={() => setReservaACancelar(null)}>
-        <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
-          <div className="admin-canchas-modal-header">
-            <h3>Cancelar Reserva</h3>
-            <button className="admin-canchas-modal-close" onClick={() => setReservaACancelar(null)}>✕</button>
-          </div>
-          <div className="admin-canchas-modal-body">
-            <p><strong>Usuario:</strong> {reservaACancelar.usuario?.nombre}</p>
-            <p><strong>Cancha:</strong> {reservaACancelar.cancha?.nombre} ({reservaACancelar.fechaReserva})</p>
-            
-            <label>Selecciona el motivo principal:</label>
-            <select 
-              className="admin-reservas-select"
-              value={motivoCancelacion} 
-              onChange={(e) => setMotivoCancelacion(e.target.value)}
-            >
-              <option value="Trabajo">Motivos de Trabajo</option>
-              <option value="Estudio">Motivos de Estudio</option>
-              <option value="Mantenimiento">Mantenimiento de Cancha</option>
-              <option value="Clima">Condiciones Climáticas</option>
-              <option value="Personal / Salud">Salud / Emergencia Personal</option>
-              <option value="Otro">Otro motivo</option>
-            </select>
-
-            <label>Mensaje / Detalle para el usuario:</label>
-            <textarea 
-              rows="3"
-              className="admin-reservas-textarea"
-              placeholder="Escribe la razón que se le notificará al usuario..."
-              value={notaCancelacion}
-              onChange={(e) => setNotaCancelacion(e.target.value)}
-            />
-          </div>
-          <div className="admin-canchas-modal-footer">
-            <button 
-              type="button" 
-              className="admin-canchas-modal-cancel-btn" 
-              onClick={() => setReservaACancelar(null)}
-            >
-              Volver
-            </button>
-            <button 
-              type="button" 
-              className="admin-btn-modal-cancel-confirm"
-              onClick={() => {
-                const detalleFinal = `${motivoCancelacion}${notaCancelacion ? `: ${notaCancelacion}` : ''}`;
-                handleCambiarEstadoReserva(reservaACancelar.id, "cancelada", detalleFinal);
-                setReservaACancelar(null);
-                setNotaCancelacion("");
-              }}
-            >
-              Confirmar Cancelación
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
   </section>
 )}
 
         {/* CANCHAS */}
-{activeTab === "canchas" && (
-  <section className="admin-canchas-section">
-    {/* ENCABEZADO CON TÍTULO, METRICAS Y BOTÓN PRINCIPAL */}
-    <div className="admin-canchas-header">
-      <div>
-        
-        <p className="admin-canchas-subtitle">
-          {canchas.length} registradas
-        </p>
-      </div>
-      <button 
-        className="admin-canchas-btn-agregar" 
-        onClick={() => {
-          setNuevaCancha({ nombre: '', tipo: '', precio: '', imagen: null });
-          setModalCrearAbierto(true);
-        }}  
-      >
-        <FaPlus /> Agregar cancha
-      </button>
-    </div>
+        {activeTab === "canchas" && (
+          <section className="admin-canchas-section">
+            {/* ENCABEZADO CON TÍTULO, METRICAS Y BOTÓN PRINCIPAL */}
+            <div className="admin-canchas-header">
+              <div>
 
-    {/* GRID DE TARJETAS DE CANCHAS */}
-    <div className="admin-canchas-grid">
-      {canchas.map((c) => (
-        <div key={c.id} className="admin-canchas-card">
-          {/* IMAGEN DE LA CANCHA */}
-          <div className="admin-canchas-card-image-container">
-            {c.imagen ? (
-              <img src={c.imagen} alt={c.nombre} className="admin-canchas-card-image" />
-            ) : (
-              <div className="admin-canchas-card-no-image">Sin Imagen</div>
-            )}
-          </div>
-
-          {/* DETALLES DE LA CANCHA */}
-          <div className="admin-canchas-card-content">
-            <div className="admin-canchas-card-header">
-              <h4 className="admin-canchas-card-title">{c.nombre}</h4>
-              <span className="admin-canchas-card-price">
-                S/ {c.precio_hora ?? c.precio}/h
-              </span>
-            </div>
-
-            <p className="admin-canchas-card-subtext">
-              ⚽ {c.tipo}
-            </p>
-
-            {/* ACCIONES Y BOTONES */}
-            <div className="admin-canchas-card-actions">
-              <button 
-                className="admin-canchas-btn-edit" 
-                onClick={() => handleEditarCancha(c)}
+                <p className="admin-canchas-subtitle">
+                  {canchas.length} registradas
+                </p>
+              </div>
+              <button
+                className="admin-canchas-btn-agregar"
+                onClick={() => {
+                  setNuevaCancha({ nombre: '', tipo: '', precio: '', imagen: null });
+                  setModalCrearAbierto(true);
+                }}
               >
-                <FaEdit /> Editar
-              </button>
-              <button 
-                className="admin-canchas-btn-delete" 
-                onClick={() => handleEliminarCancha(c.id)}
-              >
-                <FaTrash /> Eliminar
+                <FaPlus /> Agregar cancha
               </button>
             </div>
+
+            {/* GRID DE TARJETAS DE CANCHAS */}
+            <div className="admin-canchas-grid">
+              {canchas.map((c) => (
+                <div key={c.id} className="admin-canchas-card">
+                  {/* IMAGEN DE LA CANCHA */}
+                  <div className="admin-canchas-card-image-container">
+                    {c.imagen ? (
+                      <img src={c.imagen} alt={c.nombre} className="admin-canchas-card-image" />
+                    ) : (
+                      <div className="admin-canchas-card-no-image">Sin Imagen</div>
+                    )}
+                  </div>
+
+                  {/* DETALLES DE LA CANCHA */}
+                  <div className="admin-canchas-card-content">
+                    <div className="admin-canchas-card-header">
+                      <h4 className="admin-canchas-card-title">{c.nombre}</h4>
+                      <span className="admin-canchas-card-price">
+                        S/ {c.precio_hora ?? c.precio}/h
+                      </span>
+                    </div>
+
+                    <p className="admin-canchas-card-subtext">
+                      ⚽ {c.tipo}
+                    </p>
+
+                    {/* ACCIONES Y BOTONES */}
+                    <div className="admin-canchas-card-actions">
+                      <button
+                        className="admin-canchas-btn-edit"
+                        onClick={() => handleEditarCancha(c)}
+                      >
+                        <FaEdit /> Editar
+                      </button>
+                      <button
+                        className="admin-canchas-btn-delete"
+                        onClick={() => handleEliminarCancha(c.id)}
+                      >
+                        <FaTrash /> Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* MODAL PARA AGREGAR NUEVA CANCHA */}
+        {modalCrearAbierto && (
+          <div className="admin-canchas-modal-overlay" onClick={() => setModalCrearAbierto(false)}>
+            <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-canchas-modal-header">
+                <h3>Agregar Nueva Cancha</h3>
+                <button className="admin-canchas-modal-close" onClick={() => setModalCrearAbierto(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+              <form onSubmit={(e) => {
+                handleAgregarCancha(e);
+                setModalCrearAbierto(false);
+              }}>
+                <div className="admin-canchas-modal-body">
+                  <label>Nombre de la cancha</label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    placeholder="Ej: Cancha Central"
+                    value={nuevaCancha.nombre}
+                    onChange={handleInputChange}
+                    required
+                  />
+
+                  <label>Tipo de cancha</label>
+                  <input
+                    type="text"
+                    name="tipo"
+                    placeholder="Ej: Fútbol - Césped Sintético"
+                    value={nuevaCancha.tipo}
+                    onChange={handleInputChange}
+                    required
+                  />
+
+                  <label>Precio por hora (S/)</label>
+                  <input
+                    type="number"
+                    name="precio"
+                    placeholder="Ej: 85"
+                    value={nuevaCancha.precio}
+                    onChange={handleInputChange}
+                    required
+                  />
+
+                  <label>Imagen de la cancha</label>
+                  <input type="file" accept="image/*" onChange={handleImageChange} />
+                </div>
+                <div className="admin-canchas-modal-footer">
+                  <button
+                    type="button"
+                    className="admin-canchas-modal-cancel-btn"
+                    onClick={() => setModalCrearAbierto(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button type="submit" className="admin-canchas-modal-save-btn">
+                    Guardar Cancha
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+        )}
 
-{/* MODAL PARA AGREGAR NUEVA CANCHA */}
-{modalCrearAbierto && (
-  <div className="admin-canchas-modal-overlay" onClick={() => setModalCrearAbierto(false)}>
-    <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
-      <div className="admin-canchas-modal-header">
-        <h3>Agregar Nueva Cancha</h3>
-        <button className="admin-canchas-modal-close" onClick={() => setModalCrearAbierto(false)}>
-          <FaTimes />
-        </button>
+        {/* MODAL EDITAR CANCHA */}
+        {editandoCancha && (
+          <div className="admin-canchas-modal-overlay" onClick={() => setEditandoCancha(null)}>
+            <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-canchas-modal-header">
+                <h3>Editar Cancha</h3>
+                <button className="admin-canchas-modal-close" onClick={() => setEditandoCancha(null)}>
+                  <FaTimes />
+                </button>
+              </div>
+              <form onSubmit={handleActualizarCancha}>
+                <div className="admin-canchas-modal-body">
+                  <label>Nombre</label>
+                  <input type="text" name="nombre" value={nuevaCancha.nombre} onChange={handleInputChange} required />
+
+                  <label>Tipo</label>
+                  <input type="text" name="tipo" value={nuevaCancha.tipo} onChange={handleInputChange} required />
+
+                  <label>Precio por hora</label>
+                  <input type="number" name="precio" value={nuevaCancha.precio} onChange={handleInputChange} required />
+
+                  <label>Cambiar imagen</label>
+                  <input type="file" accept="image/*" onChange={handleImageChange} />
+                  {editandoCancha.imagen && (
+                    <>
+                      <p className="admin-canchas-preview-text">Imagen actual:</p>
+                      <img src={editandoCancha.imagen} alt="Cancha" className="admin-canchas-preview-img" />
+                    </>
+                  )}
+                </div>
+                <div className="admin-canchas-modal-footer">
+                  <button type="button" className="admin-canchas-modal-cancel-btn" onClick={() => setEditandoCancha(null)}>Cancelar</button>
+                  <button type="submit" className="admin-canchas-modal-save-btn">Guardar Cambios</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL PARA ELEGIR MOTIVO Y CANCELAR RESERVA */}
+        {mostrarModalCancelar && (
+          <div className="admin-modal-overlay" onClick={cerrarModalCancelar}>
+            <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <h3>Cancelar Reserva</h3>
+                <button className="admin-modal-close" onClick={cerrarModalCancelar}><FaTimes /></button>
+              </div>
+              <div className="admin-modal-body">
+                <p><strong>Usuario:</strong> {reservaCancelar?.usuario?.nombre}</p>
+                <p><strong>Cancha:</strong> {reservaCancelar?.cancha?.nombre}</p>
+
+                <label className="admin-modal-label">Motivo de cancelación</label>
+                <select
+                  className="admin-modal-select"
+                  value={motivoAdmin}
+                  onChange={(e) => setMotivoAdmin(e.target.value)}
+                >
+                  <option value="Mantenimiento de la cancha">Mantenimiento de la cancha</option>
+                  <option value="Condiciones climáticas">Condiciones climáticas</option>
+                  <option value="Problema técnico">Problema técnico</option>
+                  <option value="Doble reserva / error de sistema">Doble reserva / error de sistema</option>
+                  <option value="Solicitud del cliente">Solicitud del cliente</option>
+                  <option value="Otro">Otro</option>
+                </select>
+
+                <label className="admin-modal-label">Observación (opcional)</label>
+                <textarea
+                  className="admin-modal-select"
+                  rows={3}
+                  placeholder="Detalles adicionales para el cliente..."
+                  value={observacionAdmin}
+                  onChange={(e) => setObservacionAdmin(e.target.value)}
+                />
+              </div>
+              <div className="admin-modal-footer">
+                <button className="admin-modal-cancel-btn" onClick={cerrarModalCancelar}>Volver</button>
+                <button className="admin-modal-save-btn" onClick={handleConfirmarCancelacion}>Confirmar Cancelación</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL DETALLE DE CANCELACIÓN */}
+        {detalleCancelacion && (
+          <div className="admin-modal-overlay" onClick={() => setDetalleCancelacion(null)}>
+            <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <h3>Detalle de Cancelación</h3>
+                <button className="admin-modal-close" onClick={() => setDetalleCancelacion(null)}><FaTimes /></button>
+              </div>
+              <div className="admin-modal-body">
+                <p><strong>Usuario:</strong> {detalleCancelacion.usuario?.nombre}</p>
+                <p><strong>Cancha:</strong> {detalleCancelacion.cancha?.nombre}</p>
+                <p>
+                  <strong>Cancelado por:</strong>{" "}
+                  {detalleCancelacion.canceladoPor === "cliente" ? "El cliente" : "Administración"}
+                </p>
+                <p><strong>Motivo:</strong> {detalleCancelacion.motivoCancelacion || "No especificado"}</p>
+                {detalleCancelacion.observacionCancelacion && (
+                  <p><strong>Observación:</strong> {detalleCancelacion.observacionCancelacion}</p>
+                )}
+              </div>
+              <div className="admin-modal-footer">
+                <button className="admin-modal-cancel-btn" onClick={() => setDetalleCancelacion(null)}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-      <form onSubmit={(e) => {
-        handleAgregarCancha(e);
-        setModalCrearAbierto(false);
-      }}>
-        <div className="admin-canchas-modal-body">
-          <label>Nombre de la cancha</label>
-          <input 
-            type="text" 
-            name="nombre" 
-            placeholder="Ej: Cancha Central" 
-            value={nuevaCancha.nombre} 
-            onChange={handleInputChange} 
-            required 
-          />
-
-          <label>Tipo de cancha</label>
-          <input 
-            type="text" 
-            name="tipo" 
-            placeholder="Ej: Fútbol - Césped Sintético" 
-            value={nuevaCancha.tipo} 
-            onChange={handleInputChange} 
-            required 
-          />
-
-          <label>Precio por hora (S/)</label>
-          <input 
-            type="number" 
-            name="precio" 
-            placeholder="Ej: 85" 
-            value={nuevaCancha.precio} 
-            onChange={handleInputChange} 
-            required 
-          />
-
-          <label>Imagen de la cancha</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-        </div>
-        <div className="admin-canchas-modal-footer">
-          <button 
-            type="button" 
-            className="admin-canchas-modal-cancel-btn" 
-            onClick={() => setModalCrearAbierto(false)}
-          >
-            Cancelar
-          </button>
-          <button type="submit" className="admin-canchas-modal-save-btn">
-            Guardar Cancha
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-{/* MODAL EDITAR CANCHA */}
-{editandoCancha && (
-  <div className="admin-canchas-modal-overlay" onClick={() => setEditandoCancha(null)}>
-    <div className="admin-canchas-modal-box" onClick={(e) => e.stopPropagation()}>
-      <div className="admin-canchas-modal-header">
-        <h3>Editar Cancha</h3>
-        <button className="admin-canchas-modal-close" onClick={() => setEditandoCancha(null)}>
-          <FaTimes />
-        </button>
-      </div>
-      <form onSubmit={handleActualizarCancha}>
-        <div className="admin-canchas-modal-body">
-          <label>Nombre</label>
-          <input type="text" name="nombre" value={nuevaCancha.nombre} onChange={handleInputChange} required />
-          
-          <label>Tipo</label>
-          <input type="text" name="tipo" value={nuevaCancha.tipo} onChange={handleInputChange} required />
-          
-          <label>Precio por hora</label>
-          <input type="number" name="precio" value={nuevaCancha.precio} onChange={handleInputChange} required />
-          
-          <label>Cambiar imagen</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          {editandoCancha.imagen && (
-            <>
-              <p className="admin-canchas-preview-text">Imagen actual:</p>
-              <img src={editandoCancha.imagen} alt="Cancha" className="admin-canchas-preview-img" />
-            </>
-          )}
-        </div>
-        <div className="admin-canchas-modal-footer">
-          <button type="button" className="admin-canchas-modal-cancel-btn" onClick={() => setEditandoCancha(null)}>Cancelar</button>
-          <button type="submit" className="admin-canchas-modal-save-btn">Guardar Cambios</button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-</div>
 
       {/* MODAL EDITAR USUARIO */}
       {editandoUsuario && (

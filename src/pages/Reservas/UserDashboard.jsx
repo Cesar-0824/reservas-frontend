@@ -214,18 +214,32 @@ function UserDashboard({ onLogout }) {
     }
   };
 
-  const handleCancelarReserva = async (id) => {
-    if (!window.confirm("¿Cancelar reserva?")) return;
-    try {
-      await axios.delete(`http://localhost:8080/api/reservas/${id}`, { headers: authHeaders() });
-      alert("Reserva cancelada.");
-      refrescarDatos();
-    } catch (err) {
-      console.error("Error cancelar:", err);
-      alert("No se pudo cancelar.");
-      if (err.response?.status === 401) onLogout?.();
-    }
+const handleCancelarReserva = async (reserva) => {
+  if (!window.confirm("¿Cancelar reserva?")) return;
+
+  const motivo = window.prompt("¿Motivo de la cancelación? (opcional)", "Ya no puedo asistir");
+
+  const reservaActualizada = {
+    ...reserva,
+    estado: "cancelada",
+    motivoCancelacion: motivo || "Cancelado por el cliente",
+    canceladoPor: "cliente"
   };
+
+  try {
+    await axios.put(
+      `http://localhost:8080/api/reservas/actualizar/${reserva.id}`,
+      reservaActualizada,
+      { headers: authHeaders() }
+    );
+    alert("Reserva cancelada.");
+    refrescarDatos();
+  } catch (err) {
+    console.error("Error cancelar:", err);
+    alert("No se pudo cancelar.");
+    if (err.response?.status === 401) onLogout?.();
+  }
+};
 
   const handlePagoFicticio = async (reservaId) => {
     const ventanaPago = window.open('', '_blank');
@@ -442,16 +456,23 @@ function UserDashboard({ onLogout }) {
                           <span className={`user-estado-badge user-estado-${r.estado || 'pendiente'}`}>
                             {r.estado || 'Pendiente'}
                           </span>
+                          {r.estado === "cancelada" && r.motivoCancelacion && (
+                            <p className="user-motivo-cancelacion">
+                              Motivo: {r.motivoCancelacion}
+                            </p>
+                          )}
                         </td>
                         <td>
                           <div className="user-actions-buttons">
-                            <button
-                              className="user-cancel-button"
-                              onClick={() => handleCancelarReserva(r.id)}
-                              title="Cancelar reserva"
-                            >
-                              <FaTimesCircle /> Cancelar
-                            </button>
+                            {r.estado !== "cancelada" && r.estado !== "pagada" && (
+                              <button
+                                className="user-cancel-button"
+                                onClick={() => handleCancelarReserva(r)}
+                                title="Cancelar reserva"
+                              >
+                                <FaTimesCircle /> Cancelar
+                              </button>
+                            )}
                             {r.estado === "confirmada" && (
                               <button
                                 className="user-pay-button"
