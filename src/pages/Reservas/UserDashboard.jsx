@@ -93,7 +93,7 @@ const [subTabReservas, setSubTabReservas] = useState('vigentes'); // 'vigentes' 
 const [comprobanteDialog, setComprobanteDialog] = useState(null); // { reservaId }
 const [tipoComprobante, setTipoComprobante] = useState('boleta');
 const [rucFactura, setRucFactura] = useState('');
-const [comprobantes, setComprobantes] = useState({}); // { [reservaId]: { tipo, ruc } }
+const [, setComprobantes] = useState({}); // { [reservaId]: { tipo, ruc } }
 const [detallePago, setDetallePago] = useState(null); // reserva seleccionada
 
 
