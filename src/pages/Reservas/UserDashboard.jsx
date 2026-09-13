@@ -546,12 +546,13 @@ const cargarNotificaciones = async () => {
   }
 };
 
-useEffect(() => {// eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
   if (!currentUser?.id) return;
   cargarNotificaciones();
   const interval = setInterval(cargarNotificaciones, 3 * 60 * 1000);
   return () => clearInterval(interval);
-  }, [currentUser?.id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [currentUser?.id]);
 
 const marcarComoLeida = async (id) => {
   try {
