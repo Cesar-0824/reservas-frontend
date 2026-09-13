@@ -6,6 +6,7 @@ import './login.css';
 
 
 
+
 function Login({ onLoginSuccess }) {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -18,9 +19,9 @@ function Login({ onLoginSuccess }) {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError(null); // ahora será un objeto, no un string
     setLoading(true);
 
     try {
@@ -46,16 +47,16 @@ function Login({ onLoginSuccess }) {
           navigate('/reservas', { replace: true });
         }
       } else {
-        setError('Error: No se recibió un token válido.');
+        setError({ codigo: 'GENERICO', mensaje: 'No se recibió un token válido.' });
       }
     } catch (err) {
       console.error('Login error:', err);
-      if (err.response?.data) {
+      if (err.response?.data?.codigo) {
         setError(err.response.data);
       } else if (err.request) {
-        setError('No se pudo conectar con el servidor.');
+        setError({ codigo: 'SIN_CONEXION', mensaje: 'No se pudo conectar con el servidor.' });
       } else {
-        setError    ('Error inesperado. Intenta de nuevo.');
+        setError({ codigo: 'GENERICO', mensaje: 'Error inesperado. Intenta de nuevo.' });
       }
     } finally {
       setLoading(false);
@@ -191,10 +192,24 @@ return (
           </div>
 
           {error && (
-            <p className="error-message">
-              {error}
-            </p>
-          )}
+  <div className="login-error-box">
+    {error.codigo === 'CORREO_NO_REGISTRADO' ? (
+      <>
+        <p className="login-error-titulo">Correo no registrado</p>
+        <p className="login-error-mensaje">{error.mensaje}</p>
+        <p className="login-error-registro">
+          ¿Aún no tienes una cuenta?{" "}
+          <span className="login-link-registro" onClick={() => navigate('/registrar')}>
+            Regístrate
+          </span>{" "}
+          para continuar.
+        </p>
+      </>
+    ) : (
+      <p className="login-error-mensaje">{error.mensaje}</p>
+    )}
+  </div>
+)}
 
           <button
             type="submit"

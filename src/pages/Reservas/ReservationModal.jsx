@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './ReservationModal.css';
 import {
   FaTimes,
@@ -21,19 +22,40 @@ function ReservationModal({
 }) {
   const [duration, setDuration] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [duracionMinima, setDuracionMinima] = useState(1);
+  const [duracionMaxima, setDuracionMaxima] = useState(3);
 
   useEffect(() => {
-    if (show && canchaInfo) {
-      setTotalPrice(duration * (canchaInfo.precio_hora || 0));
+    if (show) {
+      axios.get('http://localhost:8080/api/configuracion')
+        .then(res => {
+          setDuracionMinima(res.data.duracionMinima || 1);
+          setDuracionMaxima(res.data.duracionMaxima || 3);
+          setDuration(res.data.duracionMinima || 1);
+        })
+        .catch(err => console.error('Error cargando configuración:', err));
     }
-  }, [duration, canchaInfo, show]);
+  }, [show]);
+
+useEffect(() => {
+  if (show && canchaInfo) {
+    const dur = parseFloat(duration) || 0;
+    setTotalPrice(dur * (canchaInfo.precio_hora || 0));
+  }
+}, [duration, canchaInfo, show]);
 
   if (!show || !slotInfo || !canchaInfo || !currentUser) return null;
 
   const handleDurationChange = (e) => {
-    const dur = parseInt(e.target.value);
-    setDuration(dur >= 1 && dur <= 3 ? dur : 1);
-  };
+  setDuration(e.target.value);
+};
+
+const handleDurationBlur = () => {
+  let dur = parseFloat(duration);
+  if (isNaN(dur) || dur < duracionMinima) dur = duracionMinima;
+  if (dur > duracionMaxima) dur = duracionMaxima;
+  setDuration(dur);
+};
 
   const handleConfirm = () => {
     if (onConfirm) {
@@ -41,18 +63,22 @@ function ReservationModal({
     }
   };
 
+  const formatHora = (horaDecimal) => {
+    const horas = Math.floor(horaDecimal);
+    const minutos = (horaDecimal % 1) * 60;
+    return String(horas).padStart(2, '0') + ':' + String(minutos).padStart(2, '0');
+  };
+
   const startHour = parseInt(slotInfo.time.split(':')[0]);
-  const endHour = String(startHour + duration).padStart(2, '0') + ':00';
+  const endHour = formatHora(startHour + duration);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-button" onClick={onClose}>
           <FaTimes />
-          
         </button>
         <h2>Confirmar Reserva</h2>
-
 
         <div className="modal-detail-item">
           <FaUserCircle /> Usuario: <strong>{currentUser.nombreUsuario}</strong>
@@ -71,15 +97,17 @@ function ReservationModal({
         </div>
 
         <div className="modal-detail-item">
-          <label htmlFor="duration"><FaClock /> Duración (1-3 horas):</label>
+          <label htmlFor="duration"><FaClock /> Duración ({duracionMinima}-{duracionMaxima} horas):</label>
           <input
-            type="number"
-            id="duration"
-            min="1"
-            max="3"
-            value={duration}
-            onChange={handleDurationChange}
-          />
+  type="number"
+  id="duration"
+  min={duracionMinima}
+  max={duracionMaxima}
+  step="0.5"
+  value={duration}
+  onChange={handleDurationChange}
+  onBlur={handleDurationBlur}
+/>
         </div>
 
         <div className="modal-detail-item">

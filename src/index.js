@@ -19,6 +19,23 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
+// Si el backend responde 401 (token inválido o expirado), limpia la sesión
+// y manda al login. Evita que se quede "atascado" mostrando un dashboard
+// vacío con datos en 0 por culpa de un token viejo en localStorage.
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('currentUser');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Cubre las peticiones hechas con fetch() nativo
 if (backendUrl) {
   const originalFetch = window.fetch;
