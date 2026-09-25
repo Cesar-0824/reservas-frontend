@@ -695,6 +695,8 @@ const ingresosPerdidos = reservasCanceladas.reduce((sum, r) => sum + (Number(r.m
   
 
   // ===== GRÁFICO 1: Evolución de Ingresos (línea) =====
+  const ordenMeses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
   const ingresosPorClave = {};
   const canceladosPorClave = {};
   const cantidadCanceladosPorClave = {}; // 👈 NUEVO: cantidad de reservas canceladas
@@ -708,7 +710,9 @@ const ingresosPerdidos = reservasCanceladas.reduce((sum, r) => sum + (Number(r.m
     } else if (filtroTiempo === 'semana' || filtroTiempo === 'mes') {
       clave = f.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
     } else {
-      clave = f.toLocaleDateString('es-ES', { month: 'short' });
+      // CAMBIO: usa el índice del mes en vez del texto del locale,
+      // para evitar el desfase "sept" vs "sep" según el entorno.
+      clave = ordenMeses[f.getMonth()];
     }
 
     if (r.estado === 'pagada' || r.estado === 'confirmada') {
@@ -719,8 +723,7 @@ const ingresosPerdidos = reservasCanceladas.reduce((sum, r) => sum + (Number(r.m
     }
   });
 
-if (filtroTiempo === 'anio') {
-    const ordenMeses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  if (filtroTiempo === 'anio') {
     ordenMeses.forEach(m => {
       if (!(m in ingresosPorClave)) ingresosPorClave[m] = 0;
       if (!(m in canceladosPorClave)) canceladosPorClave[m] = 0;
@@ -760,13 +763,11 @@ if (filtroTiempo === 'anio') {
     }
   }
 
-
   // orden correcto según el tipo de clave
   let clavesOrdenadas = Object.keys(ingresosPorClave);
   if (filtroTiempo === 'dia') {
     clavesOrdenadas.sort((a, b) => parseInt(a) - parseInt(b));
   } else if (filtroTiempo === 'anio') {
-    const ordenMeses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
     clavesOrdenadas.sort((a, b) => ordenMeses.indexOf(a.toLowerCase()) - ordenMeses.indexOf(b.toLowerCase()));
   } else {
     clavesOrdenadas.sort((a, b) => {
@@ -775,7 +776,6 @@ if (filtroTiempo === 'anio') {
       return ma - mb || da - db;
     });
   }
-
 
   if (ingresosChartInstance.current) ingresosChartInstance.current.destroy();
   if (ingresosChartRef.current) {
