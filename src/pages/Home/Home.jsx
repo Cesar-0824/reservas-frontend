@@ -12,8 +12,7 @@ import {
   FaMapMarkerAlt,
   FaUsers,
   FaMoneyBillWave,
-  FaLightbulb,   
-  FaRegLightbulb
+
 } from "react-icons/fa";
 import clubImage from "../../assets/club.png";
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -29,6 +28,7 @@ const navigate = useNavigate();
 const prevRef = useRef(null);
 const nextRef = useRef(null);
 const [swiperInstance, setSwiperInstance] = useState(null);
+
 
 useEffect(() => {
   if (swiperInstance && prevRef.current && nextRef.current) {
@@ -68,49 +68,40 @@ useEffect(() => {
     }
   }, []);
 
-  // --- Estado y logica del formulario de Contacto ---
-  const [contactoForm, setContactoForm] = useState({
-    nombre: '',
-    correo: '',
-    mensaje: ''
-  });
-  const [contactoStatus, setContactoStatus] = useState('');
+  const [detalleCancha, setDetalleCancha] = useState(null);
 
-  const handleContactoChange = (e) => {
-    const { name, value } = e.target;
-    setContactoForm(prev => ({ ...prev, [name]: value }));
-  };
 
-  const handleContactoSubmit = (e) => {
-    e.preventDefault();
-    setContactoStatus('Enviando...');
 
-    setTimeout(() => {
-      console.log('Formulario enviado:', contactoForm);
-      setContactoStatus('¡Mensaje enviado con éxito! Te responderemos pronto.');
-      setContactoForm({ nombre: '', correo: '', mensaje: '' });
-    }, 1500);
-  };
 
-    // --- Tema claro / oscuro ---
-    const [theme, setTheme] = useState(() => {
-      return localStorage.getItem('sportsmatch-theme') || 'dark';
-    });
 
-    useEffect(() => {
-      if (theme === 'light') {
-        document.documentElement.classList.add('light-theme');
-      } else {
-        document.documentElement.classList.remove('light-theme');
-      }
-      localStorage.setItem('sportsmatch-theme', theme);
-    }, [theme]);
 
-    const toggleTheme = () => {
-      setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
-    };
+
 
   console.log("Canchas recibidas:", canchas)
+
+  const handleReservarClick = () => {
+  const token = localStorage.getItem('authToken');
+  const rawUser = localStorage.getItem('currentUser');
+
+  if (!token || !rawUser) {
+    navigate('/login');
+    return;
+  }
+
+  let user;
+  try {
+    user = JSON.parse(rawUser);
+  } catch {
+    navigate('/login');
+    return;
+  }
+
+  if (user.rol === 'admin') {
+    navigate('/admin', { state: { tab: 'reservas' } });
+  } else {
+    navigate('/reservas', { state: { tab: 'disponibilidad' } });
+  }
+};
 
   return (
   <div className="home-wrapper">
@@ -129,7 +120,7 @@ useEffect(() => {
           <h1 className="hero-title">
             Reserva tu cancha
             <br />
-            en <span>SportsMacth</span>
+            en <span>SportsMatch</span>
           </h1>
 
           <p className="hero-text">
@@ -140,11 +131,12 @@ useEffect(() => {
 
           <div className="hero-buttons">
             <button
-              className="btn-primary"
-              onClick={() => navigate("/login")}
-            >
-              Reservar Cancha
-            </button>
+  type="button"
+  className="btn-primary"
+  onClick={handleReservarClick}
+>
+  Reservar Cancha
+</button>
           </div>
 
         </div>
@@ -160,7 +152,7 @@ useEffect(() => {
       {/* BENEFICIOS */}
       <section className="features-section">
 
-        <h2>¿Por qué elegir SportsMacth?</h2>
+        <h2>¿Por qué elegir SportsMatch?</h2>
 
         <p className="features-description">
           Vive una mejor experiencia deportiva reservando tu cancha en línea.
@@ -226,37 +218,42 @@ useEffect(() => {
               1400: { slidesPerView: 4, spaceBetween: 24 },
             }}
           >
-            {canchas.map((cancha) => (
-              <SwiperSlide key={cancha.id}>
-                <div className="cancha-card">
-
-                  <div className="cancha-img-wrapper">
-                    <span className="cancha-badge">{cancha.tipo}</span>
-                    <img
-                      src={cancha.imagen}
-                      alt={cancha.nombre}
-                    />
-                  </div>
-
-                  <div className="cancha-info">
-                    <h3>{cancha.nombre}</h3>
-
-                    <div className="cancha-precio-box">
-                      <span className="precio-label">Por hora</span>
-                      <span className="precio-actual">S/ {cancha.precio_hora}</span>
-                    </div>
+            {canchas.map((cancha) => {
               
-                    <button
-                      className="btn-reservar"
-                      onClick={() => navigate("/login")}
-                    >
-                      Reservar
-                    </button>
-                  </div>
 
-                </div>
-              </SwiperSlide>
-            ))}
+
+              return (
+                <SwiperSlide key={cancha.id}>
+                  <div className="cancha-card">
+
+                    <div className="cancha-img-wrapper">
+                      <span className="cancha-badge">{cancha.tipo}</span>
+                      <img src={cancha.imagen} alt={cancha.nombre} />
+                    </div>
+
+                    <div className="cancha-info">
+                      <h3>{cancha.nombre}</h3>
+
+                      <div className="cancha-precio-box">
+                        <span className="precio-label">Por hora</span>
+                        <span className="precio-actual">S/ {cancha.precio_hora}</span>
+                      </div>
+
+                      <div className="cancha-card-acciones">
+                        <button className="btn-ver-detalles" onClick={() => setDetalleCancha(cancha)}>
+                          Ver Detalles
+                        </button>
+
+                        <button type="button" className="btn-reservar" onClick={handleReservarClick}>
+                          Reservar
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
 
           <button ref={nextRef} className="cancha-nav-btn cancha-nav-next">
@@ -266,7 +263,47 @@ useEffect(() => {
         </div>
 
       </section>
+      {detalleCancha && (
+  <div className="admin-modal-overlay" onClick={() => setDetalleCancha(null)}>
+    <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+      <div className="admin-modal-header">
+        <h3>{detalleCancha.nombre}</h3>
+        <button className="admin-modal-close" onClick={() => setDetalleCancha(null)}>✕</button>
+      </div>
+      <div className="admin-modal-body">
+        <img src={detalleCancha.imagen} alt={detalleCancha.nombre} style={{ width: '100%', borderRadius: 8, marginBottom: 12 }} />
 
+        <p>
+          <strong>Estado:</strong>{' '}
+          <span className={`admin-cancha-estado-badge ${detalleCancha.estado === 'activa' ? 'estado-activa' : 'estado-mantenimiento'}`}>
+            {detalleCancha.estado === 'activa' ? 'Activa' : 'En Mantenimiento'}
+          </span>
+        </p>
+
+        {detalleCancha.estado === 'mantenimiento' && (
+          <>
+            <p><strong>Motivo:</strong> {detalleCancha.motivoEstado || 'No especificado'}</p>
+            {detalleCancha.observacionEstado && (
+              <p><strong>Observación:</strong> {detalleCancha.observacionEstado}</p>
+            )}
+          </>
+        )}
+
+        <p><strong>Deporte:</strong> {detalleCancha.tipo}</p>
+        <p><strong>Precio por hora:</strong> S/ {detalleCancha.precio_hora}</p>
+        {detalleCancha.modalidad && <p><strong>Modalidad:</strong> {detalleCancha.modalidad}</p>}
+        {detalleCancha.dimensiones && <p><strong>Dimensiones:</strong> {detalleCancha.dimensiones}</p>}
+        {detalleCancha.tipoSuperficie && <p><strong>Superficie:</strong> {detalleCancha.tipoSuperficie}</p>}
+        {detalleCancha.iluminacion && <p><strong>Iluminación:</strong> {detalleCancha.iluminacion}</p>}
+        {detalleCancha.caracteristicas && <p><strong>Características:</strong> {detalleCancha.caracteristicas}</p>}
+        {detalleCancha.descripcion && <p><strong>Descripción:</strong> {detalleCancha.descripcion}</p>}
+      </div>
+      <div className="admin-modal-footer">
+        <button className="admin-modal-cancel-btn" onClick={() => setDetalleCancha(null)}>Cerrar</button>
+      </div>
+    </div>
+  </div>
+)}
       {/* SERVICIOS */}
       <section id="servicios" className="servicios-section">
         <h2>
@@ -338,57 +375,9 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* CONTACTO */}
-      <section id="contacto" className="contacto-section">
-        <h2>Contáctanos</h2>
+      
 
-        <div className="contacto-card">
-          <div className="contacto-info">
-            <p><span>Dirección:</span> Av. Las Palmeras 123, Lima</p>
-            <p><span>Teléfono:</span> +51 987 654 321</p>
-            <p><span>Email:</span> contacto@cantobello.com</p>
-          </div>
-
-          <form className="contacto-form" onSubmit={handleContactoSubmit}>
-            <input
-              type="text"
-              name="nombre"
-              placeholder="Tu nombre"
-              value={contactoForm.nombre}
-              onChange={handleContactoChange}
-              required
-            />
-            <input
-              type="email"
-              name="correo"
-              placeholder="Tu correo electrónico"
-              value={contactoForm.correo}
-              onChange={handleContactoChange}
-              required
-            />
-            <textarea
-              name="mensaje"
-              placeholder="Escribe tu mensaje..."
-              value={contactoForm.mensaje}
-              onChange={handleContactoChange}
-              required
-            ></textarea>
-            <button type="submit">Enviar</button>
-          </form>
-
-          {contactoStatus && <p className="contacto-status-message">{contactoStatus}</p>}
-        </div>
-      </section>
-
-      {/* BOTÓN FLOTANTE DEL FOQUITO */}
-      <button
-        className="theme-toggle-btn"
-        onClick={toggleTheme}
-        aria-label="Cambiar tema"
-        title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-      >
-        {theme === 'dark' ? <FaRegLightbulb /> : <FaLightbulb />}
-      </button>
+      
 
     </div>
   </div>

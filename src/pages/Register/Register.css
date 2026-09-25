@@ -198,6 +198,28 @@
   font-weight: 800;
 }
 
+.register-form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+.register-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+.register-password-wrapper {
+  position: relative;
+  width: 100%;
+}
+---------------------
+
+
+
+
+
 .register-form .register-form-group {
   margin-bottom: 20px;
   text-align: left;
@@ -290,6 +312,48 @@
   color: #0c310b;
 }
 
+
+
+
+/* ==============================================
+   BOTÓN MOSTRAR / OCULTAR
+============================================== */
+.register-toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #16861f;
+  
+  padding: 6px 10px;
+  user-select: none;
+  transition: all 0.25s ease;
+}
+
+.register-toggle-password:hover {
+  color: #287238;
+  background: rgba(22, 134, 31, 0.08);
+  border-radius: 6px;
+}
+
+.register-toggle-password:active {
+  transform: translateY(-50%) scale(0.96);
+  color: #0e6316;
+}
+
+.register-toggle-password:focus-visible {
+  outline: 2px solid rgba(22, 134, 31, 0.4);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
 /* ===================================================
    RESPONSIVE
 =================================================== */

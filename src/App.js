@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 import Header from './components/Header/Header';
 import BrandingBar from './components/BrandingBar/BrandingBar';
@@ -14,24 +15,53 @@ import ResetPassword from './pages/ForgotPassword/ResetPassword'
 
 import './App.css';
 
-// Función para verificar si hay sesión iniciada
-const getIsAuthenticated = () => {
+// Interceptor global: si cualquier request recibe 401, limpia la sesión y manda a login
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
+// Verifica la sesión contra el backend (no solo localStorage)
+const verificarSesion = async () => {
     const token = localStorage.getItem('authToken');
     const rawUser = localStorage.getItem('currentUser');
+
+    if (!token || !rawUser || rawUser === 'undefined' || rawUser === 'null') {
+        return false;
+    }
+
     try {
-        if (token && rawUser && rawUser !== 'undefined' && rawUser !== 'null') {
-            const parsedUser = JSON.parse(rawUser);
-            return !!parsedUser && typeof parsedUser === 'object' && !!parsedUser.id;
-        }
-    } catch (e) {
-        console.error("Error parseando currentUser desde localStorage en getIsAuthenticated:", e);
+        JSON.parse(rawUser);
+    } catch {
         localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
+        return false;
     }
-    return false;
+
+    try {
+        // TODO: reemplaza esta URL por un endpoint real de tu backend
+        // que valide el token (ej: /api/auth/me, /api/usuarios/perfil)
+        await axios.get('http://localhost:8080/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return true;
+    } catch (err) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        return false;
+    }
 };
 
-// Función para verificar si el usuario es admin
+// Verifica si el usuario es admin (a partir de los datos ya validados en localStorage)
 const esAdmin = () => {
     const rawUser = localStorage.getItem('currentUser');
     if (!rawUser) return false;
@@ -44,8 +74,7 @@ const esAdmin = () => {
 };
 
 // Ruta protegida para cualquier usuario logueado
-const PrivateRoute = ({ children }) => {
-    const isAuthenticated = getIsAuthenticated();
+const PrivateRoute = ({ children, isAuthenticated }) => {
     return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
@@ -63,10 +92,8 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
     const isFullWidthRoute = location.pathname === '/login' || location.pathname === '/registrar';
 
     const isDashboardRoute = isAdminRoute || isUserDashboardRoute;
-    
-    const hideHeaderAndFooter = isDashboardRoute || isFullWidthRoute;
 
-    
+    const hideHeaderAndFooter = isDashboardRoute || isFullWidthRoute;
 
     return (
         <div className="App">
@@ -94,7 +121,7 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
                     <Route
                         path="/reservas"
                         element={
-                            <PrivateRoute>
+                            <PrivateRoute isAuthenticated={isAuthenticated}>
                                 <UserDashboard onLogout={globalHandleLogout} />
                             </PrivateRoute>
                         }
@@ -103,7 +130,7 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
                     <Route
                         path="/admin"
                         element={
-                            <PrivateRoute>
+                            <PrivateRoute isAuthenticated={isAuthenticated}>
                                 <AdminRoute>
                                     <AdminDashboard onLogout={globalHandleLogout} />
                                 </AdminRoute>
@@ -114,7 +141,7 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
                     <Route
                         path="/dashboard"
                         element={
-                            <PrivateRoute>
+                            <PrivateRoute isAuthenticated={isAuthenticated}>
                                 <div style={{ padding: '50px', textAlign: 'center' }}>
                                     <h2>¡Bienvenido, usuario logueado!</h2>
                                     <button onClick={globalHandleLogout} className="logout-button">Cerrar Sesión</button>
@@ -140,21 +167,33 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
 }
 
 function App() {
-    const [, setAuthTrigger] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(null); // null = "verificando"
 
     const handleLoginSuccess = () => {
-        setAuthTrigger(prev => !prev);
-        console.log("App.js: Login exitoso, estado de autenticación re-evaluado.");
+        verificarSesion().then(setIsAuthenticated);
     };
 
     const globalHandleLogout = () => {
-        console.log("App.js: Cierre de sesión global activado.");
         localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
-        setAuthTrigger(prev => !prev);
+        setIsAuthenticated(false);
     };
 
-    const isAuthenticated = getIsAuthenticated();
+    useEffect(() => {
+        verificarSesion().then(setIsAuthenticated);
+
+        const handleStorageChange = (e) => {
+            if (e.key === 'authToken' && e.newValue === null) {
+                setIsAuthenticated(false);
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+    if (isAuthenticated === null) {
+        return <div style={{ textAlign: 'center', padding: '50px' }}>Cargando...</div>;
+    }
 
     return (
         <Router>

@@ -22,12 +22,16 @@ import {
   FaUserCircle,
   FaChevronDown,
   FaTimesCircle,
-  FaCog
+  FaCog,
+  FaMoneyBillWave 
 } from "react-icons/fa";
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import html2canvas from 'html2canvas';
+
+import Pagos from "./Pagos"
+
 
 
 import DateFilterPicker from '../../components/DateFilterPicker/DateFilterPicker';
@@ -51,21 +55,61 @@ function AdminDashboard({ onLogout }) {
   const [mostrarMenuPerfil, setMostrarMenuPerfil] = useState(false);
   const [mostrarNotificaciones, setMostrarNotificaciones] = useState(false);
   const [ordenUsuarios, setOrdenUsuarios] = useState({ campo: 'fechaRegistro', direccion: 'desc' });
-  const [mostrarMenuExcel, setMostrarMenuExcel] = useState(false);
-  const [mostrarMenuPDF, setMostrarMenuPDF] = useState(false);
   const [filtroTiempo, setFiltroTiempo] = useState('anio');
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
-  const [resumenStats, setResumenStats] = useState({ totalReservas: 0, totalIngresos: 0, ticketPromedio: 0 });
+  const [resumenStats, setResumenStats] = useState({
+  totalReservas: 0,
+  totalIngresos: 0,
+  ticketPromedio: 0,
+  totalCanceladas: 0,
+  ingresosPerdidos: 0
+});
   const [datosExport, setDatosExport] = useState({ ingresos: [], deportes: [], horarios: [] });
   const [apiOk, setApiOk] = useState(true);
   const [editandoPerfil, setEditandoPerfil] = useState(false);
+  const [fechaFiltroReserva, setFechaFiltroReserva] = useState("");
   const [currentUser, setCurrentUser] = useState(() => {
   const stored = localStorage.getItem('currentUser');
+  
+  
+  
   
 
   return stored ? JSON.parse(stored) : null;
 });
-  
+    
+
+
+
+const [pagos, setPagos] = useState([])
+useEffect(() => {
+  const fetchPagos = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+ 
+      const res = await axios.get("http://localhost:8080/api/pagos", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+ 
+      setPagos(res.data);
+    } catch (err) {
+      console.error("Error al cargar pagos:", err);
+    }
+  };
+ 
+  fetchPagos();
+}, []);
+ 
+
+
+const [filtroEstadoReserva, setFiltroEstadoReserva] = useState("pendiente");
+const [reservaExpandidaId, setReservaExpandidaId] = useState(null);
+const [, setDetallePago] = useState(null);
+const [detalleReserva, setDetalleReserva] = useState(null);
+const [busquedaReserva, setBusquedaReserva] = useState("");
+
 
 const [perfilForm, setPerfilForm] = useState({ nombre: '', email: '' });
 const [passwordForm, setPasswordForm] = useState({ nueva: '', confirmar: '' });
@@ -234,53 +278,9 @@ useEffect(() => {
   const [editandoUsuario, setEditandoUsuario] = useState(null);
   const [nuevoRol, setNuevoRol] = useState('');
 
-  const construirFilasExport = (lista) => {
-  return lista.map(u => ({
-    Nombre: u.nombre || '',
-    Email: u.email || '',
-    Rol: u.rol || '',
-    "Gasto Total (S/)": calcularGastoUsuario(u.id).toFixed(2),
-    Estado: u.habilitado === false ? 'Inactivo' : 'Activo',
-    "Fecha de Registro": u.fechaRegistro
-      ? new Date(u.fechaRegistro).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })
-      : 'N/A'
-  }));
-};
-//Export Usuarios
-const exportarExcel = (lista, nombreArchivo) => {
-  const filas = construirFilasExport(lista);
-  const hoja = XLSX.utils.json_to_sheet(filas);
-  const libro = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(libro, hoja, "Usuarios");
-  XLSX.writeFile(libro, `${nombreArchivo}.xlsx`);
-};
+  
 
-const exportarPDF = (lista, nombreArchivo, titulo) => {
-  const doc = new jsPDF();
-  const filas = construirFilasExport(lista);
 
-  doc.setFontSize(14);
-  doc.text(titulo, 14, 15);
-  doc.setFontSize(9);
-  doc.text(`Generado: ${new Date().toLocaleDateString('es-PE')}`, 14, 21);
-
-  autoTable(doc, {
-    startY: 26,
-    head: [["Nombre", "Email", "Rol", "Gasto Total (S/)", "Estado", "Fecha de Registro"]],
-    body: filas.map(f => [
-      f.Nombre, f.Email, f.Rol, f["Gasto Total (S/)"], f.Estado, f["Fecha de Registro"]
-    ]),
-    styles: { fontSize: 8 },
-    headStyles: { fillColor: [21, 128, 61] }
-  });
-
-  doc.save(`${nombreArchivo}.pdf`);
-};
-
-// Listas ya filtradas por categoría
-const usuariosActivos = usuarios.filter(u => u.habilitado !== false);
-const usuariosDeshabilitados = usuarios.filter(u => u.habilitado === false);
-const usuariosAdmins = usuarios.filter(u => u.rol === 'admin');
 
 
 const handleOrdenar = (campo) => {
@@ -405,8 +405,12 @@ const generarNotificacionReserva = (r) => {
     ? new Date(r.fechaReserva + 'T00:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })
     : 'fecha no definida';
 
+  const hora = r.horaInicio && r.horaFin
+    ? ` de ${r.horaInicio.slice(0,5)} a ${r.horaFin.slice(0,5)}`
+    : '';
+
   let estadoTexto = '';
-  let estadoClase = '';
+  let estadoClase = ''; 
 
   switch (r.estado) {
     case 'pendiente':
@@ -433,8 +437,8 @@ const generarNotificacionReserva = (r) => {
     key: `reserva-${r.id}`,
     tipo: 'reserva',
     reservaId: r.id,
-    orden: r.fechaCreacion ? new Date(r.fechaCreacion).getTime() : 0, // 👈 timestamp real
-    mensaje: `${r.usuario?.nombre || 'Un usuario'} hizo una reserva para el ${fecha} en ${r.cancha?.nombre || 'una cancha'}`,
+    orden: r.fechaCreacion ? new Date(r.fechaCreacion).getTime() : 0,
+    mensaje: `${r.usuario?.nombre || 'Un usuario'} hizo una reserva para el ${fecha}${hora} en ${r.cancha?.nombre || 'una cancha'}`,
     estadoTexto,
     estadoClase
   };
@@ -683,40 +687,53 @@ useEffect(() => {
   const totalReservas = reservasFiltradas.length;
   const ticketPromedio = reservasValidas.length ? totalIngresos / reservasValidas.length : 0;
 
-  setResumenStats({ totalReservas, totalIngresos, ticketPromedio });
+ // 👇 NUEVO: reservas canceladas e ingresos perdidos por cancelación
+const reservasCanceladas = reservasFiltradas.filter(r => r.estado === 'cancelada');
+const totalCanceladas = reservasCanceladas.length;
+const ingresosPerdidos = reservasCanceladas.reduce((sum, r) => sum + (Number(r.montoTotal) || 0), 0);
+  setResumenStats({ totalReservas, totalIngresos, ticketPromedio, totalCanceladas, ingresosPerdidos });
+
+  
 
   // ===== GRÁFICO 1: Evolución de Ingresos (línea) =====
   const ingresosPorClave = {};
+  const canceladosPorClave = {};
+  const cantidadCanceladosPorClave = {}; // 👈 NUEVO: cantidad de reservas canceladas
 
   reservasFiltradas.forEach(r => {
-    if (r.estado !== 'pagada' && r.estado !== 'confirmada') return;
     const f = new Date(r.fechaReserva + 'T00:00:00');
     let clave;
 
     if (filtroTiempo === 'dia') {
-      // agrupa por hora
       clave = (r.horaInicio ? r.horaInicio.split(':')[0] : '00') + ':00';
     } else if (filtroTiempo === 'semana' || filtroTiempo === 'mes') {
-      // agrupa por día (dd/mm)
       clave = f.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
     } else {
-      // anio: agrupa por mes
       clave = f.toLocaleDateString('es-ES', { month: 'short' });
     }
 
-    ingresosPorClave[clave] = (ingresosPorClave[clave] || 0) + (Number(r.montoTotal) || 0);
+    if (r.estado === 'pagada' || r.estado === 'confirmada') {
+      ingresosPorClave[clave] = (ingresosPorClave[clave] || 0) + (Number(r.montoTotal) || 0);
+    } else if (r.estado === 'cancelada') {
+      canceladosPorClave[clave] = (canceladosPorClave[clave] || 0) + (Number(r.montoTotal) || 0);
+      cantidadCanceladosPorClave[clave] = (cantidadCanceladosPorClave[clave] || 0) + 1; // 👈 NUEVO
+    }
   });
 
 if (filtroTiempo === 'anio') {
     const ordenMeses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
     ordenMeses.forEach(m => {
       if (!(m in ingresosPorClave)) ingresosPorClave[m] = 0;
+      if (!(m in canceladosPorClave)) canceladosPorClave[m] = 0;
+      if (!(m in cantidadCanceladosPorClave)) cantidadCanceladosPorClave[m] = 0; // 👈 NUEVO
     });
   }
   if (filtroTiempo === 'dia') {
     for (let h = 7; h <= 23; h++) {
       const clave = String(h).padStart(2, '0') + ':00';
       if (!(clave in ingresosPorClave)) ingresosPorClave[clave] = 0;
+      if (!(clave in canceladosPorClave)) canceladosPorClave[clave] = 0;
+      if (!(clave in cantidadCanceladosPorClave)) cantidadCanceladosPorClave[clave] = 0; // 👈 NUEVO
     }
   }
   if (filtroTiempo === 'semana') {
@@ -727,6 +744,8 @@ if (filtroTiempo === 'anio') {
       d.setDate(inicio.getDate() + i);
       const clave = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
       if (!(clave in ingresosPorClave)) ingresosPorClave[clave] = 0;
+      if (!(clave in canceladosPorClave)) canceladosPorClave[clave] = 0;
+      if (!(clave in cantidadCanceladosPorClave)) cantidadCanceladosPorClave[clave] = 0; // 👈 NUEVO
     }
   }
   if (filtroTiempo === 'mes') {
@@ -737,9 +756,10 @@ if (filtroTiempo === 'anio') {
       const d = new Date(anioRef, mesRef, numDia);
       const clave = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
       if (!(clave in ingresosPorClave)) ingresosPorClave[clave] = 0;
+      if (!(clave in canceladosPorClave)) canceladosPorClave[clave] = 0;
+      if (!(clave in cantidadCanceladosPorClave)) cantidadCanceladosPorClave[clave] = 0; // 👈 NUEVO
     }
   }
-
 
 
   // orden correcto según el tipo de clave
@@ -764,26 +784,45 @@ if (filtroTiempo === 'anio') {
       type: 'line',
       data: {
         labels: clavesOrdenadas,
-        datasets: [{
-          label: 'Ingresos (S/.)',
-          data: clavesOrdenadas.map(c => ingresosPorClave[c]),
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.15)',
-          fill: true,
-          tension: 0.15,      // antes 0.3: bajarlo evita que la curva "infle" entre puntos
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          pointBackgroundColor: '#10b981'
-        }]
+        datasets: [
+          {
+            label: 'Ingresos (S/.)',
+            data: clavesOrdenadas.map(c => ingresosPorClave[c]),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+            fill: true,
+            tension: 0.15,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#10b981'
+          },
+          {
+            label: 'Cancelado (S/.)',
+            data: clavesOrdenadas.map(c => canceladosPorClave[c] || 0),
+            borderColor: '#dc2626',
+            backgroundColor: 'rgba(220, 38, 38, 0.15)',
+            fill: true,
+            tension: 0.15,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#dc2626'
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false },
+          legend: { display: true, position: 'top' },
           tooltip: {
             callbacks: {
-              label: (ctx) => `S/. ${ctx.parsed.y.toFixed(2)}`
+              label: (ctx) => {
+                if (ctx.dataset.label === 'Cancelado (S/.)') {
+                  const cantidad = cantidadCanceladosPorClave[ctx.label] || 0;
+                  return `${ctx.dataset.label}: S/. ${ctx.parsed.y.toFixed(2)} (${cantidad} reserva${cantidad === 1 ? '' : 's'})`; // 👈 NUEVO
+                }
+                return `${ctx.dataset.label}: S/. ${ctx.parsed.y.toFixed(2)}`;
+              }
             }
           }
         },
@@ -793,24 +832,40 @@ if (filtroTiempo === 'anio') {
       }
     });
   }
-
-
-    // ===== GRÁFICO 2: Popularidad por Deporte (dona) =====
+// ===== GRÁFICO 2: Popularidad por Deporte (dona) =====
     const conteoPorTipo = {};
-    reservasFiltradas.forEach(r => {
-      const tipo = r.cancha?.tipo || 'Otro';
-      conteoPorTipo[tipo] = (conteoPorTipo[tipo] || 0) + 1;
-    });
+    reservasFiltradas
+      .filter(r => r.estado !== 'cancelada')
+      .forEach(r => {
+        const tipo = r.cancha?.tipo || 'Otro';
+        conteoPorTipo[tipo] = (conteoPorTipo[tipo] || 0) + 1;
+      });
+
+    const totalCanceladasDeporte = reservasFiltradas.filter(r => r.estado === 'cancelada').length; // 👈 NUEVO
+
+    const paletaBase = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#14b8a6', '#f97316', '#a855f7'];
+
+const tipos = Object.keys(conteoPorTipo);
+const coloresDona = tipos.map((_, i) => paletaBase[i % paletaBase.length]);
+
+const labelsDona = tipos.map(tipo => `${tipo} (${conteoPorTipo[tipo]} reservas)`);
+const dataDona = Object.values(conteoPorTipo);
+
+if (totalCanceladasDeporte > 0) {
+  labelsDona.push(`Canceladas (${totalCanceladasDeporte} reservas)`);
+  dataDona.push(totalCanceladasDeporte);
+  coloresDona.push('#dc2626');
+}
 
     if (deportesChartInstance.current) deportesChartInstance.current.destroy();
 if (deportesChartRef.current) {
   deportesChartInstance.current = new Chart(deportesChartRef.current.getContext('2d'), {
     type: 'doughnut',
     data: {
-      labels: Object.keys(conteoPorTipo).map(tipo => `${tipo} (${conteoPorTipo[tipo]} reservas)`),
+      labels: labelsDona,
       datasets: [{
-        data: Object.values(conteoPorTipo),
-        backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
+        data: dataDona,
+        backgroundColor: coloresDona
       }]
     },
     options: {
@@ -823,16 +878,24 @@ if (deportesChartRef.current) {
 
     // ===== GRÁFICO 3: Horarios Pico (barras) =====
     const conteoPorHora = {};
+    const canceladasPorHora = {}; // 👈 NUEVO
+
 reservasFiltradas.forEach(r => {
   if (!r.horaInicio) return;
   const hora = r.horaInicio.split(':')[0] + ':00';
-  conteoPorHora[hora] = (conteoPorHora[hora] || 0) + 1;
+
+  if (r.estado !== 'cancelada') {
+    conteoPorHora[hora] = (conteoPorHora[hora] || 0) + 1;
+  } else {
+    canceladasPorHora[hora] = (canceladasPorHora[hora] || 0) + 1; // 👈 NUEVO
+  }
 });
 
 // 👇 Completa las horas de atención (07:00 a 23:00) aunque no tengan reservas
 for (let h = 7; h <= 23; h++) {
   const clave = String(h).padStart(2, '0') + ':00';
   if (!(clave in conteoPorHora)) conteoPorHora[clave] = 0;
+  if (!(clave in canceladasPorHora)) canceladasPorHora[clave] = 0; // 👈 NUEVO
 }
 
 const horasOrdenadas = Object.keys(conteoPorHora).sort();
@@ -843,16 +906,23 @@ if (horariosChartRef.current) {
     type: 'bar',
     data: {
       labels: horasOrdenadas,
-      datasets: [{
-        label: 'Reservas',
-        data: horasOrdenadas.map(h => conteoPorHora[h]),
-        backgroundColor: '#3b82f6'
-      }]
+      datasets: [
+        {
+          label: 'Reservas',
+          data: horasOrdenadas.map(h => conteoPorHora[h]),
+          backgroundColor: '#3b82f6'
+        },
+        {
+          label: 'Canceladas', // 👈 NUEVO
+          data: horasOrdenadas.map(h => canceladasPorHora[h]),
+          backgroundColor: '#dc2626'
+        }
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: { legend: { display: true, position: 'bottom' } }, // 👈 cambiado a true para diferenciar colores
       scales: {
         y: {
           beginAtZero: true,
@@ -867,9 +937,20 @@ if (horariosChartRef.current) {
 }
 
   setDatosExport({
-  ingresos: clavesOrdenadas.map(c => ({ Periodo: c, "Ingresos (S/)": ingresosPorClave[c].toFixed(2) })),
+  ingresos: clavesOrdenadas.map(c => ({
+    Periodo: c,
+    "Ingresos (S/)": ingresosPorClave[c].toFixed(2),
+    "Cancelado (S/)": (canceladosPorClave[c] || 0).toFixed(2)
+  })),
   deportes: Object.keys(conteoPorTipo).map(tipo => ({ Deporte: tipo, Reservas: conteoPorTipo[tipo] })),
-  horarios: horasOrdenadas.map(h => ({ Hora: h, Reservas: conteoPorHora[h] }))
+  horarios: horasOrdenadas.map(h => ({ Hora: h, Reservas: conteoPorHora[h] })),
+  resumen: [
+    { Metrica: 'Total de Reservas', Valor: totalReservas },
+    { Metrica: 'Ingresos Totales (S/)', Valor: totalIngresos.toFixed(2) },
+    { Metrica: 'Ticket Promedio (S/)', Valor: ticketPromedio.toFixed(2) },
+    { Metrica: 'Reservas Canceladas', Valor: totalCanceladas },
+    { Metrica: 'Ingresos Perdidos por Cancelación (S/)', Valor: ingresosPerdidos.toFixed(2) }
+  ]
 });
     // Limpieza al desmontar o antes de re-ejecutar el efecto
   return () => {
@@ -1064,6 +1145,7 @@ const handleEliminarUsuario = (id) => {
 };
 
 
+
 const handleGuardarRol = async () => {
   if (!editandoUsuario) return;
   try {
@@ -1143,17 +1225,27 @@ const handleCambiarEstadoReserva = (reservaId, nuevoEstado) => {
           return;
         }
 
-        const reservaActualizada = { ...reservaActual, estado: nuevoEstado };
+        let response;
 
-        await axios.put(
-          `http://localhost:8080/api/reservas/actualizar/${reservaId}`,
-          reservaActualizada,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        if (nuevoEstado === 'confirmada') {
+          // Usa el endpoint que dispara fechaLimitePago + correo
+          response = await axios.put(
+            `http://localhost:8080/api/reservas/${reservaId}/estado?estado=confirmada`,
+            null,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } else {
+          const reservaActualizada = { ...reservaActual, estado: nuevoEstado };
+          response = await axios.put(
+            `http://localhost:8080/api/reservas/actualizar/${reservaId}`,
+            reservaActualizada,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        }
 
         mostrarToast('exito', `Estado de reserva actualizado a "${nuevoEstado}"`);
 
-        setReservas(prev => prev.map(r => (r.id === reservaId ? { ...r, estado: nuevoEstado } : r)));
+        setReservas(prev => prev.map(r => (r.id === reservaId ? response.data : r)));
       } catch (error) {
         console.error("Error al actualizar estado de reserva:", error);
         mostrarToast('error', 'No se pudo actualizar el estado de la reserva.');
@@ -1211,6 +1303,7 @@ cerrarModalCancelar();
     estadisticas: 'Estadísticas',
     usuarios: 'Usuarios',
     reservas: 'Reservas',
+    pagos: 'Pagos',
     canchas: 'Canchas',
     configuracion: 'Configuración'
   };
@@ -1302,13 +1395,20 @@ cerrarModalCancelar();
           >
             <FaClipboardList /> Reservas
           </button>
+          <button
+            onClick={() => setActiveTab('pagos')}
+            className={activeTab === 'pagos' ? 'active' : ''}
+          >
+            <FaMoneyBillWave /> Pagos
 
+          </button>
           <button
             onClick={() => setActiveTab('canchas')}
             className={activeTab === 'canchas' ? 'active' : ''}
           >
             <FaFutbol /> Canchas
           </button>
+
           <button
              onClick={() => setActiveTab('configuracion')}
             className={activeTab === 'configuracion' ? 'active' : ''}
@@ -1597,6 +1697,11 @@ cerrarModalCancelar();
     <span className="summary-label">Ticket Promedio</span>
     <span className="summary-value">S/. {resumenStats.ticketPromedio.toFixed(2)}</span>
   </div>
+  <div className="summary-card summary-card-danger">
+    <span className="summary-label">Reservas Canceladas</span>
+    <span className="summary-value">{resumenStats.totalCanceladas}</span>
+    <span className="summary-subvalue">S/. {resumenStats.ingresosPerdidos.toFixed(2)} perdidos</span>
+  </div>
 </div>
             <div className="stats-charts-grid">
               <div className="chart-card large">
@@ -1634,188 +1739,11 @@ cerrarModalCancelar();
 
 {/* USUARIOS */}
 {activeTab === 'usuarios' && (
+    <section>
   
-  <section className="admin-table-section">
-    <div className="admin-usuarios-export-header">
-          {/* EXPORTACIÓN */}
-  <div className="admin-export-toolbar">
-
-  {/* EXCEL */}
-  <div className="admin-export-dropdown-wrapper">
-
-    <button
-      className="admin-export-btn-excel"
-      onClick={(e) => {
-        e.stopPropagation();
-        setMostrarMenuExcel(!mostrarMenuExcel);
-        setMostrarMenuPDF(false);
-      }}
-    >
-      <span className="admin-export-icon">▣</span>
-      <span>Excel</span>
-      <span className="admin-export-arrow">▾</span>
-    </button>
-
-    {mostrarMenuExcel && (
-      <div
-        className="admin-export-menu"
-        onClick={(e) => e.stopPropagation()}
-      >
-
-        <div className="admin-export-menu-title">
-          Exportar usuarios
-        </div>
-
-        <button
-          onClick={() => {
-            exportarExcel(
-              usuarios,
-              'todos_los_usuarios'
-            );
-            setMostrarMenuExcel(false);
-          }}
-        >
-          <span>Todos los usuarios</span>
-          <small>Excel</small>
-        </button>
-
-        <button
-          onClick={() => {
-            exportarExcel(
-              usuariosActivos,
-              'usuarios_activos'
-            );
-            setMostrarMenuExcel(false);
-          }}
-        >
-          <span>Usuarios activos</span>
-          <small>Excel</small>
-        </button>
-
-        <button
-          onClick={() => {
-            exportarExcel(
-              usuariosDeshabilitados,
-              'usuarios_deshabilitados'
-            );
-            setMostrarMenuExcel(false);
-          }}
-        >
-          <span>Usuarios deshabilitados</span>
-          <small>Excel</small>
-        </button>
-
-        <button
-          onClick={() => {
-            exportarExcel(
-              usuariosAdmins,
-              'administradores'
-            );
-            setMostrarMenuExcel(false);
-          }}
-        >
-          <span>Administradores</span>
-          <small>Excel</small>
-        </button>
-
-      </div>
-    )}
-
-  </div>
-
-
-  {/* PDF */}
-  <div className="admin-export-dropdown-wrapper">
-
-    <button
-      className="admin-export-btn-pdf"
-      onClick={(e) => {
-        e.stopPropagation();
-        setMostrarMenuPDF(!mostrarMenuPDF);
-        setMostrarMenuExcel(false);
-      }}
-    >
-      <span className="admin-export-icon">▤</span>
-      <span>PDF</span>
-      <span className="admin-export-arrow">▾</span>
-    </button>
-
-    {mostrarMenuPDF && (
-      <div
-        className="admin-export-menu"
-        onClick={(e) => e.stopPropagation()}
-      >
-
-        <div className="admin-export-menu-title">
-          Exportar usuarios
-        </div>
-
-        <button
-          onClick={() => {
-            exportarPDF(
-              usuarios,
-              'todos_los_usuarios',
-              'Todos los Usuarios'
-            );
-            setMostrarMenuPDF(false);
-          }}
-        >
-          <span>Todos los usuarios</span>
-          <small>PDF</small>
-        </button>
-
-        <button
-          onClick={() => {
-            exportarPDF(
-              usuariosActivos,
-              'usuarios_activos',
-              'Usuarios Activos'
-            );
-            setMostrarMenuPDF(false);
-          }}
-        >
-          <span>Usuarios activos</span>
-          <small>PDF</small>
-        </button>
-
-        <button
-          onClick={() => {
-            exportarPDF(
-              usuariosDeshabilitados,
-              'usuarios_deshabilitados',
-              'Usuarios Deshabilitados'
-            );
-            setMostrarMenuPDF(false);
-          }}
-        >
-          <span>Usuarios deshabilitados</span>
-          <small>PDF</small>
-        </button>
-
-        <button
-          onClick={() => {
-            exportarPDF(
-              usuariosAdmins,
-              'administradores',
-              'Administradores'
-            );
-            setMostrarMenuPDF(false);
-          }}
-        >
-          <span>Administradores</span>
-          <small>PDF</small>
-        </button>
-
-      </div>
-    )}
-
-  </div>
-
-</div>
-      
-    </div>
-
-    {/* Tarjetas resumen */}
+  
+{/* Tarjetas resumen + Buscador, en su propia sección */}
+  <section className="admin-summary-section">
     <div className="admin-summary" style={{ marginBottom: '20px' }}>
       <div className="admin-summary-card">
         <p style={{ margin: 0, color: 'var(--admin-text-muted)' }}>Total</p>
@@ -1831,7 +1759,6 @@ cerrarModalCancelar();
       </div>
     </div>
 
-    {/* Buscador */}
     <div className="admin-buscador-container">
       <FaSearch className="admin-buscador-icon" />
       <input
@@ -1842,10 +1769,11 @@ cerrarModalCancelar();
         onChange={(e) => setBusquedaUsuario(e.target.value)}
       />
     </div>
+  </section>
 
 
-
-    <table>
+  <section className="admin-table-section">
+<table>
       <thead>
         <tr>
           <th className="admin-th-ordenable" onClick={() => handleOrdenar('nombre')}>
@@ -1886,14 +1814,14 @@ cerrarModalCancelar();
               </span>
             </td>
             <td>
-  {u.fechaRegistro
-    ? new Date(u.fechaRegistro).toLocaleDateString('es-PE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
-    : 'N/A'}
-</td>
+              {u.fechaRegistro
+                ? new Date(u.fechaRegistro).toLocaleDateString('es-PE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  })
+                : 'N/A'}
+            </td>
             <td>
               <button className="admin-edit-btn" onClick={() => handleAbrirEditarUsuario(u)} title="Editar rol">
                 <FaEdit />
@@ -1920,8 +1848,10 @@ cerrarModalCancelar();
       </p>
     )}
   </section>
-
+  </section>
 )}
+
+
 {usuarioDeshabilitar && (
   <div className="admin-modal-overlay" onClick={cerrarModalDeshabilitar}>
     <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
@@ -1967,173 +1897,319 @@ cerrarModalCancelar();
         </div>
       )}
 {/* RESERVAS */}
-{activeTab === "reservas" && (
-  <section className="admin-table-section">
-    <h3>Gestión de Reservas</h3>
+{activeTab === "reservas" && (() => {
+  const ORDEN_ESTADO = { pendiente: 0, confirmada: 1, cancelada: 2 };
 
-    <div className="admin-reservas-grid">
-      {["pendiente", "confirmada", "pagada", "cancelada"].map((estado) => {
-        const reservasEstado = reservas.filter(
-          (r) => r.estado === estado
-        );
+  const reservasVisibles = (
+    filtroEstadoReserva === "todas"
+      ? reservas.filter((r) =>
+          ["pendiente", "confirmada", "cancelada"].includes(r.estado)
+        )
+      : reservas.filter((r) => r.estado === filtroEstadoReserva)
+  )
+    .filter((r) => {
+      if (!busquedaReserva.trim()) return true;
+      const texto = busquedaReserva.toLowerCase();
+      return r.usuario?.nombre?.toLowerCase().includes(texto);
+    })
+    .filter((r) => {
+      if (!fechaFiltroReserva) return true;
+      return r.fechaReserva === fechaFiltroReserva;
+    })
+    .sort((a, b) => {
+      const ordenEstado = ORDEN_ESTADO[a.estado] - ORDEN_ESTADO[b.estado];
+      if (ordenEstado !== 0) return ordenEstado;
+      return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
+    });
 
-        return (
-          <div className="admin-reservas-card" key={estado}>
-            <h4>
-              {estado.charAt(0).toUpperCase() + estado.slice(1)}{" "}
-              <span>({reservasEstado.length})</span>
-            </h4>
+  const totalPendientes = reservas.filter((r) => r.estado === "pendiente").length;
+  const totalConfirmadas = reservas.filter((r) => r.estado === "confirmada").length;
+  const totalCanceladas = reservas.filter((r) => r.estado === "cancelada").length;
 
-            {reservasEstado.length === 0 ? (
-              <p className="admin-empty-state">
-                No hay reservas {estado}s.
-              </p>
-            ) : (
-              <div className="admin-table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Usuario</th>
-                      <th>Cancha</th>
-                      <th>Fecha</th>
-                      <th>Horario</th>
+  function ResumenReservas() {
+    return (
+      <div className="admin-summary-grid">
+        <div className="admin-summary-card">
+          <span className="admin-summary-label">Total</span>
+          <span className="admin-summary-value">
+            {totalPendientes + totalConfirmadas + totalCanceladas}
+          </span>
+        </div>
+        <div className="admin-summary-card">
+          <span className="admin-summary-label">Pendientes</span>
+          <span className="admin-summary-value">{totalPendientes}</span>
+        </div>
+        <div className="admin-summary-card">
+          <span className="admin-summary-label">Confirmadas</span>
+          <span className="admin-summary-value">{totalConfirmadas}</span>
+        </div>
+        <div className="admin-summary-card">
+          <span className="admin-summary-label">Canceladas</span>
+          <span className="admin-summary-value">{totalCanceladas}</span>
+        </div>
+      </div>
+    );
+  }
 
-                      {/* PAGO EN PENDIENTE, CONFIRMADA Y PAGADA */}
-                      {(estado === "pendiente" ||
-                        estado === "confirmada" ||
-                        estado === "pagada") && <th>Pago</th>}
+  function FiltrosReservas() {
+    return (
+      <div className="admin-filtros-row">
+        <input
+          type="text"
+          className="admin-search-input"
+          placeholder="Buscar por nombre de usuario"
+          value={busquedaReserva}
+          onChange={(e) => setBusquedaReserva(e.target.value)}
+        />
 
-                      {/* CANCELADO POR SOLO EN CANCELADAS */}
-                      {estado === "cancelada" && <th>Cancelado por</th>}
+        <input
+          type="date"
+          className="admin-filtro-fecha"
+          value={fechaFiltroReserva}
+          onChange={(e) => setFechaFiltroReserva(e.target.value)}
+        />
 
-                      {/* ACCIONES: solo para los estados que tienen botones reales */}
-                      {estado !== "pagada" && <th>Acciones</th>}
-                    </tr>
-                  </thead>
+        <select
+          className="admin-filtro-estado"
+          value={filtroEstadoReserva}
+          onChange={(e) => setFiltroEstadoReserva(e.target.value)}
+        >
+          <option value="pendiente">Pendientes</option>
+          <option value="confirmada">Confirmadas</option>
+          <option value="cancelada">Canceladas</option>
+          <option value="todas">Todas</option>
+        </select>
+      </div>
+    );
+  }
 
-                  <tbody>
-                    {reservasEstado.map((r) => (
-                      <tr key={r.id}>
-                        <td>{r.usuario?.nombre}</td>
-                        <td>{r.cancha?.nombre}</td>
-                        <td>{r.fechaReserva}</td>
-                        <td>
-                          {r.horaInicio} - {r.horaFin}
-                        </td>
+  function TablaReservas() {
+    if (reservasVisibles.length === 0) {
+      return <p className="admin-empty-state">No se encontraron reservas con esos criterios.</p>;
+    }
 
-                        {/* PAGO */}
-{(estado === "pendiente" || estado === "confirmada") && (
-  <td>
-    {(() => {
-      const pago = ultimoPago(r);
-      const est = pago?.estado;
-      return (
-        <span className={
-          est === "exitoso" ? "badge badge-pagado"
-          : est === "fallido" ? "badge badge-fallido"
-          : "badge badge-sin-pago"
-        }>
-          {est === "exitoso" ? "✔ Pagado"
-            : est === "fallido" ? `✖ Fallido${r.pagos?.length > 1 ? ` (intento ${r.pagos.length})` : ''}`
-            : "Pendiente"}
-        </span>
-      );
-    })()}
-  </td>
-)}
-{estado === "pagada" && (
-  <td>
-    <span className="badge badge-pagado">
-      ✔ Pagada
-    </span>
-  </td>
-)}
+    return (
+      <div className="admin-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Cancha</th>
+              <th>Fecha</th>
+              <th>Horario</th>
+              <th>Estado</th>
+              <th>Info</th>
+              <th>Detalles</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reservasVisibles.map((r) => (
+              <tr key={r.id}>
+                <td>{r.usuario?.nombre}</td>
+                <td>{r.cancha?.nombre}</td>
+                <td>{r.fechaReserva}</td>
+                <td>
+                  {r.horaInicio} - {r.horaFin}
+                </td>
+                <td>
+                  <span
+                    className={
+                      r.estado === "pendiente"
+                        ? "badge badge-sin-pago"
+                        : r.estado === "confirmada"
+                        ? "badge badge-pagado"
+                        : "badge badge-fallido"
+                    }
+                  >
+                    {r.estado.charAt(0).toUpperCase() + r.estado.slice(1)}
+                  </span>
+                </td>
+                <td>
+                  {r.estado === "cancelada" ? (
+                      <span
+                        className={
+                          r.canceladoPor === "cliente"
+                            ? "badge badge-sin-pago"
+                            : r.canceladoPor === "sistema"
+                            ? "badge badge-fallido"
+                            : "badge badge-admin"
+                        }
+                      >
+                        {r.canceladoPor === "cliente"
+                          ? "Cliente"
+                          : r.canceladoPor === "sistema"
+                          ? "Sistema"
+                          : "Admin"}
+                      </span>
+                    ) : (
+                    (() => {
+                      const pago = ultimoPago(r);
+                      const est = pago?.estado;
+                      return (
+                        <span
+                          className={
+                            est === "exitoso"
+                              ? "badge badge-pagado"
+                              : est === "fallido"
+                              ? "badge badge-fallido"
+                              : "badge badge-sin-pago"
+                          }
+                        >
+                          {est === "exitoso"
+                            ? "✔ Pagado"
+                            : est === "fallido"
+                            ? `✖ Fallido${
+                                r.pagos?.length > 1 ? ` (intento ${r.pagos.length})` : ""
+                              }`
+                            : "Sin pago"}
+                        </span>
+                      );
+                    })()
+                  )}
+                </td>
+                <td>
+                  <button className="admin-view-btn" onClick={() => setDetalleReserva(r)}>
+                    👁 Ver detalle
+                  </button>
+                </td>
+                <td>
+                  <div className="admin-actions-cell">
+                    {r.estado === "pendiente" && (
+                      <>
+                        <button
+                          className="admin-confirm-btn"
+                          onClick={() => handleCambiarEstadoReserva(r.id, "confirmada")}
+                        >
+                          ✔ Confirmar
+                        </button>
+                        <button className="admin-cancel-btn" onClick={() => abrirModalCancelar(r)}>
+                          ✖ Cancelar
+                        </button>
+                      </>
+                    )}
 
-                        {/* CANCELADO POR */}
-                        {estado === "cancelada" && (
-                          <td>
-                            <span
-                              className={
-                                r.canceladoPor === "cliente"
-                                  ? "badge badge-sin-pago"
-                                  : "badge badge-admin"
-                              }
-                            >
-                              {r.canceladoPor === "cliente"
-                                ? "Cliente"
-                                : "Admin"}
-                            </span>
-                          </td>
-                        )}
+                    {r.estado === "confirmada" && (
+                      <button className="admin-cancel-btn" onClick={() => abrirModalCancelar(r)}>
+                        ✖ Cancelar
+                      </button>
+                    )}
 
-                        {/* ACCIONES: no se renderiza el <td> para pagada */}
-                        {estado !== "pagada" && (
-                          <td>
-                            <div className="admin-actions-cell">
-                              {/* PENDIENTE */}
-                              {estado === "pendiente" && (
-                                <>
-                                  <button
-                                    className="admin-confirm-btn"
-                                    onClick={() =>
-                                      handleCambiarEstadoReserva(
-                                        r.id,
-                                        "confirmada"
-                                      )
-                                    }
-                                  >
-                                    ✔ Confirmar
-                                  </button>
+                    {r.estado === "cancelada" && (
+                      <span className="admin-empty-state" style={{ margin: 0 }}>
+                        —
+                      </span>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 
-                                  <button
-                                    className="admin-cancel-btn"
-                                    onClick={() =>
-                                      abrirModalCancelar(r)
-                                    }
-                                  >
-                                    ✖ Cancelar
-                                  </button>
-                                </>
-                              )}
+  function ModalDetalleReserva() {
+    if (!detalleReserva) return null;
 
-                              {/* CONFIRMADA */}
-                              {estado === "confirmada" && (
-                                <button
-                                  className="admin-cancel-btn"
-                                  onClick={() =>
-                                    abrirModalCancelar(r)
-                                  }
-                                >
-                                  ✖ Cancelar
-                                </button>
-                              )}
+    return (
+      <div className="admin-modal-overlay" onClick={() => setDetalleReserva(null)}>
+        <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-modal-header">
+            <h3>Detalle de la reserva #{detalleReserva.id}</h3>
+            <button className="admin-modal-close" onClick={() => setDetalleReserva(null)}>
+              ✕
+            </button>
+          </div>
 
-                              {/* CANCELADA */}
-                              {estado === "cancelada" && (
-                                <button
-                                  className="admin-view-btn"
-                                  onClick={() =>
-                                    handleVerDetalleCancelacion(r)
-                                  }
-                                >
-                                  👁 Ver detalle
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          <div className="admin-modal-body">
+            <div className="admin-modal-row">
+              <span>Usuario</span>
+              <strong>{detalleReserva.usuario?.nombre || "—"}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Cancha</span>
+              <strong>{detalleReserva.cancha?.nombre || "—"}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Fecha</span>
+              <strong>{detalleReserva.fechaReserva || "—"}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Horario</span>
+              <strong>
+                {detalleReserva.horaInicio} - {detalleReserva.horaFin}
+              </strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Monto total</span>
+              <strong>S/ {Number(detalleReserva.montoTotal ?? 0).toFixed(2)}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Estado</span>
+              <strong>{detalleReserva.estado}</strong>
+            </div>
+
+            {detalleReserva.estado !== "cancelada" &&
+              (() => {
+                const pago = ultimoPago(detalleReserva);
+                return (
+                  <div className="admin-modal-row">
+                    <span>Estado de pago</span>
+                    <strong>{pago?.estado || "Sin pago"}</strong>
+                  </div>
+                );
+              })()}
+
+            {detalleReserva.estado === "cancelada" && (
+              <>
+                <div className="admin-modal-row">
+                  <span>Cancelado por</span>
+                  <strong>
+                    {detalleReserva.canceladoPor === "cliente"
+                      ? "Cliente"
+                      : detalleReserva.canceladoPor === "sistema"
+                      ? "Sistema"
+                      : "Admin"}
+                  </strong>
+                </div>
+                <div className="admin-modal-row">
+                  <span>Motivo de cancelación</span>
+                  <strong>{detalleReserva.motivoCancelacion || "No especificado"}</strong>
+                </div>
+              </>
             )}
           </div>
-        );
-      })}
-    </div>
-  </section>
-)}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <section className="admin-summary-section">
+        <h3>Gestión de Reservas</h3>
+        <ResumenReservas />
+      </section>
+
+      <section className="admin-filtros-section">
+        <FiltrosReservas />
+      </section>
+
+      <section className="admin-table-section">
+        <TablaReservas />
+      </section>
+
+      {/* MODAL DE DETALLE */}
+      <ModalDetalleReserva />
+    </>
+  );
+})()}
+
+
+{activeTab === "pagos" && <Pagos pagos={pagos} />}
+
 
 {activeTab === "canchas" && (
   <section className="admin-canchas-section">
@@ -2567,7 +2643,16 @@ cerrarModalCancelar();
                 <p><strong>Motivo:</strong> {detalleCancelacion.motivoCancelacion || "No especificado"}</p>
                 {detalleCancelacion.observacionCancelacion && (
                   <p><strong>Observación:</strong> {detalleCancelacion.observacionCancelacion}</p>
+                  
                 )}
+                <p>
+                  <strong>Cancelado por:</strong>{" "}
+                  {detalleCancelacion.canceladoPor === "cliente"
+                    ? "El cliente"
+                    : detalleCancelacion.canceladoPor === "sistema"
+                    ? "El sistema (venció el plazo de pago)"
+                    : "Administración"}
+                </p>
               </div>
               <div className="admin-modal-footer">
                 <button className="admin-modal-cancel-btn" onClick={() => setDetalleCancelacion(null)}>Cerrar</button>

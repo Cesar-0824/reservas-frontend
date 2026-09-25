@@ -16,17 +16,18 @@ function Contacto() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setStatus('Enviando...');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setStatus('Enviando...');
 
-    // Simulación de envío (puedes reemplazar con fetch o axios)
-    setTimeout(() => {
-      console.log('Formulario enviado:', formData);
-      setStatus('¡Mensaje enviado con éxito! Te responderemos pronto.');
-      setFormData({ nombre: '', correo: '', mensaje: '' });
-    }, 1500);
-  };
+  try {
+    await axios.post(`${process.env.REACT_APP_API_URL}/api/contacto`, formData);
+    setStatus('¡Mensaje enviado con éxito! Te responderemos pronto.');
+    setFormData({ nombre: '', correo: '', mensaje: '' });
+  } catch (err) {
+    setStatus('No se pudo enviar el mensaje. Intenta nuevamente.');
+  }
+};
 
   return (
     <div className="contacto-container">

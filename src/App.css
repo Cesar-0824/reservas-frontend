@@ -1,106 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-
- 
-* {
-  box-sizing: border-box;
-}
- 
-html, body, #root, .App {
-  height: 100%;
+html, body {
+  background-color: #080c09 ; /* Tu color oscuro base */
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100%;
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--bg-dark, #0b0f0c);
-  color: var(--text-main, #ffffff);
 }
- 
-.App {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
- 
-/* ===========================
-   CONTENIDO PRINCIPAL
-   (usado por Home y cualquier otra página normal)
-=========================== */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 0;
-}
- 
-/* ===========================
-   WRAPPER SOLO PARA PÁGINAS QUE NECESITAN CENTRADO
-   (ej: login) — úsalo en vez de centrar .main-content globalmente
-=========================== */
-.centered-page-wrapper {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
- 
-/* Estilo para la sección del trofeo */
-.trophy-section {
-  background-color: #333;
-  padding: 50px 20px;
-  text-align: center;
-  margin-top: auto; /* empuja esta sección al final */
-}
- 
-.trophy-image {
-  max-width: 50%;
-  height: auto;
-  opacity: 0.8;
-}
- 
-@media (max-width: 768px) {
-  .trophy-image {
-    max-width: 80%;
-  }
-}
- 
-.logout-button {
-    padding: 10px 20px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-}
- 
-.logout-button:hover {
-    background-color: #c82333;
-}
- 
-/* Puedes añadir estilos para .dummy-page si los necesitas */
-.dummy-page {
-  padding: 50px;
-  text-align: center;
-  font-size: 1.5em;
-  color: var(--tertiary-color);
+.stats-container {
+  background: transparent; /* Hereda el fondo oscuro de app.css */
+  padding: 24px;
 }
 
-/* Monitores grandes: un poco más de aire y tipografía */
-@media (min-width: 1600px) {
-  .hero-title {
-    font-size: clamp(2.5rem, 4.5vw, 4.5rem);
-  }
+.stats-header h2 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
 
-  .feature-card {
-    padding: 42px;
-  }
+.stats-subtitle {
+  color: #b5b894;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
 
-  .features-section h2,
-  .canchas-section h2 {
-    font-size: 3rem;
-  }
+/* Tarjetas de métricas */
+.stats-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.stat-label {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Gráficos */
+.chart-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.chart-title {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Leyenda del gráfico circular */
+.legend-item {
+  color: #d1d5db;
+  font-size: 0.85rem;
+}
+
+/* Filtros */
+.filter-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #9ca3af;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #ffffff;
 }

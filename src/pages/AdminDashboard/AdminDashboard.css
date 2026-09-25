@@ -1,51 +1,54 @@
-/* ===========================
-   VARIABLES
-=========================== */
+/* =========================================================
+   VARIABLES — Paleta de colores unificada
+========================================================= */
 :root {
   --admin-sidebar-bg: #0d1a12;
-  --admin-sidebar-active: #3161fffa;
-
-  --admin-bg-page: #f4f6f8;
+  --admin-sidebar-active: #22c55e;
+  --admin-bg-page: #f8faf9;
   --admin-card-bg: #ffffff;
-  --admin-card-bg-solid: #ffffff;
-
   --admin-primary: #15803d;
-  --admin-success: #388f58;
-  --admin-success-dark: #26914d;
-
+  --admin-primary-light: #16a34a;
+  --admin-primary-soft: rgba(22, 163, 74, 0.08);
+  --admin-success: #16a34a;
+  --admin-success-dark: #15803d;
   --admin-blue: #3b82f6;
   --admin-warning: #f59e0b;
   --admin-purple: #8b5cf6;
-
   --admin-danger: #ef4444;
   --admin-danger-dark: #dc2626;
-
   --admin-text-dark: #111827;
   --admin-text-muted: #6b7280;
   --admin-border-light: #e5e7eb;
-
   --admin-radius: 12px;
   --admin-shadow-sm: 0 2px 8px rgba(24, 17, 17, 0.05);
   --admin-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --admin-shadow-lg: 0 10px 40px rgba(22, 163, 74, 0.12);
+}
+/* =========================================================
+   RESETEO Y BASE
+========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* ===========================
+/* =========================================================
    CONTENEDOR GENERAL
-=========================== */
+========================================================= */
 .admin-dashboard-container {
   display: flex;
-  min-height: 100vh;
-  
+  height: 100vh;
   width: 100%;
   overflow: hidden;
-  box-sizing: border-box;
   background-color: var(--admin-bg-page);
   font-family: "Segoe UI", system-ui, sans-serif;
 }
 
-/* ===========================
+
+/* =========================================================
    SIDEBAR
-=========================== */
+========================================================= */
 .admin-sidebar {
   width: 260px;
   background: linear-gradient(180deg, #122419 0%, #0a140e 100%);
@@ -55,14 +58,9 @@
   height: 100vh;
   flex-shrink: 0;
   display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  flex-direction: column;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-.admin-nav {
-  display: flex;
-  flex-direction: column;
-  flex: 1 ; /* hace que admin-nav ocupe todo el espacio disponible dentro de admin-sidebar */
 }
 
 .admin-sidebar h2 {
@@ -80,6 +78,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
 }
 
 .admin-nav button {
@@ -92,7 +91,7 @@
   text-align: left;
   cursor: pointer;
   border-radius: 10px;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .admin-nav button:hover {
@@ -108,55 +107,9 @@
   box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
 }
 
-/* ===========================
-   CONTENIDO PRINCIPAL
-=========================== */
-.admin-content {
-  flex: 1;
-  min-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 0 40px 45px 40px; /* 👈 quitamos el padding-top, ahora lo maneja el header */
-  box-sizing: border-box;
-  align-items: flex-start;
-  margin-left: 260px;
-}
-
-.admin-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--admin-bg-page, #ffffff);
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.admin-logout-button {
   width: 100%;
-  padding: 16px 24px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--admin-border-light, #e2e8f0);
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-}
-.admin-header-titles {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.admin-header h3 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--admin-text-dark);
-  line-height: 1.2;
-}
-
-.admin-nav button.admin-logout-button {
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.05); /* Fondo oscuro muy suave */
+  background-color: rgba(255, 255, 255, 0.05);
   color: #e2e8f0;
   padding: 12px 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -170,19 +123,60 @@
   transition: all 0.2s ease;
   margin-top: auto;
   margin-bottom: 16px;
-  box-sizing: border-box;
 }
 
-.admin-nav button.admin-logout-button:hover {
-  background-color: var(--admin-danger, #ef4444);
-  border-color: var(--admin-danger, #ef4444);
+.admin-logout-button:hover {
+  background-color: var(--admin-danger);
+  border-color: var(--admin-danger);
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
-/* ===========================
-   HEADER SUPERIOR (Campanita + Perfil)
-=========================== */
+/* =========================================================
+   CONTENIDO PRINCIPAL
+========================================================= */
+.admin-content {
+  flex: 1;
+  min-height: 100%;
+  overflow-y: visible;
+  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 40px 45px 40px;
+  margin-left: 260px;
+  
+}
+
+
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(248, 250, 249, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--admin-border-light);
+}
+
+.admin-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text-dark);
+}
+
 .admin-header-right {
   display: flex;
   align-items: center;
@@ -198,7 +192,7 @@
   cursor: pointer;
   padding: 8px;
   border-radius: 8px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .admin-header-icon-btn:hover {
@@ -220,7 +214,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 3px;
 }
 
 .admin-header-profile {
@@ -292,10 +285,7 @@
   background: rgba(239, 68, 68, 0.08);
 }
 
-.admin-header-notif-wrapper {
-  position: relative;
-}
-
+/* Notificaciones */
 .admin-notif-dropdown {
   position: absolute;
   top: calc(100% + 10px);
@@ -331,10 +321,19 @@
 .admin-notif-item {
   padding: 12px 18px;
   border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s ease;
 }
 
 .admin-notif-item:last-child {
   border-bottom: none;
+}
+
+.admin-notif-item-clickable {
+  cursor: pointer;
+}
+
+.admin-notif-item-clickable:hover {
+  background: #f9fafb;
 }
 
 .admin-notif-mensaje {
@@ -363,27 +362,55 @@
   color: var(--admin-text-muted);
   font-size: 0.85rem;
 }
+@media (max-width: 900px) {
+  .admin-dashboard-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
 
-.admin-notif-item-clickable {
-  cursor: pointer;
-  transition: background 0.2s ease;
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 16px;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: none;
+  }
+
+  .admin-nav button {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+
+  .admin-logout-button {
+    width: 100%;
+    margin-top: 12px;
+    order: 999;
+  }
+
+  .admin-content {
+    height: auto;
+    overflow-y: visible;
+    overflow-x: hidden;
+    margin-left: 0;      /* 👈 CLAVE: quita el desplazamiento del sidebar fijo */
+    width: 100%;
+    padding: 0 16px 24px 16px;  /* 👈 padding más chico para móvil */
+  }
 }
-
-.admin-notif-item-clickable:hover {
-  background: #f9fafb;
-}
-
-.admin-reserva-highlight {
-  animation: highlightFade 2s ease;
-}
-
-@keyframes highlightFade {
-  0% { background-color: rgba(59, 130, 246, 0.25); }
-  100% { background-color: transparent; }
-}
-
-/* ========= HOME ========= */
-
+/* =========================================================
+   TARJETA DE BIENVENIDA
+========================================================= */
 .admin-welcome-card {
   background: var(--admin-card-bg);
   border-radius: 16px;
@@ -395,16 +422,9 @@
   gap: 24px;
   border: 1px solid var(--admin-border-light);
   box-shadow: var(--admin-shadow-sm);
-  
-  /* Arreglos clave de ancho y responsividad */
-  width: 100%;             /* Asegura que ocupe el 100% del contenedor */
-  box-sizing: border-box;  /* Evita que el padding rompa el ancho total */
+  width: 100%;
+  box-sizing: border-box;
   transition: all 0.3s ease;
-}
-
-/* Agrupador del texto (por si la fecha está separada) */
-.admin-welcome-card .welcome-text {
-  flex: 1;
 }
 
 .admin-welcome-card h2 {
@@ -413,9 +433,7 @@
   font-size: 1.6rem;
   font-weight: 700;
   line-height: 1.2;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  
 }
 
 .admin-welcome-card p {
@@ -423,32 +441,7 @@
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.5;
-  max-width: 650px; /* Un poco más espacioso para el texto largo */
-}
-
-/* Estilo para el bloque de fecha (si usas una clase específica) */
-.admin-welcome-card .date-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding-left: 24px;
-  border-left: 1px solid var(--admin-border-light);
-  white-space: nowrap;
-}
-
-.admin-welcome-card .date-badge span {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--admin-text-muted);
-  font-weight: 600;
-}
-
-.admin-welcome-card .date-badge strong {
-  font-size: 1.1rem;
-  color: var(--admin-text-dark);
-  font-weight: 700;
-  margin-top: 2px;
+  max-width: 650px;
 }
 
 .admin-date-card {
@@ -460,7 +453,7 @@
 
 .admin-date-card span {
   color: var(--admin-text-muted);
-  font-size: .78rem;
+  font-size: 0.78rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -496,14 +489,6 @@
   font-weight: 700;
 }
 
-.admin-home-card p {
-  color: var(--admin-text-dark);
-  font-size: .92rem;
-  margin: 8px 0;
-}
-
-
-
 .admin-home-card table {
   width: 100%;
   border-collapse: collapse;
@@ -518,9 +503,19 @@
 }
 
 @media (max-width: 900px) {
-  .admin-home-grid { grid-template-columns: 1fr; }
-  .admin-welcome-card { flex-direction: column; align-items: flex-start; gap: 20px; }
-  .admin-date-card { text-align: left; }
+  .admin-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-welcome-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .admin-date-card {
+    text-align: left;
+  }
 }
 
 /* ===========================
@@ -550,6 +545,21 @@
   transform: translateY(-4px);
   box-shadow: var(--admin-shadow-md);
 }
+.summary-card-danger {
+  border-color: rgba(220, 38, 38, 0.3);
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.summary-card-danger .summary-value {
+  color: #dc2626;
+}
+
+.summary-subvalue {
+  display: block;
+  font-size: 0.75rem;
+  color: #f87171;
+  margin-top: 4px;
+}
 
 .admin-summary-card .icon {
   font-size: 1.8rem;
@@ -561,14 +571,37 @@
   justify-content: center;
   border-radius: 50%;
   margin-inline: auto;
-  color: #ef4444;
 }
 
-.admin-summary-card:nth-child(1) .icon { color: #418058; background: rgba(34, 197, 94, 0.12); }
-.admin-summary-card:nth-child(2) .icon { color: #3b82f6; background: rgba(59, 130, 246, 0.12); }
-.admin-summary-card:nth-child(3) .icon { color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
-.admin-summary-card:nth-child(4) .icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.12); }
-.admin-summary-card:nth-child(5) .icon { color: #16a34a; background: rgba(34, 197, 94, 0.15); }
+.admin-summary-card:nth-child(1) .icon {
+  color: #418058;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.admin-summary-card:nth-child(2) .icon {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.admin-summary-card:nth-child(3) .icon {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.admin-summary-card:nth-child(4) .icon {
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.admin-summary-card:nth-child(5) .icon {
+  color: #16a34a;
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.admin-summary-card:nth-child(6) .icon {
+  color: #e20606;
+  background: rgba(34, 197, 94, 0.15);
+}
 
 .admin-summary-card h3 {
   font-size: 1.9rem;
@@ -584,19 +617,38 @@
   color: var(--admin-text-muted, #667085);
 }
 
+.admin-home-card th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  background: var(--admin-card-bg);
+  font-size: 15px;
+}
+.admin-home-card p {
+  font-size: 14px;
+  color: var(--admin-text-dark);
+}
+
 /* ===========================
    TABLA GENÉRICA (Usuarios / secciones con tabla)
 =========================== */
 .admin-table-section {
   background-color: var(--admin-card-bg);
   padding: 24px;
-  margin-bottom: 30px;
+  margin-bottom: 0; 
   border-radius: var(--admin-radius);
   box-shadow: var(--admin-shadow-sm);
   overflow-x: auto;
+  overflow-y: visible;
   width: 100%;
-  min-height: 300px;
+  min-height: 0;
   border: 1px solid var(--admin-border-light);
+  max-width: 100%;
+    display: flex;            /* 👈 nuevo */
+  flex-direction: column;   /* 👈 nuevo */
+  flex: 1;                  /* 👈 nuevo: crece para llenar .admin-content */
+  min-height: 0;
 }
 
 .admin-table-section h3 {
@@ -604,6 +656,7 @@
   font-size: 1.15rem;
   color: var(--admin-text-dark);
   font-weight: 700;
+  flex-shrink: 0; 
 }
 
 .admin-table-section table {
@@ -638,9 +691,7 @@
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.admin-table-section tbody tr:hover {
-  background: #f8fafc;
-}
+
 
 .admin-table-section tbody tr:last-child td {
   border-bottom: none;
@@ -696,13 +747,14 @@
 }
 
 @media (max-width: 900px) {
-  .admin-table-section { overflow-x: auto; }
+  
   .admin-table-section table { min-width: 850px; }
 }
 
 /* ===========================
    BADGES DE ROL
 =========================== */
+
 .admin-rol-badge {
   display: inline-block;
   padding: 5px 14px;
@@ -710,6 +762,7 @@
   font-size: 0.82rem;
   font-weight: 700;
   text-transform: capitalize;
+  white-space: nowrap;
 }
 
 .admin-rol-admin {
@@ -731,11 +784,14 @@
   font-weight: 700;
   background-color: rgba(239, 68, 68, 0.12);
   color: var(--admin-danger);
+  white-space: nowrap;
 }
 
+
 /* ===========================
-   BADGES DE PAGO / CANCELACIÓN (genérico "badge" + variantes)
+   BADGES DE PAGO / CANCELACIÓN
 =========================== */
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -768,9 +824,11 @@
   border-color: rgba(139, 92, 246, 0.25);
 }
 
+
 /* ===========================
    BOTONES DE TABLA / ACCIONES
 =========================== */
+
 .admin-edit-btn,
 .admin-delete-btn {
   border: 1px solid transparent;
@@ -780,7 +838,10 @@
   margin: 0 4px;
   padding: 8px 10px;
   border-radius: 10px;
-  transition: all 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
 }
 
 .admin-edit-btn {
@@ -790,7 +851,7 @@
 
 .admin-edit-btn:hover {
   background-color: var(--admin-blue);
-  color: white;
+  color: #ffffff;
 }
 
 .admin-delete-btn {
@@ -800,8 +861,13 @@
 
 .admin-delete-btn:hover {
   background-color: var(--admin-danger);
-  color: white;
+  color: #ffffff;
 }
+
+
+/* ===========================
+   BOTONES DE RESERVAS
+=========================== */
 
 .admin-confirm-btn,
 .admin-cancel-btn,
@@ -816,18 +882,20 @@
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   line-height: 1;
   white-space: nowrap;
 }
 
 .admin-confirm-btn {
   background-color: var(--admin-success);
-  color: white;
-  border: none;
-  
+  color: #ffffff;
 }
-
 
 .admin-confirm-btn:hover {
   background-color: #1b5e20;
@@ -836,7 +904,7 @@
 .admin-cancel-btn {
   background-color: rgba(239, 68, 68, 0.1);
   color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .admin-cancel-btn:hover {
@@ -847,7 +915,7 @@
 .admin-view-btn {
   background-color: rgba(59, 130, 246, 0.1);
   color: var(--admin-blue);
-  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.25);
 }
 
 .admin-view-btn:hover {
@@ -863,6 +931,11 @@
   box-shadow: none;
 }
 
+
+/* ===========================
+   CONTENEDOR DE ACCIONES
+=========================== */
+
 .admin-actions-cell {
   display: inline-flex;
   align-items: center;
@@ -871,101 +944,454 @@
   white-space: nowrap;
 }
 
+
 /* ===========================
-   GRID DE RESERVAS
+   RESPONSIVE
 =========================== */
-.admin-reservas-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  margin-top: 20px;
-  width: 100%;
-}
-
-.admin-reservas-card {
-  background-color: var(--admin-card-bg);
-  padding: 22px;
-  border-radius: var(--admin-radius);
-  box-shadow: var(--admin-shadow-sm);
-  border: 1px solid var(--admin-border-light);
-}
-
-.admin-reservas-card h4 {
-  margin-bottom: 16px;
-  color: var(--admin-text-dark);
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.admin-reservas-card h4 span {
-  color: var(--admin-text-muted);
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-.admin-table-wrapper {
-  overflow-x: auto;
-}
-
-.admin-reservas-card table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-reservas-card th,
-.admin-reservas-card td {
-  vertical-align: middle;
-  padding: 12px 10px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.admin-reservas-card th:nth-last-child(-n+3),
-.admin-reservas-card td:nth-last-child(-n+3) {
-  text-align: center;
-}
-
-.admin-empty-state {
-  text-align: center;
-  color: var(--admin-text-muted);
-  font-size: 0.9rem;
-  padding: 20px 0;
-}
 
 @media (max-width: 900px) {
-  .admin-reservas-grid { grid-template-columns: 1fr; }
+  .admin-actions-cell {
+    gap: 6px;
+  }
+
+  .admin-confirm-btn,
+  .admin-cancel-btn,
+  .admin-view-btn {
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-rol-badge {
+    padding: 4px 11px;
+    font-size: 0.76rem;
+  }
+
+  .admin-usuario-deshabilitado-badge {
+    margin-left: 5px;
+    padding: 3px 8px;
+    font-size: 0.68rem;
+  }
+
+  .badge {
+    padding: 4px 10px;
+    font-size: 0.74rem;
+  }
+
+  .admin-edit-btn,
+  .admin-delete-btn {
+    margin: 0 2px;
+    padding: 7px 8px;
+    font-size: 0.9rem;
+  }
+
+  .admin-confirm-btn,
+  .admin-cancel-btn,
+  .admin-view-btn {
+    padding: 7px 10px;
+    font-size: 0.74rem;
+  }
+
+  .admin-actions-cell {
+    gap: 5px;
+  }
+}
+
+@media (max-width: 400px) {
+  .admin-confirm-btn,
+  .admin-cancel-btn,
+  .admin-view-btn {
+    padding: 7px 8px;
+    font-size: 0.7rem;
+  }
+
+  .admin-actions-cell {
+    gap: 4px;
+  }
 }
 
 /* ===========================
-   MODAL (Usuario / Reservas)
+   GRID DE RESERVAS — ESTILO UNIFICADO
 =========================== */
+.admin-reservas-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+
+
+/* ============================================================
+   GESTIÓN DE RESERVAS — CORREGIDO TAMAÑO Y DISTRIBUCIÓN
+============================================================ */
+  .admin-table-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;        /* 👈 clave: permite que overflow-y funcione dentro de flex */
+  
+  }
+
+/* --- Sección principal --- */
+.admin-table-section {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid #dcfce7;
+  flex: 1;           /* 👈 crece para llenar el espacio restante de .admin-content */
+  min-height: 0; 
+}
+
+.admin-table-section > h3 {
+  margin: 0 0 20px;
+  font-size: 1.25rem;
+  color: #166534;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-table-section > h3::before {
+  content: "📋";
+  font-size: 1.3rem;
+}
+
+/* --- Filtro --- */
+.admin-filtros-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.admin-filtro-estado {
+  padding: 10px 16px;
+  border: 1px solid #dcfce7;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #1f2937;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.admin-filtro-estado:hover {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.admin-filtro-estado:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+/* --- Bloque por estado --- */
+.admin-reservas-seccion {
+  margin-bottom: 28px;
+}
+
+.admin-reservas-seccion > h4 {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  color: #1f2937;
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-reservas-seccion > h4 span {
+  color: #000000;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: #f0fdf4;
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+
+/* --- LISTA DE RESERVAS --- */
+.admin-reservas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-reserva-tarjeta {
+  background: #fafafa;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  transition: all 0.25s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-reserva-tarjeta:hover {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+/* --- Fila principal de datos — DISTRIBUCIÓN CORREGIDA --- */
+.admin-reserva-fila {
+  display: grid;
+  grid-template-columns: 
+    minmax(140px, 1.2fr)   /* Usuario */
+    minmax(160px, 1.5fr)   /* Cancha */
+    minmax(120px, 1fr)     /* Fecha */
+    minmax(140px, 1.2fr)   /* Horario */
+    minmax(140px, 1.2fr)   /* Pago / Cancelado por */
+    minmax(160px, 1.3fr);  /* Acciones */
+  gap: 12px 16px;
+  align-items: center;
+  width: 100%;
+}
+
+.admin-reserva-dato {
+  min-width: 0;
+}
+
+.admin-reserva-dato-etiqueta {
+  font-size: 0.72rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+.admin-reserva-dato-valor {
+  font-size: 0.88rem;
+  color: #1f2937;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-reserva-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+/* --- Fila expandida con detalle --- */
+.admin-reserva-expandida {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #dcfce7;
+}
+
+.admin-detalle-expandido-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: #ffffff;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #dcfce7;
+  transition: all 0.2s ease;
+}
+
+.admin-detalle-expandido-fila:hover {
+  border-left-color: var(--primary-accent);
+  background: #f0fdf4;
+}
+
+.admin-detalle-expandido-etiqueta {
+  color: #166534;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.admin-detalle-expandido-valor {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+/* --- Estado vacío --- */
+.admin-empty-state {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  padding: 32px 20px;
+}
+
+/* --- Badges --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-pagado {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+.badge-fallido {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+.badge-sin-pago {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+.badge-admin {
+  background: rgba(139, 92, 246, 0.12);
+  color: #3730a3;
+}
+
+/* --- Botones de acción --- */
+.admin-view-btn,
+.admin-confirm-btn,
+.admin-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.admin-view-btn {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--primary-accent);
+}
+.admin-view-btn:hover {
+  background: var(--primary-accent);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.admin-confirm-btn {
+  background: var(--primary-accent);
+  color: #ffffff;
+}
+.admin-confirm-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+}
+
+.admin-cancel-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+.admin-cancel-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  .admin-reserva-fila {
+    grid-template-columns: 
+      minmax(120px, 1fr)
+      minmax(140px, 1.2fr)
+      minmax(100px, 0.9fr)
+      minmax(120px, 1fr)
+      minmax(120px, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-table-section {
+    padding: 20px;
+  }
+  .admin-reserva-fila {
+    grid-template-columns: 1fr 1fr;
+  }
+  .admin-reserva-acciones {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+  .admin-detalle-expandido-fila {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .admin-detalle-expandido-valor {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-reserva-fila {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+
+/* ===========================
+   MODAL
+   Usuario / Reservas
+=========================== */
+
 .admin-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
   backdrop-filter: blur(3px);
+  overflow-y: auto;
 }
 
 .admin-modal-box {
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 40px);
   background: var(--admin-card-bg-solid);
   border: 1px solid var(--admin-border-light);
   border-radius: 12px;
-  width: 100%;
-  max-width: 420px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   color: var(--admin-text-dark);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .admin-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 18px 22px;
   border-bottom: 1px solid var(--admin-border-light);
 }
@@ -974,14 +1400,17 @@
   margin: 0;
   font-size: 1.15rem;
   color: var(--admin-text-dark);
+  line-height: 1.3;
 }
 
 .admin-modal-close {
+  flex-shrink: 0;
   background: transparent;
   border: none;
   color: var(--admin-text-muted);
   font-size: 1.1rem;
   cursor: pointer;
+  padding: 4px;
   transition: color 0.2s ease;
 }
 
@@ -994,6 +1423,7 @@
   flex-direction: column;
   gap: 6px;
   padding: 20px 22px;
+  overflow-y: auto;
 }
 
 .admin-modal-body p {
@@ -1003,12 +1433,21 @@
 
 .admin-modal-body input,
 .admin-modal-select {
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #ffffff;
   color: var(--admin-text-dark);
   font-size: 0.9rem;
+}
+
+.admin-modal-body input:focus,
+.admin-modal-select:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .admin-modal-user-name {
@@ -1020,7 +1459,8 @@
 .admin-modal-user-email {
   color: var(--admin-text-muted);
   font-size: 0.88rem;
-  margin: 2px 0 12px 0;
+  margin: 2px 0 12px;
+  overflow-wrap: anywhere;
 }
 
 .admin-modal-label {
@@ -1038,35 +1478,41 @@
   border-top: 1px solid var(--admin-border-light);
 }
 
-.admin-modal-cancel-btn {
-  background: #e5e7eb;
-  color: #374151;
+.admin-modal-cancel-btn,
+.admin-modal-save-btn {
   padding: 9px 18px;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.admin-modal-cancel-btn {
+  background: #e5e7eb;
+  color: #374151;
 }
 
 .admin-modal-save-btn {
   background: var(--admin-success);
   color: #ffffff;
-  padding: 9px 18px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
 }
 
 .admin-modal-save-btn:hover {
   background: var(--admin-success-dark);
 }
 
+
 /* ===========================
    RESPONSIVE GENERAL
 =========================== */
+
 @media (max-width: 900px) {
-  .admin-dashboard-container { flex-direction: column; }
+  .admin-dashboard-container {
+    flex-direction: column;
+  }
 
   .admin-sidebar {
     width: 100%;
@@ -1077,25 +1523,116 @@
     border-bottom: 1px solid var(--admin-border-light);
   }
 
-  .admin-sidebar h2 { display: none; }
+  .admin-sidebar h2 {
+    display: none;
+  }
 
   .admin-nav {
     flex-direction: row;
     gap: 8px;
   }
 
-  .admin-content { padding: 20px; }
+  .admin-content {
+    padding: 20px;
+  }
+}
+
+
+/* ===========================
+   RESPONSIVE - MÓVIL
+=========================== */
+
+@media (max-width: 600px) {
+  .admin-modal-overlay {
+    padding: 12px;
+    align-items: center;
+  }
+
+  .admin-modal-box {
+    max-height: calc(100vh - 24px);
+    border-radius: 10px;
+  }
+
+  .admin-modal-header {
+    padding: 16px;
+  }
+
+  .admin-modal-header h3 {
+    font-size: 1.05rem;
+  }
+
+  .admin-modal-body {
+    padding: 16px;
+  }
+
+  .admin-modal-footer {
+    padding: 14px 16px;
+    flex-direction: column-reverse;
+  }
+
+  .admin-modal-cancel-btn,
+  .admin-modal-save-btn {
+    width: 100%;
+    padding: 10px 16px;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+}
+
+
+/* ===========================
+   RESPONSIVE - MÓVIL PEQUEÑO
+=========================== */
+
+@media (max-width: 400px) {
+  .admin-modal-overlay {
+    padding: 8px;
+  }
+
+  .admin-modal-box {
+    max-height: calc(100vh - 16px);
+  }
+
+  .admin-modal-header {
+    padding: 14px;
+  }
+
+  .admin-modal-body {
+    padding: 14px;
+  }
+
+  .admin-modal-footer {
+    padding: 12px 14px;
+  }
+
+  .admin-modal-header h3 {
+    font-size: 1rem;
+  }
+
+  .admin-modal-body input,
+  .admin-modal-select {
+    font-size: 0.85rem;
+  }
 }
 
 /* ===========================
    PANEL DE ESTADÍSTICAS
 =========================== */
+
 .admin-statistics-container {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  box-sizing: border-box;
 }
+
+
+/* ===========================
+   CABECERA DE ESTADÍSTICAS
+=========================== */
 
 .stats-header {
   display: flex;
@@ -1108,43 +1645,58 @@
 .stats-header h2 {
   margin: 0;
   font-size: 1.6rem;
-  color: var(--admin-text-dark);
+  color: #000000 !important;
+  line-height: 1.3;
 }
-
 .stats-header p {
-  margin: 4px 0 0 0;
+  margin: 4px 0 0;
   color: var(--admin-text-muted);
   font-size: 0.9rem;
+  line-height: 1.4;
 }
---nuevo
+
+
+/* ===========================
+   ACCIONES DE ESTADÍSTICAS
+=========================== */
+
 .stats-header-actions {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px; /* Reduce la distancia vertical con los filtros de abajo (antes tenía 12px) */
+  gap: 4px;
 }
+
 .export-group {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 10px; 
-  margin-top: -10px;/* Si aún lo quieres MÁS arriba, puedes poner un margen negativo: margin-top: -6px; */
+  margin-bottom: 10px;
 }
+
 .time-filter-group {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 6px;
   background-color: #f8fafc;
   padding: 4px;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
-  flex-wrap: wrap;
 }
+
+
+/* ===========================
+   BOTONES DE FILTRO
+=========================== */
 
 .filter-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 8px 14px;
   font-size: 13px;
@@ -1154,8 +1706,13 @@
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   user-select: none;
+  white-space: nowrap;
 }
 
 .filter-btn:hover {
@@ -1167,63 +1724,78 @@
 .filter-btn.active {
   background-color: var(--admin-primary);
   color: #ffffff;
+  border-color: var(--admin-primary);
   box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
 }
 
 .filter-btn.active:hover {
   background-color: #047857;
+  border-color: #047857;
 }
+
+
+/* ===========================
+   BOTONES DE EXPORTACIÓN
+=========================== */
+
 .export-group .filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   padding: 6px 14px;
   font-size: 13.5px;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
+  font-weight: 700;
 }
+
+
+/* Excel / primer botón */
 .export-group .filter-btn:nth-child(1) {
   background-color: #f0fdf4;
   color: #1a7439;
-  font-weight: 700;
-  border: 1px solid #bbf7d0;
+  border-color: #bbf7d0;
 }
+
 .export-group .filter-btn:nth-child(1):hover {
   background-color: #dcfce7;
+  color: #166534;
   border-color: #86efac;
 }
+
+
+/* PDF / segundo botón */
 .export-group .filter-btn:nth-child(2) {
   background-color: #fef2f2;
   color: #8f2020;
-  font-weight: 700;
-  border: 1px solid #fecaca;
+  border-color: #fecaca;
 }
+
 .export-group .filter-btn:nth-child(2):hover {
   background-color: #fee2e2;
+  color: #7f1d1d;
   border-color: #fca5a5;
 }
+
+
+/* Tercer botón de exportación */
 .export-group .filter-btn:nth-child(3) {
   background-color: #fef2f2;
-  color: #8f2020;      /* Negro puro */
-  font-weight: 700;    /* Texto grueso (Bold) */
-  border: 1px solid #fecaca;
+  color: #8f2020;
+  border-color: #fecaca;
 }
+
 .export-group .filter-btn:nth-child(3):hover {
   background-color: #fee2e2;
+  color: #7f1d1d;
   border-color: #fca5a5;
 }
-.export-group .filter-btn:hover {
-  background-color: #c8ced4;
-  border-color: #077c34;
 
-}
+
+/* ===========================
+   GRID DE GRÁFICOS
+=========================== */
+
 .stats-charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+  width: 100%;
 }
 
 .chart-card {
@@ -1234,16 +1806,25 @@
   box-shadow: var(--admin-shadow-sm);
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .chart-card.large {
   grid-column: span 2;
 }
 
+
+/* ===========================
+   CABECERA DEL GRÁFICO
+=========================== */
+
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 16px;
 }
 
@@ -1251,36 +1832,191 @@
   margin: 0;
   font-size: 1.05rem;
   color: var(--admin-text-dark);
+  line-height: 1.3;
 }
 
+
+/* ===========================
+   ETIQUETAS DE GRÁFICOS
+=========================== */
+
 .badge-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
+  white-space: nowrap;
 }
-.badge-tag.green { background: rgba(34, 197, 94, 0.12); color: #15803d; }
-.badge-tag.purple { background: rgba(139, 92, 246, 0.12); color: #6d28d9; }
-.badge-tag.blue { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; }
+
+.badge-tag.green {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.badge-tag.purple {
+  background: rgba(139, 92, 246, 0.12);
+  color: #6d28d9;
+}
+
+.badge-tag.blue {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+}
+
+
+/* ===========================
+   CUERPO DEL GRÁFICO
+=========================== */
 
 .chart-body {
   position: relative;
-  height: 280px;
   width: 100%;
+  height: 280px;
+  min-width: 0;
 }
 
-@media (max-width: 900px) {
-  .stats-charts-grid { grid-template-columns: 1fr; }
-  .chart-card.large { grid-column: span 1; }
-}
 
 /* ===========================
-SECCIÓN CANCHAS (Grid de tarjetas)
+   RESPONSIVE - TABLET
 =========================== */
+
+@media (max-width: 900px) {
+  .stats-header {
+    align-items: flex-start;
+  }
+
+  .stats-header-actions {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .export-group,
+  .time-filter-group {
+    justify-content: flex-start;
+  }
+
+  .stats-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card.large {
+    grid-column: span 1;
+  }
+}
+
+
+/* ===========================
+   RESPONSIVE - MÓVIL
+=========================== */
+
+@media (max-width: 600px) {
+  .admin-statistics-container {
+    gap: 18px;
+  }
+
+  .stats-header {
+    gap: 12px;
+  }
+
+  .stats-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .stats-header p {
+    font-size: 0.84rem;
+  }
+
+  .stats-header-actions {
+    gap: 8px;
+  }
+
+  .export-group,
+  .time-filter-group {
+    width: 100%;
+  }
+
+  .export-group {
+    margin-bottom: 4px;
+  }
+
+  .filter-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 0.76rem;
+  }
+
+  .export-group .filter-btn {
+    padding: 7px 10px;
+    font-size: 0.76rem;
+  }
+
+  .time-filter-group {
+    padding: 4px;
+  }
+
+  .chart-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .chart-header {
+    align-items: flex-start;
+  }
+
+  .chart-header h3 {
+    font-size: 0.98rem;
+  }
+
+  .chart-body {
+    height: 240px;
+  }
+}
+
+
+/* ===========================
+   RESPONSIVE - MÓVIL PEQUEÑO
+=========================== */
+
+@media (max-width: 400px) {
+  .stats-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .stats-header p {
+    font-size: 0.8rem;
+  }
+
+  .filter-btn,
+  .export-group .filter-btn {
+    padding: 7px 8px;
+    font-size: 0.7rem;
+  }
+
+  .chart-card {
+    padding: 14px;
+  }
+
+  .chart-body {
+    height: 220px;
+  }
+}
+/* ===========================
+   SECCIÓN CANCHAS
+   Grid de tarjetas
+=========================== */
+
 .admin-canchas-section {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* ===========================
+   HEADER
+=========================== */
 
 .admin-canchas-header {
   display: flex;
@@ -1290,27 +2026,42 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   gap: 16px;
   width: 100%;
   margin-bottom: 28px;
+  box-sizing: border-box;
 }
 
 .admin-canchas-subtitle {
+  margin: 4px 0 0;
   color: var(--admin-text-muted);
   font-size: 0.9rem;
-  margin-top: 4px;
 }
 
+/* ===========================
+   BOTÓN AGREGAR
+=========================== */
+
 .admin-canchas-btn-agregar {
-  background-color: var(--admin-primary);
-  color: white;
-  font-weight: 600;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  transition: background 0.25s ease, transform 0.2s ease;
+
+  padding: 12px 20px;
+
+  background-color: var(--admin-primary);
+  color: #ffffff;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.2s ease;
 }
 
 .admin-canchas-btn-agregar:hover {
@@ -1318,22 +2069,39 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   transform: translateY(-2px);
 }
 
+/* ===========================
+   GRID
+=========================== */
+
 .admin-canchas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
   width: 100%;
+  box-sizing: border-box;
 }
 
+/* ===========================
+   TARJETA
+=========================== */
+
 .admin-canchas-card {
-  background: var(--admin-card-bg);
-  border-radius: var(--admin-radius);
-  border: 1px solid var(--admin-border-light);
-  box-shadow: var(--admin-shadow-sm);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  min-width: 0;
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border-light);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow-sm);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .admin-canchas-card:hover {
@@ -1341,277 +2109,327 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   box-shadow: var(--admin-shadow-md);
 }
 
+/* ===========================
+   IMAGEN
+=========================== */
+
 .admin-canchas-card-image-container {
   width: 100%;
   height: 160px;
   background: #f3f4f6;
+  overflow: hidden;
 }
 
 .admin-canchas-card-image {
+  display: block;
+
   width: 100%;
   height: 100%;
+
   object-fit: cover;
-  display: block;
 }
 
 .admin-canchas-card-no-image {
-  width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
   color: var(--admin-text-muted);
   font-size: 0.85rem;
   font-weight: 600;
 }
 
+/* ===========================
+   CONTENIDO
+=========================== */
+
 .admin-canchas-card-content {
-  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  padding: 18px;
+  min-width: 0;
+  box-sizing: border-box;
 }
+
+/* ===========================
+   HEADER DE TARJETA
+=========================== */
 
 .admin-canchas-card-header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
+  min-width: 0;
 }
 
 .admin-canchas-card-title {
   margin: 0;
+
+  min-width: 0;
+
+  color: var(--admin-text-dark);
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--admin-text-dark);
+
+  overflow-wrap: anywhere;
 }
 
 .admin-canchas-card-price {
+  flex-shrink: 0;
+
+  padding: 4px 10px;
+
   background: rgba(21, 128, 61, 0.1);
   color: var(--admin-primary);
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 4px 10px;
+
   border-radius: 20px;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
   white-space: nowrap;
 }
 
 .admin-canchas-card-subtext {
+  margin: 0;
+
   color: var(--admin-text-muted);
   font-size: 0.88rem;
-  margin: 0;
+
+  overflow-wrap: anywhere;
 }
 
+/* =========================================================
+   ACCIONES DE LA TARJETA
+========================================================= */
 .admin-canchas-card-actions {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  width: 100%;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
+.admin-canchas-btn-detalle,
 .admin-canchas-btn-edit,
 .admin-canchas-btn-delete {
-  flex: 1;
-  border: none;
-  padding: 9px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
 }
 
+/* =========================================================
+   BOTÓN — DETALLE
+========================================================= */
+.admin-canchas-btn-detalle {
+  background: rgba(22, 134, 31, 0.1);
+  color: #16861f;
+}
+.admin-canchas-btn-detalle:hover {
+  background: #16861f;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(22, 134, 31, 0.2);
+}
+.admin-canchas-btn-detalle:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   BOTÓN — EDITAR
+========================================================= */
 .admin-canchas-btn-edit {
   background: rgba(59, 130, 246, 0.1);
-  color: var(--admin-blue);
+  color: var(--admin-blue, #3b82f6);
 }
-
 .admin-canchas-btn-edit:hover {
-  background: var(--admin-blue);
-  color: white;
+  background: var(--admin-blue, #3b82f6);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(59, 130, 246, 0.15);
+}
+.admin-canchas-btn-edit:active {
+  transform: translateY(0);
 }
 
+/* =========================================================
+   BOTÓN — ELIMINAR
+========================================================= */
 .admin-canchas-btn-delete {
   background: rgba(239, 68, 68, 0.1);
-  color: var(--admin-danger);
+  color: var(--admin-danger, #ef4444);
 }
-
 .admin-canchas-btn-delete:hover {
-  background: var(--admin-danger);
-  color: white;
-}
-
-/* ===========================
-   MODAL DE CANCHAS (Crear / Editar)
-=========================== */
-.admin-canchas-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(3px);
-}
-
-.admin-canchas-modal-box {
-  background: var(--admin-card-bg-solid);
-  border: 1px solid var(--admin-border-light);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 440px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  color: var(--admin-text-dark);
-}
-
-.admin-canchas-modal-header {
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--admin-border-light);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.admin-canchas-modal-header h3 {
-  margin: 0;
-  font-size: 1.15rem;
-  color: var(--admin-text-dark);
-}
-
-.admin-canchas-modal-close {
-  background: transparent;
-  border: none;
-  color: var(--admin-text-muted);
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.admin-canchas-modal-close:hover {
-  color: var(--admin-text-dark);
-}
-
-.admin-canchas-modal-body {
-  padding: 20px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.admin-canchas-modal-body label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--admin-text-dark);
-  margin-top: 10px;
-}
-
-.admin-canchas-modal-body input {
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: var(--admin-text-dark);
-  font-size: 0.92rem;
-  outline: none;
-}
-
-.admin-canchas-modal-body input:focus {
-  border-color: var(--admin-primary);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
-}
-
-.admin-canchas-modal-footer {
-  padding: 16px 22px;
-  border-top: 1px solid var(--admin-border-light);
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.admin-canchas-modal-cancel-btn {
-  background: #e5e7eb;
-  border: none;
-  color: #374151;
-  padding: 9px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.admin-canchas-modal-save-btn {
-  background: var(--admin-success);
-  border: none;
+  background: var(--admin-danger, #ef4444);
   color: #ffffff;
-  padding: 9px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(239, 68, 68, 0.15);
+}
+.admin-canchas-btn-delete:active {
+  transform: translateY(0);
 }
 
-.admin-canchas-modal-save-btn:hover {
-  background: var(--admin-success-dark);
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+@media (max-width: 900px) {
+  .admin-canchas-header {
+    align-items: flex-start;
+    margin-bottom: 22px;
+  }
+  .admin-canchas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .admin-canchas-card-image-container {
+    height: 150px;
+  }
+  .admin-canchas-card-content {
+    padding: 16px;
+  }
 }
 
-.admin-modal-body p strong {
-  color: #94a3b8;
-  font-weight: 500;
-}
-.admin-canchas-preview-text {
-  margin-top: 10px;
-  font-size: 0.85rem;
-  color: var(--admin-text-muted);
+/* =========================================================
+   RESPONSIVE — MÓVIL
+========================================================= */
+@media (max-width: 600px) {
+  .admin-canchas-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .admin-canchas-btn-agregar {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .admin-canchas-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .admin-canchas-card-image-container {
+    height: 180px;
+  }
+  .admin-canchas-card-content {
+    padding: 16px;
+  }
+  .admin-canchas-card-title {
+    font-size: 1rem;
+  }
+  .admin-canchas-card-price {
+    font-size: 0.82rem;
+  }
+  .admin-canchas-card-subtext {
+    font-size: 0.85rem;
+  }
+  .admin-canchas-card-actions {
+    flex-wrap: nowrap;
+  }
 }
 
-.admin-canchas-preview-img {
-  border-radius: 10px;
-  margin-top: 5px;
-  height: 140px;
-  width: 100%;
-  max-width: 220px;
-  object-fit: cover;
+/* =========================================================
+   RESPONSIVE — MÓVIL PEQUEÑO
+========================================================= */
+@media (max-width: 400px) {
+  .admin-canchas-grid {
+    gap: 14px;
+  }
+  .admin-canchas-card-image-container {
+    height: 160px;
+  }
+  .admin-canchas-card-content {
+    padding: 14px;
+  }
+  .admin-canchas-card-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .admin-canchas-btn-detalle,
+  .admin-canchas-btn-edit,
+  .admin-canchas-btn-delete {
+    width: 100%;
+  }
+  .admin-canchas-btn-agregar {
+    padding: 11px 16px;
+    font-size: 0.85rem;
+  }
 }
 
 /* ==========================================
    BUSCADOR ADMIN
 ========================================== */
+
 .admin-buscador-container {
   position: relative;
-  margin-bottom: 18px;
+
   width: 100%;
   max-width: 320px;
+  min-width: 0;
+
+  margin-bottom: 18px;
+  box-sizing: border-box;
 }
+
+/* ICONO */
 
 .admin-buscador-icon {
   position: absolute;
   left: 14px;
   top: 50%;
+
   transform: translateY(-50%);
+
   color: var(--admin-text-muted);
   font-size: 0.95rem;
+
   pointer-events: none;
+
   transition: color 0.2s ease;
 }
 
+/* INPUT */
+
 .admin-buscador-input {
   width: 100%;
+  min-width: 0;
+
   padding: 10px 14px 10px 40px;
-  border-radius: 10px;
-  border: 1px solid var(--admin-border-light);
+
+  box-sizing: border-box;
+
   background: #ffffff;
   color: var(--admin-text-dark);
+
+  border: 1px solid var(--admin-border-light);
+  border-radius: 10px;
+
   font-size: 0.9rem;
   line-height: 1.4;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .admin-buscador-input:hover {
@@ -1624,197 +2442,101 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
 }
 
+/* ICONO AL ENFOCAR */
+
 .admin-buscador-container:focus-within .admin-buscador-icon {
   color: var(--admin-primary);
 }
+
+/* PLACEHOLDER */
 
 .admin-buscador-input::placeholder {
   color: var(--admin-text-muted);
   opacity: 1;
 }
 
+/* BOTÓN "X" DEL INPUT SEARCH */
+
 .admin-buscador-input::-webkit-search-cancel-button {
   cursor: pointer;
   padding: 2px;
 }
 
-/* =========================================
-   EXPORTACIÓN DE USUARIOS
-========================================= */
-.admin-usuarios-export-header {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  margin-bottom: 4px;
-}
-
-.admin-export-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.admin-export-dropdown-wrapper {
-  position: relative;
-}
-
-.admin-export-btn-excel,
-.admin-export-btn-pdf {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  margin-bottom: 20px;
-  height: 38px;
-  padding: 0 13px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
-}
-
-.admin-export-btn-excel {
-  background: rgba(34, 197, 94, 0.08);
-  color: #15803d;
-  border: 1px solid rgba(34, 197, 94, 0.22);
-}
-
-.admin-export-btn-excel:hover {
-  background: rgba(34, 197, 94, 0.14);
-  border-color: rgba(34, 197, 94, 0.35);
-  box-shadow: 0 3px 8px rgba(34, 197, 94, 0.12);
-  transform: translateY(-1px);
-}
-
-.admin-export-btn-pdf {
-  background: rgba(239, 68, 68, 0.08);
-  color: #b91c1c;
-  border: 1px solid rgba(239, 68, 68, 0.22);
-}
-
-.admin-export-btn-pdf:hover {
-  background: rgba(239, 68, 68, 0.14);
-  border-color: rgba(239, 68, 68, 0.35);
-  box-shadow: 0 3px 8px rgba(239, 68, 68, 0.12);
-  transform: translateY(-1px);
-}
-
-.admin-export-icon {
-  font-size: 0.85rem;
-  line-height: 1;
-}
-
-.admin-export-arrow {
-  font-size: 0.7rem;
-  opacity: 0.7;
-  margin-left: 2px;
-}
-
-.admin-export-menu {
-  position: absolute;
-  top: calc(100% + 7px);
-  right: 0;
-  width: 235px;
-  background: #ffffff;
-  border: 1px solid var(--admin-border-light);
-  border-radius: 10px;
-  padding: 6px;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.05);
-  z-index: 1000;
-  animation: adminExportDropdown 0.15s ease-out;
-}
-
-.oculto-en-export {
-  display: none !important;
-}
-@keyframes adminExportDropdown {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.admin-export-menu-title {
-  padding: 8px 10px 7px;
-  color: var(--admin-text-muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid #f1f5f9;
-  margin-bottom: 4px;
-}
-
-.admin-export-menu button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  background: transparent;
-  border: none;
-  border-radius: 7px;
-  color: var(--admin-text-dark);
-  font-size: 0.82rem;
-  font-weight: 500;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.admin-export-menu button:hover {
-  background: #f8fafc;
-  color: #2563eb;
-}
-
-.admin-export-menu button small {
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #64748b;
-  background: #f1f5f9;
-}
+/* ==========================================
+   RESPONSIVE - MÓVIL
+========================================== */
 
 @media (max-width: 600px) {
-  .admin-usuarios-export-header {
-    flex-direction: column;
-    align-items: stretch;
+
+  .admin-buscador-container {
+    max-width: none;
+    margin-bottom: 16px;
   }
 
-  .admin-export-toolbar {
-    width: 100%;
-    justify-content: flex-end;
-    margin-left: 0;
+  .admin-buscador-input {
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE - MÓVIL PEQUEÑO
+========================================== */
+
+@media (max-width: 400px) {
+
+  .admin-buscador-input {
+    padding-left: 38px;
+    font-size: 0.85rem;
+  }
+
+  .admin-buscador-icon {
+    left: 13px;
+    font-size: 0.9rem;
   }
 }
 
 
 
-.admin-header-titles {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+
 
 .stats-summary-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+  align-items: stretch;
 }
 
 .summary-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  background: #ffffff;
+  border: 1px solid #dcfce7;
+  border-radius: var(--radius-md);
+  padding: 24px 20px;
+  box-shadow: var(--shadow-soft);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+  transition: all 0.25s ease;
 }
-
+.summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+  border-color: #bbf7d0;
+}
+.summary-card-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+/* --- Subtexto / variación --- */
+.summary-card-subtext {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 4px;
+}
 .summary-label {
   font-size: 13px;
   color: #64748b;
@@ -1866,146 +2588,232 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   background-color: #fee2e2;
   color: #dc2626;
 }
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  .stats-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
 
-/**--Configuracion--/*/
+@media (max-width: 480px) {
+  .stats-summary-cards {
+    grid-template-columns: 1fr;
+  }
+  .summary-card-value {
+    font-size: 1.7rem;
+  }
+}
+/* ==========================================
+   CONFIGURACIÓN ADMIN
+========================================== */
 
-/* Seccion principal de configuración */
 .admin-config-section {
   width: 100%;
-  box-sizing: border-box;
   padding: 10px 0;
+  box-sizing: border-box;
 }
+
 .admin-config-header {
   margin-bottom: 24px;
 }
 
-/* Arreglo para el título y descripción (que estaban blancos e invisibles) */
+/* ===========================
+   TÍTULO Y DESCRIPCIÓN
+=========================== */
+
 .admin-config-section h2 {
+  margin: 0 0 6px;
+
   color: var(--admin-text-dark, #1e293b);
   font-size: 1.6rem;
   font-weight: 700;
-  margin: 0 0 6px 0;
 }
 
 .admin-config-section p {
+  margin: 0 0 24px;
+
   color: var(--admin-text-muted, #64748b);
   font-size: 0.95rem;
-  margin: 0 0 24px 0;
 }
 
-/* Grilla ocupando todo el ancho */
+/* ===========================
+   GRID
+=========================== */
+
 .admin-config-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+
   width: 100%;
-  max-width: 700px; /* opcional: para que no se estire demasiado en pantallas grandes */
+  max-width: 700px;
+
   box-sizing: border-box;
   align-items: start;
 }
 
+/* ===========================
+   BOTÓN GUARDAR TODO
+=========================== */
+
 .admin-config-guardar-todo {
-  margin-top: 50px;
   display: flex;
   justify-content: flex-start;
+
+  margin-top: 50px;
 }
+
 .admin-confirm-btn-final {
   padding: 14px 32px;
   font-size: 1rem;
 }
-/* Tarjeta individual */
+
+/* ===========================
+   TARJETA DE CONFIGURACIÓN
+=========================== */
+
 .admin-config-card {
-  background: var(--admin-card-bg, #ffffff);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid var(--admin-border-light, #eaecf0);
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
   display: flex;
   flex-direction: column;
   gap: 14px;
+
   width: 100%;
+  min-width: 0;
+
+  padding: 24px;
+
   box-sizing: border-box;
+
+  background: var(--admin-card-bg, #ffffff);
+  border: 1px solid var(--admin-border-light, #eaecf0);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
 }
+
+/* ===========================
+   HEADER DE TARJETA
+=========================== */
+
 .admin-config-card-header {
   margin-bottom: 4px;
   padding-bottom: 12px;
+
   border-bottom: 1px solid var(--admin-border-light, #f1f5f9);
 }
-/* Títulos dentro de la tarjeta */
+
 .admin-config-card-header h3 {
-  margin: 0 0 2px 0;
+  margin: 0 0 2px;
+
+  color: var(--admin-text-dark, #0f172a);
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--admin-text-dark, #0f172a);
 }
+
 .admin-config-card-header p {
   margin: 0;
-  font-size: 0.85rem;
+
   color: var(--admin-text-muted, #64748b);
+  font-size: 0.85rem;
 }
-.admin-config-card .admin-confirm-btn,
-.admin-config-card .admin-secondary-btn {
-  margin-top: 12px; 
+
+/* ===========================
+   LABELS
+=========================== */
+
+.admin-config-card label {
+  margin-bottom: -6px;
+
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
-.admin-config-card input[type="text"],
-.admin-config-card input[type="email"],
-.admin-config-card input[type="password"],
+
+/* ===========================
+   INPUTS Y SELECT
+=========================== */
+
+.admin-config-card input,
 .admin-config-card select {
   width: 100%;
+  min-width: 0;
+
   padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 0.925rem;
+
+  box-sizing: border-box;
+
   color: #0f172a;
   background-color: #ffffff;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+
   outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+
+  font-size: 0.925rem;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
+
 .admin-config-card input:focus,
 .admin-config-card select:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
-/* Labels e Inputs Generales */
-.admin-config-card label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: -6px;
+
+.admin-config-card input[readonly] {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
 }
+
+/* ===========================
+   LOGO
+=========================== */
 
 .admin-logo-config {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+
   padding: 16px;
+
   background-color: #f8fafc;
   border: 1px dashed #cbd5e1;
   border-radius: 12px;
+
   text-align: center;
   margin-bottom: 8px;
 }
+
 .admin-logo-config label {
   align-self: flex-start;
-  font-weight: 600;
-  font-size: 0.85rem;
+
   color: #334155;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-/* Vista previa de la imagen */
+/* Vista previa */
+
 .admin-logo-preview {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 90px;
+  height: 90px;
+
+  overflow: hidden;
+
+  background-color: #ffffff;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .admin-logo-preview img {
@@ -2014,25 +2822,34 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   object-fit: cover;
 }
 
-/* Customización del input file */
+/* Input de archivo */
+
 .admin-logo-config input[type="file"] {
-  font-size: 0.85rem;
-  color: #64748b;
   width: 100%;
   max-width: 280px;
+
+  color: #64748b;
+  font-size: 0.85rem;
 }
 
 .admin-logo-config input[type="file"]::file-selector-button {
   padding: 6px 14px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
+  margin-right: 10px;
+
   background-color: #ffffff;
   color: #1e293b;
-  font-weight: 600;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
   font-size: 0.8rem;
+  font-weight: 600;
+
   cursor: pointer;
-  margin-right: 10px;
-  transition: all 0.2s;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .admin-logo-config input[type="file"]::file-selector-button:hover {
@@ -2041,85 +2858,81 @@ SECCIÓN CANCHAS (Grid de tarjetas)
 }
 
 .admin-logo-config small {
-  font-size: 0.75rem;
   color: #94a3b8;
+  font-size: 0.75rem;
   line-height: 1.3;
 }
 
-.admin-config-card input[type="text"],
-.admin-config-card input[type="email"] {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.925rem;
-  color: #0f172a;
-  background-color: #ffffff;
-  box-sizing: border-box;
-  outline: none;
-  transition: border-color 0.2s;
-}
-/* Inputs */
-.admin-config-card input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  color: #0f172a;
-  background-color: #ffffff;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.admin-config-card input[readonly] {
-  background-color: #f8fafc;
-  color: #64748b;
-  border-color: #e2e8f0;
-  cursor: not-allowed;
-}
+/* ===========================
+   HORARIO
+=========================== */
+
 .admin-config-time-row {
   display: flex;
   align-items: center;
   gap: 12px;
+
   width: 100%;
 }
 
 .admin-config-time-row input[type="time"] {
   flex: 1;
+  min-width: 0;
+
   padding: 9px 12px;
+
+  color: #0f172a;
+
   border: 1px solid #cbd5e1;
   border-radius: 10px;
-  font-size: 0.9rem;
-  color: #0f172a;
+
   outline: none;
   box-sizing: border-box;
+
+  font-size: 0.9rem;
 }
+
 .admin-config-time-row input[type="time"]:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
+
 .admin-config-time-row span {
+  flex-shrink: 0;
+
+  color: #64748b;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #64748b;
 }
-/* Botón *
-/
 
+/* ===========================
+   BOTONES DE TARJETA
+=========================== */
 
-/* Botón de Guardar */
-.admin-config-card .admin-confirm-btn {
+.admin-config-card .admin-confirm-btn,
+.admin-config-card .admin-secondary-btn {
   margin-top: 12px;
+}
+
+/* Botón guardar */
+
+.admin-config-card .admin-confirm-btn {
   padding: 12px;
+
   background-color: #1a7949;
   color: #ffffff;
+
   border: none;
   border-radius: 10px;
-  font-weight: 600;
+
   font-size: 0.925rem;
+  font-weight: 600;
+
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .admin-config-card .admin-confirm-btn:hover {
@@ -2129,103 +2942,135 @@ SECCIÓN CANCHAS (Grid de tarjetas)
 .admin-config-card .admin-confirm-btn:active {
   transform: scale(0.99);
 }
+
+/* ===========================
+   SWITCH
+=========================== */
+
 .admin-config-switch-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
-  background-color: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #f1f5f9;
+  justify-content: space-between;
   gap: 16px;
+
+  padding: 10px 12px;
+
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
 }
 
 .admin-config-switch-row div {
   display: flex;
   flex-direction: column;
   gap: 2px;
+
+  min-width: 0;
 }
 
 .admin-config-switch-row strong {
-  font-size: 0.875rem;
   color: #0f172a;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
 .admin-config-switch-row span {
-  font-size: 0.775rem;
   color: #64748b;
+  font-size: 0.775rem;
   line-height: 1.3;
 }
 
-/* Componente Switch Toggle (Estilo iOS) */
+/* Switch */
+
 .admin-switch {
   position: relative;
+
   display: inline-block;
+
   width: 44px;
   height: 24px;
+
   flex-shrink: 0;
+
   cursor: pointer;
 }
 
 .admin-switch input {
-  opacity: 0;
   width: 0;
   height: 0;
+  opacity: 0;
 }
 
 .admin-switch span {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
+
   background-color: #cbd5e1;
-  transition: 0.3s ease;
+
   border-radius: 24px;
+
+  transition: background-color 0.3s ease;
 }
 
-.admin-switch span:before {
+.admin-switch span::before {
   position: absolute;
+
   content: "";
-  height: 18px;
+
   width: 18px;
+  height: 18px;
+
   left: 3px;
   bottom: 3px;
-  background-color: white;
-  transition: 0.3s ease;
+
+  background-color: #ffffff;
+
   border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+  transition: transform 0.3s ease;
 }
 
 .admin-switch input:checked + span {
   background-color: #2563eb;
 }
 
-.admin-switch input:checked + span:before {
+.admin-switch input:checked + span::before {
   transform: translateX(20px);
 }
 
-/* Información de Seguridad */
+/* ===========================
+   INFORMACIÓN DE SEGURIDAD
+=========================== */
+
 .admin-security-info {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: #f8fafc;
+
   padding: 14px;
-  border-radius: 12px;
+
+  background-color: #f8fafc;
   border: 1px solid #e2e8f0;
+  border-radius: 12px;
 }
 
 .admin-security-info div {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
+  justify-content: space-between;
+  gap: 10px;
+
   padding-bottom: 8px;
+
   border-bottom: 1px dashed #e2e8f0;
+
+  font-size: 0.85rem;
 }
 
 .admin-security-info div:last-child {
-  border-bottom: none;
   padding-bottom: 0;
+  border-bottom: none;
 }
 
 .admin-security-info strong {
@@ -2233,26 +3078,39 @@ SECCIÓN CANCHAS (Grid de tarjetas)
 }
 
 .admin-security-info span {
-  color: #2563eb;
-  font-weight: 600;
-  font-size: 0.8rem;
-  background-color: #eff6ff;
   padding: 2px 8px;
+
+  background-color: #eff6ff;
+  color: #2563eb;
+
   border-radius: 6px;
+
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-/* Botones Principales y Secundarios */
+/* ===========================
+   BOTONES GENERALES
+=========================== */
+
 .admin-confirm-btn {
   margin-top: 8px;
   padding: 11px;
+
   background-color: #2563eb;
   color: #ffffff;
+
   border: none;
   border-radius: 10px;
-  font-weight: 600;
+
   font-size: 0.9rem;
+  font-weight: 600;
+
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .admin-confirm-btn:hover {
@@ -2267,14 +3125,22 @@ SECCIÓN CANCHAS (Grid de tarjetas)
 .admin-secondary-btn {
   margin-top: 8px;
   padding: 11px;
+
   background-color: #fef2f2;
   color: #dc2626;
+
   border: 1px solid #fecaca;
   border-radius: 10px;
-  font-weight: 600;
+
   font-size: 0.9rem;
+  font-weight: 600;
+
   cursor: pointer;
-  transition: all 0.2s ease;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .admin-secondary-btn:hover {
@@ -2283,11 +3149,16 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   border-color: #dc2626;
 }
 
-/* Mensajes de Feedback */
+/* ===========================
+   MENSAJES
+=========================== */
+
 .admin-config-mensaje {
   padding: 12px 16px;
-  border-radius: 10px;
   margin-bottom: 20px;
+
+  border-radius: 10px;
+
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -2303,259 +3174,599 @@ SECCIÓN CANCHAS (Grid de tarjetas)
   color: #b91c1c;
   border: 1px solid #fecaca;
 }
+
+/* ===========================
+   VALOR FIJO
+=========================== */
+
 .admin-config-valor-fijo {
-  font-size: 0.925rem;
-  color: #0f172a;
   padding: 10px 14px;
+
   background-color: #f8fafc;
-  border-radius: 10px;
+  color: #0f172a;
+
   border: 1px solid #e2e8f0;
-}
-.admin-cancha-estado-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
-}
-.estado-activa { background-color: #16a34a; }
-.estado-mantenimiento { background-color: #f59e0b; }
+  border-radius: 10px;
 
-.admin-canchas-btn-detalle {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  cursor: pointer;
-  font-size: 13px;
+  font-size: 0.925rem;
 }
-.admin-canchas-card-image-container { position: relative; }
-.admin-canchas-card-estado-toggle { margin-top: 10px; }
 
+/* ===========================
+   RESPONSIVE - TABLET
+=========================== */
 
-.admin-modal-save-btn:hover,
-.admin-canchas-modal-save-btn:hover {
-  background-color: #15803d;
+@media (max-width: 900px) {
+
+  .admin-config-section {
+    padding: 6px 0;
+  }
+
+  .admin-config-grid {
+    max-width: 100%;
+    gap: 20px;
+  }
+
+  .admin-config-guardar-todo {
+    margin-top: 30px;
+  }
+
+  .admin-config-card {
+    padding: 20px;
+  }
 }
------------------------
-/* Overlay centrado pero adaptable */
+
+/* ===========================
+   RESPONSIVE - MÓVIL
+=========================== */
+
+@media (max-width: 600px) {
+
+  .admin-config-section h2 {
+    font-size: 1.35rem;
+  }
+
+  .admin-config-section p {
+    font-size: 0.88rem;
+    margin-bottom: 20px;
+  }
+
+  .admin-config-grid {
+    gap: 16px;
+  }
+
+  .admin-config-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .admin-config-card-header h3 {
+    font-size: 1.05rem;
+  }
+
+  .admin-config-card-header p {
+    font-size: 0.82rem;
+  }
+
+  .admin-config-guardar-todo {
+    margin-top: 20px;
+  }
+
+  .admin-confirm-btn-final {
+    width: 100%;
+    padding: 12px 20px;
+    box-sizing: border-box;
+  }
+
+  .admin-config-switch-row {
+    align-items: flex-start;
+  }
+
+  .admin-security-info div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-security-info span {
+    align-self: flex-start;
+  }
+
+  .admin-logo-config input[type="file"] {
+    max-width: 100%;
+  }
+}
+
+/* ===========================
+   RESPONSIVE - MÓVIL PEQUEÑO
+=========================== */
+
+@media (max-width: 400px) {
+
+  .admin-config-card {
+    padding: 14px;
+  }
+
+  .admin-config-time-row {
+    gap: 8px;
+  }
+
+  .admin-config-time-row span {
+    font-size: 0.78rem;
+  }
+
+  .admin-config-card input,
+  .admin-config-card select {
+    font-size: 0.88rem;
+  }
+}
+/* ==========================================
+   MODALES ADMIN
+========================================== */
+
+/* =========================================================
+   MODAL — ESTILO CLARO IGUAL A TU IMAGEN
+========================================================= */
 .admin-modal-overlay,
 .admin-canchas-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  z-index: 2000;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
-  padding: 1rem;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeInOverlay 0.25s ease;
+}
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Caja del Modal (Flexible) */
+/* =========================================================
+   CAJA DEL MODAL — FONDO BLANCO
+========================================================= */
 .admin-modal-box,
 .admin-canchas-modal-box {
-  background-color: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
   width: 100%;
-  max-width: 500px;
-  max-height: 85vh; /* Limita la altura al 85% de la pantalla */
+  max-width: 520px;
+  max-height: calc(100vh - 32px);
+  min-width: 0;
   display: flex;
-  flex-direction: column; /* Organiza header, body y footer en columna */
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-  animation: modalFadeIn 0.2s ease-out;
-}
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 
-/* AQUÍ ESTÁ EL TRUCO: El cuerpo absorbe el scroll */
-.admin-modal-body,
-.admin-canchas-modal-body {
-  overflow-y: auto; /* Activa la barra de desplazamiento solo aquí */
-  flex: 1; /* Ocupa el espacio disponible entre el header y el footer */
-  padding: 1.5rem;
-}
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.08);
 
-/* Animación */
-@keyframes modalFadeIn {
+  animation: modalSlideUp 0.3s ease;
+}
+@keyframes modalSlideUp {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(20px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
-
-
-/* Encabezado del Modal */
+/* =========================================================
+   ENCABEZADO
+========================================================= */
 .admin-modal-header,
 .admin-canchas-modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #334155;
-  background-color: #1e293b;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid #e5e7eb;
 }
+
 .admin-modal-header h3,
 .admin-canchas-modal-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #f8fafc;
+  color: #111827;
+  font-size: 1.35rem;
+  font-weight: 700;
 }
+.admin-modal-header h3::before,
+.admin-canchas-modal-header h3::before {
+  content: "⚽";
+  font-size: 1.4rem;
+}
+
+/* Botón cerrar */
 .admin-modal-close,
 .admin-canchas-modal-close {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  font-size: 1.1rem;
-  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  padding: 0;
+  background: #f0fdf4;
+  border: none;
+  border-radius: 50%;
+  color: #16861f;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 .admin-modal-close:hover,
 .admin-canchas-modal-close:hover {
-  background-color: #334155;
+  background: #ef4444;
   color: #ffffff;
-}
-.admin-modal-body,
-.admin-canchas-modal-body {
-  padding: 1.5rem;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  color: #f8fafc;
-}
-/* Etiquetas e Inputs en Formularios */
-.admin-modal-label,
-.admin-canchas-modal-body label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #94a3b8;
-  margin-top: 0.3rem;
-  display: block;
+  transform: rotate(90deg);
 }
 
-.admin-modal-select,
+/* =========================================================
+   CUERPO
+========================================================= */
+.admin-modal-body,
+.admin-canchas-modal-body {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-modal-body label,
+.admin-canchas-modal-body label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* =========================================================
+   CAMPOS DE ENTRADA
+========================================================= */
+.admin-modal-body input[type="text"],
+.admin-modal-body input[type="number"],
+.admin-modal-body select,
+.admin-modal-body textarea,
 .admin-canchas-modal-body input[type="text"],
 .admin-canchas-modal-body input[type="number"],
 .admin-canchas-modal-body select,
 .admin-canchas-modal-body textarea {
   width: 100%;
-  padding: 10px 12px;
-  background-color: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #f8fafc;
-  font-family: inherit;
-  font-size: 0.9rem;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  color: #111827;
+  font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.admin-modal-select:focus,
+.admin-modal-body input:focus,
+.admin-modal-body select:focus,
+.admin-modal-body textarea:focus,
 .admin-canchas-modal-body input:focus,
 .admin-canchas-modal-body select:focus,
 .admin-canchas-modal-body textarea:focus {
-  border-color: #16a34a;
-}
-.admin-cancha-estado-badge.estado-activa {
-  background-color: rgba(22, 163, 74, 0.2);
-  color: #4ade80;
-  border: 1px solid rgba(22, 163, 74, 0.3);
+  border-color: #16861f;
+  box-shadow: 0 0 0 3px rgba(22, 134, 31, 0.12);
+  background: #ffffff;
 }
 
-.admin-cancha-estado-badge.estado-mantenimiento {
-  background-color: rgba(234, 179, 8, 0.2);
-  color: #facc15;
-  border: 1px solid rgba(234, 179, 8, 0.3);
+.admin-modal-body input::placeholder,
+.admin-canchas-modal-body input::placeholder {
+  color: #9ca3af;
 }
-/* Pie del Modal (Botones) */
+
+/* =========================================================
+   PIE — BOTONES
+========================================================= */
 .admin-modal-footer,
 .admin-canchas-modal-footer {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
-  gap: 10px;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #334155;
-  background-color: #1e293b;
+  gap: 1rem;
+  padding: 1.25rem 1.75rem 1.75rem;
+  border-top: 1px solid #e5e7eb;
 }
 
-/* Botón Cancelar / Cerrar */
 .admin-modal-cancel-btn,
-.admin-canchas-modal-cancel-btn {
-  background-color: transparent;
-  border: 1px solid #334155;
-  color: #94a3b8;
-  padding: 8px 18px;
-  border-radius: 6px;
-  font-size: 0.88rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.admin-modal-cancel-btn:hover,
-.admin-canchas-modal-cancel-btn:hover {
-  background-color: #334155;
-  color: #ffffff;
-}
-
-/* Botón Guardar / Confirmar */
 .admin-modal-save-btn,
+.admin-canchas-modal-cancel-btn,
 .admin-canchas-modal-save-btn {
-  background-color: #16a34a;
-  border: none;
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 6px;
-  font-size: 0.88rem;
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.25s ease;
 }
 
+.admin-modal-cancel-btn,
+.admin-canchas-modal-cancel-btn {
+  padding: 0.85rem 1.5rem;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+}
+.admin-modal-cancel-btn:hover,
+.admin-canchas-modal-cancel-btn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.admin-modal-save-btn,
+.admin-canchas-modal-save-btn {
+  padding: 0.85rem 1.75rem;
+  background: linear-gradient(135deg, #16861f, #287238);
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(22, 134, 31, 0.2);
+}
 .admin-modal-save-btn:hover,
 .admin-canchas-modal-save-btn:hover {
-  background-color: #15803d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(22, 134, 31, 0.3);
 }
-/* Botón Detalle */
-.admin-canchas-btn-detalle {
-  background-color: #334155;
-  color: #f8fafc;
-  border: 1px solid #475569;
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 600px) {
+  .admin-modal-overlay,
+  .admin-canchas-modal-overlay {
+    padding: 10px;
+  }
+  .admin-modal-box,
+  .admin-canchas-modal-box {
+    max-height: calc(100vh - 20px);
+    border-radius: 14px;
+  }
+  .admin-modal-header,
+  .admin-canchas-modal-header {
+    padding: 1.25rem 1.1rem;
+  }
+  .admin-modal-body,
+  .admin-canchas-modal-body {
+    padding: 1.25rem 1.1rem;
+  }
+  .admin-modal-footer,
+  .admin-canchas-modal-footer {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    padding: 1rem 1.1rem 1.25rem;
+  }
+  .admin-modal-cancel-btn,
+  .admin-modal-save-btn,
+  .admin-canchas-modal-cancel-btn,
+  .admin-canchas-modal-save-btn {
+    width: 100%;
+  }
+}
+/* =========================================================
+   MODAL — AGREGAR/EDITAR CANCHA
+========================================================= */
+.admin-canchas-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 15, 12, 0.82);
+  backdrop-filter: blur(8px);
+  display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  animation: fadeInOverlay 0.25s ease;
 }
 
-.admin-canchas-btn-detalle:hover {
-  background-color: #475569;
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.admin-canchas-modal-box {
+  background: #ffffff;
+  border: 1px solid var(--admin-border-light);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--admin-shadow-lg);
+  animation: modalSlideUp 0.35s ease;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-canchas-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid var(--admin-border-light);
+}
+
+.admin-canchas-modal-header h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--admin-text-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-canchas-modal-header h3::before {
+  content: "⚽";
+  font-size: 1.4rem;
+}
+
+.admin-canchas-modal-close {
+  background: var(--admin-primary-soft);
+  border: none;
+  color: var(--admin-text-muted);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.25s ease;
+}
+
+.admin-canchas-modal-close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.admin-canchas-modal-body {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.admin-canchas-modal-body label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--admin-text-dark);
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+.admin-canchas-modal-body input[type="text"],
+.admin-canchas-modal-body input[type="number"],
+.admin-canchas-modal-body select,
+.admin-canchas-modal-body textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--admin-border-light);
+  border-radius: 10px;
+  background: #fafafa;
+  color: var(--admin-text-dark);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.admin-canchas-modal-body input:focus,
+.admin-canchas-modal-body select:focus,
+.admin-canchas-modal-body textarea:focus {
+  border-color: var(--admin-primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.admin-canchas-modal-body input::placeholder,
+.admin-canchas-modal-body textarea::placeholder {
+  color: var(--admin-text-muted);
+}
+
+.admin-canchas-modal-body select {
+  cursor: pointer;
+}
+
+.admin-canchas-modal-body textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.admin-canchas-modal-body input[type="file"] {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px dashed var(--admin-border-light);
+  border-radius: 10px;
+  background: #fafafa;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-canchas-modal-body input[type="file"]:hover {
+  border-color: var(--admin-primary);
+  background: var(--admin-primary-soft);
+}
+
+.admin-canchas-modal-footer {
+  padding: 1.25rem 1.75rem 1.75rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  border-top: 1px solid var(--admin-border-light);
+  margin-top: 0.5rem;
+}
+
+.admin-canchas-modal-cancel-btn {
+  padding: 0.85rem 1.5rem;
+  background: transparent;
+  border: 1px solid var(--admin-border-light);
+  color: var(--admin-text-muted);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.admin-canchas-modal-cancel-btn:hover {
+  border-color: var(--admin-danger);
+  color: var(--admin-danger);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.admin-canchas-modal-save-btn {
+  padding: 0.85rem 1.75rem;
+  background: linear-gradient(135deg, var(--admin-primary), var(--admin-success-dark));
   color: #ffffff;
-  border-color: #64748b;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
 }
 
-.admin-canchas-btn-detalle:active {
-  transform: translateY(1px);
+.admin-canchas-modal-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.35);
+}
+
+.admin-canchas-modal-save-btn:active {
+  transform: translateY(0);
 }

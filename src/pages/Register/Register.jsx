@@ -6,8 +6,12 @@ import "./Register.css";
 
 function Register() {
   const [nombre, setNombre] = useState("");
+  const [apellidos, setApellidos] = useState("");
   const [email, setEmail] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [confirmarContrasena, setConfirmarContrasena] = useState("");
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
+  const [mostrarConfirmarContrasena, setMostrarConfirmarContrasena] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,13 +19,19 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (contrasena !== confirmarContrasena) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const res = await fetch("http://localhost:8080/api/usuarios/registrar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, contrasena }),
+        body: JSON.stringify({ nombre, apellidos, email, contrasena }),
       });
 
       const data = await res.json();
@@ -110,12 +120,24 @@ function Register() {
 
           <form className="register-form" onSubmit={handleSubmit}>
             <div className="register-form-group">
-              <label>Nombre</label>
+              <label>Nombres</label>
               <input
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Tu nombre completo"
+                placeholder="Tus nombres"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="register-form-group">
+              <label>Apellidos</label>
+              <input
+                type="text"
+                value={apellidos}
+                onChange={(e) => setApellidos(e.target.value)}
+                placeholder="Tus apellidos"
                 required
                 disabled={loading}
               />
@@ -135,20 +157,52 @@ function Register() {
 
             <div className="register-form-group">
               <label>Contraseña</label>
-              <input
-                type="password"
-                value={contrasena}
-                onChange={(e) => setContrasena(e.target.value)}
-                placeholder="••••••••"
-                required
-                disabled={loading}
-              />
+              <div className="register-password-wrapper">
+                <input
+                  type={mostrarContrasena ? "text" : "password"}
+                  value={contrasena}
+                  onChange={(e) => setContrasena(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="register-toggle-password"
+                  onClick={() => setMostrarContrasena((prev) => !prev)}
+                  tabIndex={-1}
+                >
+                  {mostrarContrasena ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
+            </div>
+
+            <div className="register-form-group">
+              <label>Confirmar Contraseña</label>
+              <div className="register-password-wrapper">
+                <input
+                  type={mostrarConfirmarContrasena ? "text" : "password"}
+                  value={confirmarContrasena}
+                  onChange={(e) => setConfirmarContrasena(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="register-toggle-password"
+                  onClick={() => setMostrarConfirmarContrasena((prev) => !prev)}
+                  tabIndex={-1}
+                >
+                  {mostrarConfirmarContrasena ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
             </div>
 
             {error && <p className="register-error-message">{error}</p>}
 
             <button type="submit" className="register-button" disabled={loading}>
-              {loading ? "Registrando..." : "Registrar"}
+              {loading ? "Registrando..." : "Crear cuenta"}
             </button>
           </form>
 

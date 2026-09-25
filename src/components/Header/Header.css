@@ -4,20 +4,19 @@
 
 .header {
     width: 100%;
-    /* Modo oscuro: totalmente transparente por defecto */
-    background: transparent;
-    border-bottom: 1px solid transparent;
+    /* Fondo oscuro fijo desde el inicio para evitar el destello blanco */
+    background: rgba(0, 0, 0, 0.925);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
     position: sticky;
     top: 0;
     z-index: 1000;
 
-    /* Sutil desenfoque de fondo para legibilidad */
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
 
-    animation: headerAppear 0.8s ease;
-    transition: background 0.4s ease, border-color 0.4s ease;
+    /* Animación de entrada y transición de fondo eliminadas */
+    transition: border-color 0.4s ease;
 }
 
 
@@ -36,14 +35,17 @@
 
 
 /* ===============================
-   LOGO + NOMBRE
+   LOGO + NOMBRE (IZQUIERDA)
 ================================ */
 
 .header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
     min-width: 0;
+
+    /* Posiciona el logo al extremo izquierdo */
+    order: 1;
 }
 
 
@@ -55,26 +57,33 @@
 
 
 .header-logo-badge {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 12px;
 
-    background: linear-gradient(135deg, var(--primary-accent), var(--primary-hover));
+    background: linear-gradient(135deg, var(--primary-accent), var(--primary-light));
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 14px var(--primary-glow);
     overflow: hidden;
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header-logo-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px var(--primary-glow-strong);
 }
 
 
 .header-logo-img {
-    width: 35px;
-    height: 35px;
-    object-fit: contain;
+    width: 24px;
+    height: 24px;
+    color: #ffffff;
 }
 
 
@@ -92,11 +101,20 @@
     color: var(--text-main);
     white-space: nowrap;
     transition: color 0.4s ease;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    margin-left: -8px;
+}
+
+.header-app-name:hover {
+    color: var(--text-main);
 }
 
 
 /* ===============================
-   🆕 WRAPPER MÓVIL (agrupa menu-links + header-auth)
+   WRAPPER MÓVIL (agrupa menu-links + header-auth)
 ================================ */
 
 .mobile-menu-wrapper {
@@ -169,7 +187,7 @@
 
 
 /* ===============================
-   BOTONES DE AUTENTICACIÓN
+   BOTONES DE AUTENTICACIÓN (DERECHA)
 ================================ */
 
 .header-auth {
@@ -177,6 +195,9 @@
     align-items: center;
     gap: 14px;
     flex-shrink: 0;
+
+    /* Posiciona la autenticación al extremo derecho */
+    order: 2;
 }
 
 
@@ -248,6 +269,7 @@ html:not(.light-theme) .header {
     background: rgba(0, 0, 0, 0.925);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
+
 /* ===============================
    MODO CLARO (SÓLO AQUÍ BLANCO SEMITRANSPARENTE)
 ================================ */
@@ -261,32 +283,16 @@ html.light-theme .header {
 html.light-theme .header-btn-login {
     background: rgba(255,255,255,.45);
     border-color: rgba(23, 60, 44, 0.15);
+    color: #173c2c;
 }
 
-/* ===============================
-   ANIMACIONES
-================================ */
 
-@keyframes headerAppear {
-    from {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 
 /* ===============================
    RESPONSIVE
 ================================ */
 
-
-/* Tablet Y Móvil: el menú centrado por posicion absoluta no escala bien
-   en anchos intermedios (se superpone con los botones de auth), asi que
-   activamos el modo hamburguesa desde 1024px en vez de 768px */
 @media (max-width: 1024px) {
 
     .main-header {
@@ -301,8 +307,8 @@ html.light-theme .header-btn-login {
     }
 
     .header-logo-img {
-        width: 20px;
-        height: 20px;
+        width: 28px;
+        height: 28px;
     }
 
     .header-app-name {
@@ -314,10 +320,9 @@ html.light-theme .header-btn-login {
         order: 3;
     }
 
-    /* El wrapper deja de ser "invisible" y pasa a ser el dropdown real,
-       que agrupa menu-links + header-auth como un solo bloque sin huecos */
     .mobile-menu-wrapper {
         display: block;
+        order: 4;
 
         position: absolute;
         top: 100%;
@@ -337,12 +342,9 @@ html.light-theme .header-btn-login {
     }
 
     .mobile-menu-wrapper.open {
-        max-height: 500px; /* suficiente para menu + botones, con margen de sobra */
+        max-height: 500px;
         opacity: 1;
     }
-
-    /* menu-links y header-auth ya no necesitan su propio position/background/animacion:
-       el wrapper de arriba se encarga de todo eso ahora */
 
     .menu-links {
         position: static;

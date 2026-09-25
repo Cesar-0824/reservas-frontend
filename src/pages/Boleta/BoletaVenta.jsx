@@ -79,6 +79,7 @@ function BoletaVenta({
     numero: '00000025',
     fechaEmision: new Date().toLocaleDateString('es-PE'),
     fechaVencimiento: '',
+    fechaHoraPago: '',
     moneda: 'SOLES'
   },
   cliente = {
@@ -181,6 +182,12 @@ function BoletaVenta({
           <div className="boleta-fila-dato">
             <span className="boleta-label">Fecha de emision</span>
             <span className="boleta-valor">{comprobante.fechaEmision}</span>
+          </div>
+          <div className="boleta-fila-dato">
+            <span className="boleta-label">Fecha y hora de pago</span>
+            <span className="boleta-valor">
+              {comprobante.fechaHoraPago || 'No registrada'}
+            </span>
           </div>
           {comprobante.fechaVencimiento && (
             <div className="boleta-fila-dato">

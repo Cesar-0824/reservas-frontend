@@ -1,0 +1,269 @@
+/* ============================================================
+   MÓDULO PAGOS — ESTILO UNIFICADO
+============================================================ */
+
+/* --- Tarjetas de resumen --- */
+.admin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin: 20px 0 28px;
+}
+
+.admin-summary-card {
+  background: #ffffff;
+  border: 1px solid var(--admin-border-light);
+  border-radius: var(--admin-radius);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.admin-summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-medium);
+  border-color: #bbf7d0;
+}
+
+.admin-summary-label {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-summary-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--admin-text-dark);
+}
+
+/* --- Fila de búsqueda y filtros --- */
+.admin-filtros-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.admin-search-input {
+  flex: 1 1 320px;
+  padding: 10px 16px;
+  border: 1px solid #dcfce7;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #1f2937;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.admin-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.admin-search-input:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+.admin-filtro-fecha,
+.admin-filtro-estado {
+  padding: 10px 16px;
+  border: 1px solid #dcfce7;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #1f2937;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.admin-filtro-fecha:hover,
+.admin-filtro-estado:hover {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.admin-filtro-fecha:focus,
+.admin-filtro-estado:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+/* --- Modal de detalle --- */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeInOverlay 0.25s ease;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.admin-modal {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-medium);
+  animation: modalSlideUp 0.3s ease;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.admin-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid #dcfce7;
+}
+
+.admin-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #166534;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-modal-header h3::before {
+  content: "💳";
+  font-size: 1.3rem;
+}
+
+.admin-modal-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #f0fdf4;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--primary-accent);
+  transition: all 0.25s ease;
+}
+
+.admin-modal-close:hover {
+  background: var(--admin-danger);
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.admin-modal-body {
+  padding: 1.75rem;
+}
+
+.admin-modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: #f9fafb;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #dcfce7;
+  transition: all 0.2s ease;
+}
+
+.admin-modal-row:hover {
+  background: #f0fdf4;
+  border-left-color: var(--primary-accent);
+}
+
+.admin-modal-row span {
+  color: #040805;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.admin-modal-row strong {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #dcfce7;
+}
+
+.admin-modal-actions a {
+  text-decoration: none;
+  text-align: center;
+  flex: 1;
+}
+
+/* ============================================================
+   Badges de estado de pago
+   ⚠️ Si ya tienes esto definido, NO lo dupliques: borra este bloque
+============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-pagado {
+  background: rgba(34, 197, 94, 0.12);
+  color: #0f1f15;
+}
+.badge-fallido {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+.badge-sin-pago {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+.badge-admin {
+  background: rgba(139, 92, 246, 0.12);
+  color: #3730a3;
+}
+.boleta-modal-box {
+  background: white;
+  max-width: 900px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  position: relative;
+}

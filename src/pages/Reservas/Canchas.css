@@ -1,0 +1,327 @@
+/* CONTENEDOR PRINCIPAL: Expandimos el ancho máximo para que entren 6 tarjetas */
+.canchas-view-container {
+  width: 100%;
+  max-width: 1650px; /* Aumentado para dar espacio a 6 columnas */
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.canchas-view-container h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.75rem;
+}
+
+.canchas-view-container h2 svg {
+  color: #10b981;
+}
+
+.canchas-view-error {
+  background: #fef2f2;
+  color: #ef4444;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #ef4444;
+}
+
+/* GRID RESPONSIVE PARA LAS CANCHAS */
+.canchas-view-grid {
+  display: grid;
+  gap: 1.25rem;
+  /* Por defecto en celulares (1 en fila) */
+  grid-template-columns: 1fr; 
+}
+
+/* TARJETA DE CANCHA */
+.canchas-view-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Obliga a la tarjeta a estirarse en el grid */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.canchas-view-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.canchas-view-card-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.canchas-view-no-img {
+  width: 100%;
+  height: 180px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.canchas-view-card h4 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 1rem 1rem 0.25rem 1rem;
+}
+
+.canchas-view-card p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.canchas-view-card p svg {
+  color: #10b981;
+}
+
+.canchas-view-card p:last-of-type {
+  font-weight: 600;
+  color: #0f172a;
+  margin-top: 0.4rem;
+}
+
+/* BOTONES Y ACCIONES */
+.canchas-view-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* El margin-top: auto asegura que los botones siempre estén alineados al fondo de la tarjeta, sin importar la altura del contenido arriba */
+  margin-top: auto; 
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  border-top: 1px solid #f8fafc;
+}
+
+.canchas-view-btn-outline,
+.canchas-view-btn-primary {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  min-height: 44px; /* Fija una altura mínima para que no se aplasten */
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; /* Mejor que inline-flex para ocupar todo el ancho */
+  align-items: center;
+  justify-content: center;
+  border: none;
+  flex-shrink: 0; /* Evita estrictamente que el contenedor los deforme o encoja */
+}
+
+.canchas-view-btn-outline {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.canchas-view-btn-outline:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.canchas-view-btn-primary {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.canchas-view-btn-primary:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.canchas-view-btn-outline:active,
+.canchas-view-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.canchas-view-alert-disabled {
+  margin: 0;
+  padding: 10px 16px;
+  min-height: 44px; 
+  /* Ajustes en la letra para igualar al botón principal */
+  font-size: 0.9rem; 
+  font-weight: 600; 
+  line-height: 1.2;
+  text-align: center;
+  /* Colores de alerta */
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* MODAL DE DETALLE */
+.canchas-view-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 1rem;
+}
+
+.canchas-view-modal {
+  background: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.canchas-view-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.canchas-view-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.canchas-view-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.canchas-view-modal-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.canchas-view-modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.canchas-view-modal-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.canchas-view-modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.canchas-view-modal-row span {
+  color: #64748b;
+}
+
+.canchas-view-modal-row strong {
+  color: #0f172a;
+}
+
+.canchas-view-modal-row-full {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.canchas-view-modal-row-full p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.canchas-view-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  background: #fafbfc;
+}
+/* Tablets (2 en fila) */
+@media (min-width: 640px) {
+  .canchas-view-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Laptops pequeñas (3 en fila) */
+@media (min-width: 992px) {
+  .canchas-view-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Pantallas estándar de escritorio (4 en fila) */
+@media (min-width: 1200px) {
+  .canchas-view-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Pantallas grandes de escritorio (6 en fila exactas) */
+@media (min-width: 1440px) {
+  .canchas-view-grid {
+    /* Si agregas una 7ma u 8va cancha, bajarán automáticamente a la siguiente fila */
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

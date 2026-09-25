@@ -10,6 +10,25 @@ import {
   FaUserCircle,
 } from 'react-icons/fa';
 
+// Formatea horas decimales (ej. 1.5) a "1 h 30 min"
+function formatDuracion(horas) {
+  const totalMin = Math.round(horas * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h} h`;
+  return `${h} h ${m} min`;
+}
+
+// Suma una duración en horas decimales (ej. 1.5) a un "HH:mm"
+function sumarHoras(horaInicio, duracionHoras) {
+  const [h, m] = horaInicio.split(':').map(Number);
+  const totalMinutos = h * 60 + m + Math.round(duracionHoras * 60);
+  const horas = Math.floor(totalMinutos / 60) % 24;
+  const minutos = totalMinutos % 60;
+  return String(horas).padStart(2, '0') + ':' + String(minutos).padStart(2, '0');
+}
+
 function ReservationModal({
   show,
   onClose,
@@ -22,40 +41,31 @@ function ReservationModal({
 }) {
   const [duration, setDuration] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [duracionMinima, setDuracionMinima] = useState(1);
+  const [duracionMinima, setDuracionMinima] = useState(0.5);
   const [duracionMaxima, setDuracionMaxima] = useState(3);
 
   useEffect(() => {
     if (show) {
       axios.get('http://localhost:8080/api/configuracion')
         .then(res => {
-          setDuracionMinima(res.data.duracionMinima || 1);
-          setDuracionMaxima(res.data.duracionMaxima || 3);
-          setDuration(res.data.duracionMinima || 1);
+          const min = res.data.duracionMinima || 0.5;
+          const max = res.data.duracionMaxima || 3;
+          setDuracionMinima(min);
+          setDuracionMaxima(max);
+          setDuration(min);
         })
         .catch(err => console.error('Error cargando configuración:', err));
     }
   }, [show]);
 
-useEffect(() => {
-  if (show && canchaInfo) {
-    const dur = parseFloat(duration) || 0;
-    setTotalPrice(dur * (canchaInfo.precio_hora || 0));
-  }
-}, [duration, canchaInfo, show]);
+  useEffect(() => {
+    if (show && canchaInfo) {
+      const dur = parseFloat(duration) || 0;
+      setTotalPrice(dur * (canchaInfo.precio_hora || 0));
+    }
+  }, [duration, canchaInfo, show]);
 
   if (!show || !slotInfo || !canchaInfo || !currentUser) return null;
-
-  const handleDurationChange = (e) => {
-  setDuration(e.target.value);
-};
-
-const handleDurationBlur = () => {
-  let dur = parseFloat(duration);
-  if (isNaN(dur) || dur < duracionMinima) dur = duracionMinima;
-  if (dur > duracionMaxima) dur = duracionMaxima;
-  setDuration(dur);
-};
 
   const handleConfirm = () => {
     if (onConfirm) {
@@ -63,14 +73,13 @@ const handleDurationBlur = () => {
     }
   };
 
-  const formatHora = (horaDecimal) => {
-    const horas = Math.floor(horaDecimal);
-    const minutos = (horaDecimal % 1) * 60;
-    return String(horas).padStart(2, '0') + ':' + String(minutos).padStart(2, '0');
-  };
+  const endHour = sumarHoras(slotInfo.time, duration);
 
-  const startHour = parseInt(slotInfo.time.split(':')[0]);
-  const endHour = formatHora(startHour + duration);
+  // Genera las opciones de 30 en 30 minutos entre duracionMinima y duracionMaxima
+  const opcionesDuracion = [];
+  for (let h = duracionMinima; h <= duracionMaxima + 0.0001; h += 0.5) {
+    opcionesDuracion.push(Math.round(h * 100) / 100);
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -97,24 +106,23 @@ const handleDurationBlur = () => {
         </div>
 
         <div className="modal-detail-item">
-          <label htmlFor="duration"><FaClock /> Duración ({duracionMinima}-{duracionMaxima} horas):</label>
-          <input
-  type="number"
-  id="duration"
-  min={duracionMinima}
-  max={duracionMaxima}
-  step="0.5"
-  value={duration}
-  onChange={handleDurationChange}
-  onBlur={handleDurationBlur}
-/>
+          <label htmlFor="duration"><FaClock /> Duración:</label>
+          <select
+            id="duration"
+            value={duration}
+            onChange={(e) => setDuration(parseFloat(e.target.value))}
+          >
+            {opcionesDuracion.map((h) => (
+              <option key={h} value={h}>
+                {formatDuracion(h)}
+              </option>
+            ))}
+          </select>
         </div>
 
+        <span style={{ fontWeight: 700 }}>S/</span> Precio por hora: <strong>S/ {canchaInfo.precio_hora?.toFixed(2)}</strong>
         <div className="modal-detail-item">
-          <FaDollarSign /> Precio por hora: <strong>S/ {canchaInfo.precio_hora?.toFixed(2)}</strong>
-        </div>
-        <div className="modal-detail-item">
-          <FaDollarSign /> Total a pagar: <strong>S/ {totalPrice.toFixed(2)}</strong>
+          <span style={{ fontWeight: 700 }}>S/</span> Total a pagar: <strong>S/ {totalPrice.toFixed(2)}</strong>
         </div>
 
         <div className="modal-actions">

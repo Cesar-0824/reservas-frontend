@@ -1,29 +1,35 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
-import logoImage from '../../assets/logo.png';
-import { FaBars, FaTimes } from 'react-icons/fa';
-
+import { FaBars, FaTimes, FaFutbol } from 'react-icons/fa';
+    
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
 
-    const navigate = useNavigate();
+    
     const location = useLocation();
 
-    const goToSection = (id) => (e) => {
-        e.preventDefault();
-        closeMenu();
 
-        if (location.pathname === '/') {
-            const el = document.getElementById(id);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
-            }
-        } else {
-            navigate(`/#${id}`);
+
+    // 🆕 Maneja el scroll cuando se llega a "/" con un hash en la URL
+    // (por ejemplo, al navegar desde otra ruta con navigate(`/#${id}`))
+    useEffect(() => {
+        if (location.pathname === '/' && location.hash) {
+            const id = location.hash.replace('#', '');
+
+            // Pequeño delay para asegurar que el DOM de la home
+            // ya esté montado antes de intentar hacer scroll
+            const timeoutId = setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+
+            return () => clearTimeout(timeoutId);
         }
-    };
+    }, [location]);
 
     return (
         <header className="header">
@@ -34,18 +40,14 @@ function Header() {
                 <div className="header-left">
                     <Link to="/" className="header-logo-link">
                         <span className="header-logo-badge">
-                            <img
-                                src={logoImage}
-                                alt="Logo"
-                                className="header-logo-img"
-                            />
+                            <FaFutbol className="header-logo-img" />
                         </span>
                     </Link>
 
                     <div className="header-info">
-                        <span className="header-app-name">
+                        <Link to="/" className="header-app-name" onClick={closeMenu}>
                             SportsMatch
-                        </span>
+                        </Link>
                     </div>
                 </div>
 
@@ -61,31 +63,10 @@ function Header() {
                 </button>
 
 
-                {/* 🆕 WRAPPER: agrupa menu + auth para que se desplieguen juntos, sin huecos */}
+                {/* WRAPPER: agrupa menu + auth para que se desplieguen juntos, sin huecos */}
                 <div className={menuOpen ? 'mobile-menu-wrapper open' : 'mobile-menu-wrapper'}>
 
-                    {/* CENTRO */}
-                    <nav>
-                        <ul className="menu-links">
-                            <li>
-                                <a href="#servicios" onClick={goToSection('servicios')}>
-                                    Servicios
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#informacion" onClick={goToSection('informacion')}>
-                                    Información
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#contacto" onClick={goToSection('contacto')}>
-                                    Contacto
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    
 
                     {/* DERECHA */}
                     <div className="header-auth">
