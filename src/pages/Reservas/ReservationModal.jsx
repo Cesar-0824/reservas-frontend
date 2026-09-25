@@ -6,7 +6,6 @@ import {
   FaCalendarAlt,
   FaClock,
   FaFutbol,
-  FaDollarSign,
   FaUserCircle,
 } from 'react-icons/fa';
 

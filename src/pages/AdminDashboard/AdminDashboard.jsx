@@ -45,7 +45,6 @@ function AdminDashboard({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [editandoCancha, setEditandoCancha] = useState(null);
   const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
-  const [detalleCancelacion, setDetalleCancelacion] = useState(null);
   const [mostrarModalCancelar, setMostrarModalCancelar] = useState(false);
   const [reservaCancelar, setReservaCancelar] = useState(null);
   const [motivoAdmin, setMotivoAdmin] = useState("Mantenimiento de la cancha");
@@ -105,8 +104,8 @@ useEffect(() => {
 
 
 const [filtroEstadoReserva, setFiltroEstadoReserva] = useState("pendiente");
-const [reservaExpandidaId, setReservaExpandidaId] = useState(null);
-const [, setDetallePago] = useState(null);
+
+
 const [detalleReserva, setDetalleReserva] = useState(null);
 const [busquedaReserva, setBusquedaReserva] = useState("");
 
@@ -1308,9 +1307,7 @@ cerrarModalCancelar();
     configuracion: 'Configuración'
   };
 
-  const handleVerDetalleCancelacion = (reserva) => {
-    setDetalleCancelacion(reserva);
-  };
+
 
   function ultimoPago(reserva) {
   if (!reserva.pagos || reserva.pagos.length === 0) return null;
@@ -2163,23 +2160,29 @@ cerrarModalCancelar();
               })()}
 
             {detalleReserva.estado === "cancelada" && (
-              <>
-                <div className="admin-modal-row">
-                  <span>Cancelado por</span>
-                  <strong>
-                    {detalleReserva.canceladoPor === "cliente"
-                      ? "Cliente"
-                      : detalleReserva.canceladoPor === "sistema"
-                      ? "Sistema"
-                      : "Admin"}
-                  </strong>
-                </div>
-                <div className="admin-modal-row">
-                  <span>Motivo de cancelación</span>
-                  <strong>{detalleReserva.motivoCancelacion || "No especificado"}</strong>
-                </div>
-              </>
-            )}
+                  <>
+                    <div className="admin-modal-row">
+                      <span>Cancelado por</span>
+                      <strong>
+                        {detalleReserva.canceladoPor === "cliente"
+                          ? "Cliente"
+                          : detalleReserva.canceladoPor === "sistema"
+                          ? "Sistema"
+                          : "Admin"}
+                      </strong>
+                    </div>
+                    <div className="admin-modal-row">
+                      <span>Motivo de cancelación</span>
+                      <strong>{detalleReserva.motivoCancelacion || "No especificado"}</strong>
+                    </div>
+                    {detalleReserva.observacionCancelacion && (
+                      <div className="admin-modal-row">
+                        <span>Observación</span>
+                        <strong>{detalleReserva.observacionCancelacion}</strong>
+                      </div>
+                    )}
+                  </>
+                )}
           </div>
         </div>
       </div>
@@ -2623,43 +2626,6 @@ cerrarModalCancelar();
               </div>
             </div>
           </div>
-        )}
-
-        {/* MODAL DETALLE DE CANCELACIÓN */}
-        {detalleCancelacion && (
-          <div className="admin-modal-overlay" onClick={() => setDetalleCancelacion(null)}>
-            <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
-              <div className="admin-modal-header">
-                <h3>Detalle de Cancelación</h3>
-                <button className="admin-modal-close" onClick={() => setDetalleCancelacion(null)}><FaTimes /></button>
-              </div>
-              <div className="admin-modal-body">
-                <p><strong>Usuario:</strong> {detalleCancelacion.usuario?.nombre}</p>
-                <p><strong>Cancha:</strong> {detalleCancelacion.cancha?.nombre}</p>
-                <p>
-                  <strong>Cancelado por:</strong>{" "}
-                  {detalleCancelacion.canceladoPor === "cliente" ? "El cliente" : "Administración"}
-                </p>
-                <p><strong>Motivo:</strong> {detalleCancelacion.motivoCancelacion || "No especificado"}</p>
-                {detalleCancelacion.observacionCancelacion && (
-                  <p><strong>Observación:</strong> {detalleCancelacion.observacionCancelacion}</p>
-                  
-                )}
-                <p>
-                  <strong>Cancelado por:</strong>{" "}
-                  {detalleCancelacion.canceladoPor === "cliente"
-                    ? "El cliente"
-                    : detalleCancelacion.canceladoPor === "sistema"
-                    ? "El sistema (venció el plazo de pago)"
-                    : "Administración"}
-                </p>
-              </div>
-              <div className="admin-modal-footer">
-                <button className="admin-modal-cancel-btn" onClick={() => setDetalleCancelacion(null)}>Cerrar</button>
-              </div>
-            </div>
-          </div>
-          
         )}
 
         {activeTab === 'configuracion' && (
