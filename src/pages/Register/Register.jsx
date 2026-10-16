@@ -6,7 +6,7 @@ import "./Register.css";
 
 function Register() {
   const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
+  const [apellidos, setApellidos] = useState("");
   const [email, setEmail] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [confirmarContrasena, setConfirmarContrasena] = useState("");
@@ -25,7 +25,7 @@ function Register() {
       return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
       const res = await fetch("http://localhost:8080/api/usuarios/registrar", {
