@@ -6,7 +6,7 @@ import "./Register.css";
 
 function Register() {
   const [nombre, setNombre] = useState("");
-  const [apellidos, setApellidos] = useState("");
+  const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [confirmarContrasena, setConfirmarContrasena] = useState("");
@@ -135,8 +135,8 @@ function Register() {
               <label>Apellidos</label>
               <input
                 type="text"
-                value={apellidos}
-                onChange={(e) => setApellidos(e.target.value)}
+                value={apellido}
+                onChange={(e) => setApellido(e.target.value)}
                 placeholder="Tus apellidos"
                 required
                 disabled={loading}
