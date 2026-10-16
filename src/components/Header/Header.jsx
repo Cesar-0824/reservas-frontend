@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
-import { FaBars, FaTimes, FaFutbol } from 'react-icons/fa';
+import { FaBars, FaTimes } from 'react-icons/fa';
     
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -37,19 +37,23 @@ function Header() {
             <div className="main-header">
 
                 {/* IZQUIERDA */}
-                <div className="header-left">
-                    <Link to="/" className="header-logo-link">
-                        <span className="header-logo-badge">
-                            <FaFutbol className="header-logo-img" />
-                        </span>
-                    </Link>
-
-                    <div className="header-info">
-                        <Link to="/" className="header-app-name" onClick={closeMenu}>
-                            SportsMatch
+                    <div className="header-left">
+                        <Link to="/" className="header-logo-link">
+                            <span className="header-logo-badge">
+<img
+    src={`${process.env.PUBLIC_URL}/milogo.png`}
+    alt="SportsMatch"
+    className="header-logo-img"
+/>
+                            </span>
                         </Link>
+
+                        <div className="header-info">
+                            <Link to="/" className="header-app-name" onClick={closeMenu}>
+                                SportsMatch
+                            </Link>
+                        </div>
                     </div>
-                </div>
 
 
                 {/* BOTÓN HAMBURGUESA (solo visible en móvil vía CSS) */}

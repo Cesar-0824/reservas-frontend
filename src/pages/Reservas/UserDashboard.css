@@ -65,6 +65,7 @@ body {
   height: 100vh;
   overflow-y: auto;
   box-sizing: border-box; /* Evita que el padding sume más de 100vh */
+  padding: 0.5rem 1rem;
 }
 
 .user-sidebar h2 {
@@ -1325,4 +1326,9 @@ table tbody tr:hover {
     padding: 0.6rem 0.5rem;
     font-size: 0.8rem;
   }
+}
+/* Badge de estado del cliente (Historial) */
+.user-estado-vencida {
+  background: rgba(107, 114, 128, 0.15);
+  color: #9ca3af;
 }

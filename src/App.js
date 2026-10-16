@@ -15,6 +15,16 @@ import ResetPassword from './pages/ForgotPassword/ResetPassword'
 
 import './App.css';
 
+
+// Interceptor de petición: agrega el token a TODAS las llamadas
+axios.interceptors.request.use(config => {
+    const token = localStorage.getItem('authToken');
+    if (token && !config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 // Interceptor global: si cualquier request recibe 401, limpia la sesión y manda a login
 axios.interceptors.response.use(
     response => response,
@@ -47,18 +57,14 @@ const verificarSesion = async () => {
         return false;
     }
 
-    try {
-        // TODO: reemplaza esta URL por un endpoint real de tu backend
-        // que valide el token (ej: /api/auth/me, /api/usuarios/perfil)
-        await axios.get('http://localhost:8080/api/auth/me', {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        return true;
-    } catch (err) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        return false;
-    }
+try {
+    await axios.get('http://localhost:8080/api/auth/me', {});
+    return true;
+} catch (err) {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    return false;
+}
 };
 
 // Verifica si el usuario es admin (a partir de los datos ya validados en localStorage)
@@ -67,7 +73,7 @@ const esAdmin = () => {
     if (!rawUser) return false;
     try {
         const parsedUser = JSON.parse(rawUser);
-        return parsedUser.rol === 'admin';
+        return parsedUser.rol === 'admin' || parsedUser.rol === 'superadmin';
     } catch {
         return false;
     }
@@ -81,6 +87,11 @@ const PrivateRoute = ({ children, isAuthenticated }) => {
 // Ruta protegida solo para admin
 const AdminRoute = ({ children }) => {
     return esAdmin() ? children : <Navigate to="/reservas" replace />;
+};
+
+// Ruta protegida: solo para clientes (admin/superadmin no pueden entrar aquí)
+const UserRoute = ({ children }) => {
+    return esAdmin() ? <Navigate to="/admin" replace /> : children;
 };
 
 // Layout interno: sí puede usar useLocation() porque está dentro de <Router>
@@ -107,25 +118,27 @@ function AppLayout({ isAuthenticated, globalHandleLogout, handleLoginSuccess }) 
                     <Route path="/reset-password" element={<ResetPassword />} />
 
                     <Route
-                        path="/login"
-                        element={
-                            isAuthenticated ? (
-                                esAdmin() ? <Navigate to="/admin" replace /> : <Navigate to="/reservas" replace />
-                            ) : (
-                                <Login onLoginSuccess={handleLoginSuccess} />
-                            )
-                        }
-                    />
+    path="/login"
+    element={
+        isAuthenticated ? (
+            esAdmin() ? <Navigate to="/admin" replace /> : <Navigate to="/reservas" replace />
+        ) : (
+            <Login onLoginSuccess={handleLoginSuccess} />
+        )
+    }
+/>
                     <Route path="/forgot-password" element={<ForgotPassword />} />
 
                     <Route
-                        path="/reservas"
-                        element={
-                            <PrivateRoute isAuthenticated={isAuthenticated}>
-                                <UserDashboard onLogout={globalHandleLogout} />
-                            </PrivateRoute>
-                        }
-                    />
+                            path="/reservas"
+                            element={
+                                <PrivateRoute isAuthenticated={isAuthenticated}>
+                                    <UserRoute>
+                                        <UserDashboard onLogout={globalHandleLogout} />
+                                    </UserRoute>
+                                </PrivateRoute>
+                            }
+                        />
 
                     <Route
                         path="/admin"

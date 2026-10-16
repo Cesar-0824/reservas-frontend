@@ -54,6 +54,7 @@
   background: linear-gradient(180deg, #122419 0%, #0a140e 100%);
   color: white;
   padding: 24px 18px;
+  background-color: #1f2937;
   position: fixed;
   height: 100vh;
   flex-shrink: 0;
@@ -61,6 +62,53 @@
   flex-direction: column;
   overflow-y: auto;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center; /* Alinea el ícono y el texto verticalmente en el centro */
+  padding: 20px;       /* Espaciado alrededor */
+  gap: 15px;         /* Espacio entre el ícono cuadrado y los textos */
+}
+.sidebar-logo-icon {
+  width: 40px;         /* Tamaño del cuadrado */
+  height: 40px;
+  background-color: #10b981; /* Verde brillante (ajusta al de tu imagen original) */
+  border-radius: 8px;  /* Bordes redondeados */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.futbol-icon {
+  color: #111827;      /* Color oscuro para el balón (o negro) */
+  font-size: 24px;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column; /* Apila "SportsMatch" y el subtítulo uno sobre otro */
+}
+
+.sidebar-brand-text h2 {
+  color: white;
+  margin: 0 !important;
+  padding: 0 !important;       /* Anula el padding de .admin-sidebar h2 */
+  border-bottom: none !important; /* Elimina la línea divisoria */
+  text-align: left !important; /* Fuerza la alineación a la izquierda */
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+.sidebar-brand-text .text-green {
+  color: #10b981;      /* El mismo verde brillante para la palabra "Match" */
+}
+
+.sidebar-subtitle {
+  color: #9ca3af;
+  font-size: 13px;
+  margin-top: 2px;
+  white-space: nowrap;
+  display: block;
 }
 
 .admin-sidebar h2 {
@@ -140,7 +188,7 @@
   min-height: 100%;
   overflow-y: visible;
   overflow-x: hidden;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: 0 40px 45px 40px;
@@ -183,16 +231,19 @@
   gap: 16px;
 }
 
+/* Estilo para el botón de la campana con borde */
 .admin-header-icon-btn {
+  border: 1px solid #d1d5db; /* Borde gris claro */
+  border-radius: 8px; /* Bordes redondeados */
+  padding: 8px 10px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  background: none;
-  border: none;
-  color: var(--admin-text-muted);
-  font-size: 1.15rem;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  color: #374151;
+  font-size: 1.3rem;
 }
 
 .admin-header-icon-btn:hover {
@@ -200,17 +251,17 @@
   color: var(--admin-text-dark);
 }
 
+/* Ajuste de la placa roja de notificaciones para que encaje en el nuevo botón */
 .admin-header-badge {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  background: var(--admin-danger);
+  top: -5px;
+  right: -5px;
+  background-color: #ef4444;
   color: white;
-  font-size: 0.65rem;
-  font-weight: 700;
-  min-width: 16px;
-  height: 16px;
+  font-size: 11px;
   border-radius: 50%;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,7 +271,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 1px;
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 10px;
@@ -237,7 +288,7 @@
 }
 
 .admin-header-name {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--admin-text-dark);
 }
@@ -284,18 +335,38 @@
 .admin-header-dropdown-item:hover {
   background: rgba(239, 68, 68, 0.08);
 }
+/* Estilo para el avatar con la inicial (ej. la "C" en fondo naranja) */
+.admin-avatar-initial {
+  width: 36px;
+  height: 36px;
+  background-color: #f59e0b; /* Naranja similar al de la imagen */
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  margin-right: 10px;
+}
 
-/* Notificaciones */
+/* ==========================================================================
+   NOTIFICACIONES DEL ADMIN
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Contenedor Principal (Dropdown)
+   -------------------------------------------------------------------------- */
 .admin-notif-dropdown {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
   width: 340px;
   max-height: 420px;
-  background: #ffffff;
-  border: 1px solid var(--admin-border-light);
+  background: var(--admin-bg-surface, #ffffff);
+  border: 1px solid var(--admin-border-light, #e5e7eb);
   border-radius: 12px;
-  box-shadow: var(--admin-shadow-md);
+  box-shadow: var(--admin-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
   overflow: hidden;
   z-index: 100;
   display: flex;
@@ -303,25 +374,74 @@
 }
 
 .admin-notif-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--admin-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--admin-border-light, #f3f4f6);
 }
 
 .admin-notif-header h4 {
   margin: 0;
   font-size: 0.95rem;
-  color: var(--admin-text-dark);
+  color: var(--admin-text-dark, #111827);
 }
 
+.admin-notif-ver-todas {
+  background: none;
+  border: none;
+  color: var(--admin-primary, #2563eb);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.admin-notif-ver-todas:hover {
+  color: var(--admin-primary-dark, #1d4ed8);
+}
+
+.admin-notif-ver-todas:focus-visible {
+  outline: 2px solid var(--admin-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Listado y Elementos (Items Base para Dropdown)
+   -------------------------------------------------------------------------- */
 .admin-notif-list {
   overflow-y: auto;
   max-height: 360px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--admin-border-light, #e5e7eb) transparent;
+}
+
+.admin-notif-list::-webkit-scrollbar,
+.admin-notif-modal-list::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-notif-list::-webkit-scrollbar-track,
+.admin-notif-modal-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-notif-list::-webkit-scrollbar-thumb,
+.admin-notif-modal-list::-webkit-scrollbar-thumb {
+  background-color: var(--admin-border-light, #e5e7eb);
+  border-radius: 10px;
+}
+
+.admin-notif-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--admin-text-muted, #6b7280);
+  font-size: 0.85rem;
 }
 
 .admin-notif-item {
   padding: 12px 18px;
-  border-bottom: 1px solid #f3f4f6;
-  transition: background 0.2s ease;
+  border-bottom: 1px solid var(--admin-border-light, #f3f4f6);
+  transition: background-color 0.2s ease;
 }
 
 .admin-notif-item:last-child {
@@ -333,35 +453,389 @@
 }
 
 .admin-notif-item-clickable:hover {
-  background: #f9fafb;
+  background-color: var(--admin-bg-hover, #f9fafb);
+}
+
+.admin-notif-item-clickable:focus-visible {
+  outline: 2px solid var(--admin-primary, #2563eb);
+  outline-offset: -2px;
+}
+
+.admin-notif-leida {
+  opacity: 0.6;
 }
 
 .admin-notif-mensaje {
   margin: 0 0 6px 0;
   font-size: 0.85rem;
-  color: var(--admin-text-dark);
+  color: var(--admin-text-dark, #111827);
   line-height: 1.4;
 }
 
+.admin-notif-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.admin-notif-tiempo {
+  font-size: 0.72rem;
+  color: var(--admin-text-muted, #6b7280);
+}
+
+/* --------------------------------------------------------------------------
+   3. Badges de Estado (Etiquetas)
+   -------------------------------------------------------------------------- */
 .admin-notif-estado {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 3px 10px;
   border-radius: 20px;
   font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .noti-estado-pendiente { background: rgba(245, 158, 11, 0.12); color: #b45309; }
 .noti-estado-confirmada { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; }
 .noti-estado-pagada { background: rgba(34, 197, 94, 0.12); color: #15803d; }
 .noti-estado-cancelada { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+.noti-estado-vencida { background: rgba(107, 114, 128, 0.12); color: #4b5563; }
 
-.admin-notif-empty {
-  padding: 24px;
-  text-align: center;
-  color: var(--admin-text-muted);
-  font-size: 0.85rem;
+/* --------------------------------------------------------------------------
+   4. Modal
+   -------------------------------------------------------------------------- */
+.admin-notif-modal-box {
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--admin-bg-surface, #ffffff);
+  border-radius: 12px;
 }
+
+.admin-notif-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-notif-marcar-todas {
+  background: transparent;
+  border: 1px solid var(--admin-border-light, #e5e7eb);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--admin-text-dark, #111827);
+  transition: all 0.2s ease;
+}
+
+.admin-notif-marcar-todas:hover {
+  background-color: var(--admin-bg-hover, #f3f4f6);
+  border-color: var(--admin-border-hover, #d1d5db);
+}
+
+.admin-notif-marcar-todas:active {
+  transform: translateY(1px);
+}
+
+.admin-notif-modal-list {
+  overflow-y: auto;
+  padding: 8px 0;
+  scrollbar-width: thin;
+}
+
+/* ==========================================================================
+   CENTRO DE NOTIFICACIONES (PREFIJO: adm-nc-)
+   ========================================================================== */
+
+/* 1. ESTRUCTURA PRINCIPAL (LAYOUT) */
+.adm-nc-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 300px; 
+  gap: 24px;
+  
+  /* ESTOS DOS SON LOS QUE DEBES CAMBIAR */
+  width: 100%; 
+  max-width: 100%; 
+  overflow: hidden;
+  
+  height: calc(100% - 120px);
+  padding: 24px 0;
+}
+
+/* Tarjetas globales */
+.adm-nc-main-col,
+.adm-nc-sidebar-col {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================
+   2. COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL
+   ========================================== */
+.adm-nc-main-col {
+  overflow: hidden; /* Evita que el contenedor crezca y pase el scroll a la lista */
+}
+
+/* Cabecera */
+.adm-nc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.adm-nc-title-group h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #111827;
+  font-weight: 700;
+}
+
+.adm-nc-title-group p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.adm-nc-btn-read-all {
+  background-color: #059669;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.adm-nc-btn-read-all:hover {
+  background-color: #047857;
+}
+
+/* Barra de Herramientas (Filtros y Buscador) */
+.adm-nc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f3f4f6;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.adm-nc-filters-group {
+  display: flex;
+  gap: 8px;
+}
+
+.adm-nc-filter-btn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  padding: 6px 14px;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.adm-nc-filter-btn:hover {
+  background: #f9fafb;
+}
+
+.adm-nc-filter-btn.active {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+
+.adm-nc-search-input {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  width: 200px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.adm-nc-search-input:focus {
+  border-color: #d1d5db;
+}
+
+/* ==========================================
+   3. LISTA DE NOTIFICACIONES Y SCROLL
+   ========================================== */
+.adm-nc-list-view {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 24px 24px;
+}
+
+/* Scrollbar estilizado */
+.adm-nc-list-view::-webkit-scrollbar { width: 6px; }
+.adm-nc-list-view::-webkit-scrollbar-track { background: transparent; }
+.adm-nc-list-view::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 10px; }
+
+/* Separador de fechas (HOY, AYER) */
+.adm-nc-date-divider {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 24px 0 12px 0;
+}
+
+/* Ítems individuales */
+.adm-nc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s ease;
+}
+
+.adm-nc-row:last-child {
+  border-bottom: none;
+}
+
+.adm-nc-row:hover {
+  background-color: #f9fafb;
+}
+
+/* Punto indicador de lectura */
+.adm-nc-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 14px; /* Centra el punto con la primera línea de texto */
+  flex-shrink: 0;
+}
+.adm-nc-status-dot.unread { background-color: #10b981; }
+.adm-nc-status-dot.read { background-color: transparent; }
+
+/* Círculos de iconos */
+.adm-nc-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 1.2rem;
+}
+.adm-nc-icon-circle.green { background-color: #10b981; color: white; }
+.adm-nc-icon-circle.red { background-color: #ef4444; color: white; }
+.adm-nc-icon-circle.gray { background-color: #f3f4f6; color: #6b7280; }
+
+/* Contenido del mensaje */
+.adm-nc-content-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adm-nc-message-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1f2937;
+  line-height: 1.4;
+}
+
+/* Estilo para las notificaciones leídas */
+.adm-nc-row.leida .adm-nc-message-text {
+  color: #6b7280;
+}
+
+/* Badges pequeños de estado */
+.adm-nc-badge-status {
+  display: inline-table;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  width: max-content; /* Evita que el badge se estire al 100% */
+}
+
+/* Colores de tus estados anteriores mapeados a la nueva clase */
+.noti-estado-pendiente { background: rgba(245, 158, 11, 0.12); color: #b45309; }
+.noti-estado-confirmada { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; }
+.noti-estado-pagada { background: #d1fae5; color: #059669; }
+.noti-estado-cancelada { background: #fee2e2; color: #dc2626; }
+.noti-estado-vencida { background: #f3f4f6; color: #6b7280; }
+
+/* Tiempo relativo (1h, 3d) */
+.adm-nc-time-label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   4. COLUMNA DERECHA: SIDEBAR (RESUMEN)
+   ========================================== */
+.adm-nc-sidebar-col {
+  padding: 24px;
+  height: fit-content; /* Hace que la tarjeta no se estire hasta abajo si hay pocos datos */
+}
+
+.adm-nc-summary-title {
+  margin: 0 0 20px 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.adm-nc-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.adm-nc-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.adm-nc-stat-icon {
+  font-size: 1.5rem;
+  color: #10b981;
+}
+
+.adm-nc-stat-details h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #111827;
+}
+
+.adm-nc-stat-details p {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
 @media (max-width: 900px) {
   .admin-dashboard-container {
     flex-direction: column;
@@ -408,6 +882,8 @@
     padding: 0 16px 24px 16px;  /* 👈 padding más chico para móvil */
   }
 }
+
+
 /* =========================================================
    TARJETA DE BIENVENIDA
 ========================================================= */
@@ -650,7 +1126,32 @@
   flex: 1;                  /* 👈 nuevo: crece para llenar .admin-content */
   min-height: 0;
 }
+.admin-table-header-row {
+  display: flex;
+  justify-content: flex-end; /* Esto es lo que mueve el botón a la derecha */
+  margin-bottom: 24px; /* Esto da el espacio entre el botón y la tabla de abajo */
+  width: 100%;
+}
 
+.admin-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--admin-primary); 
+  color: #ffffff;
+  border: none;
+  border-radius: 8px; 
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-add-btn:hover {
+  background-color: var(--admin-primary); 
+  transform: translateY(-2px); 
+}
 .admin-table-section h3 {
   margin-bottom: 18px;
   font-size: 1.15rem;
@@ -3770,3 +4271,15 @@
 .admin-canchas-modal-save-btn:active {
   transform: translateY(0);
 }
+
+.badge-vencida {
+  background: rgba(107, 114, 128, 0.12);
+  color: #4b5563;
+}
+/* Admin */
+.badge-vencida {
+  background: rgba(107, 114, 128, 0.12);
+  color: #4b5563;
+}
+
+

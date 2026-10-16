@@ -30,10 +30,10 @@ const handleSubmit = async (e) => {
         password: formData.password,
       });
 
-      const { token, email, userId, nombreUsuario, rol } = response.data;
+      const { token, email, userId, nombreUsuario, apellido, rol } = response.data;
 
       if (token) {
-        const user = { id: userId, email, nombreUsuario, rol };
+        const user = { id: userId, email, nombreUsuario, apellido, rol };
         localStorage.setItem('authToken', token);
         localStorage.setItem('currentUser', JSON.stringify(user));
 
@@ -41,7 +41,7 @@ const handleSubmit = async (e) => {
           onLoginSuccess();
         }
 
-        if (rol === 'admin') {
+        if (rol === 'admin' || rol === 'superadmin') {
           navigate('/admin', { replace: true });
         } else {
           navigate('/reservas', { replace: true });

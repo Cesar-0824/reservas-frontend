@@ -115,13 +115,25 @@ function DetallePagoModal({ pago, onClose, onVerBoleta }) {
             <strong>{reserva?.usuario?.nombre || "—"}</strong>
           </div>
           <div className="admin-modal-row">
-            <span>Reserva</span>
-            <strong>#{reserva?.id}</strong>
-          </div>
-          <div className="admin-modal-row">
-            <span>Cancha</span>
-            <strong>{reserva?.cancha?.nombre || "—"}</strong>
-          </div>
+              <span>Reserva</span>
+              <strong>#{reserva?.id}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Fecha de reserva</span>
+              <strong>{reserva?.fechaReserva || "—"}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Hora de inicio</span>
+              <strong>{reserva?.horaInicio || "—"}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Hora de fin</span>
+              <strong>{reserva?.horaFin || "—"}</strong>
+            </div>
+            <div className="admin-modal-row">
+              <span>Cancha</span>
+              <strong>{reserva?.cancha?.nombre || "—"}</strong>
+            </div>
           <div className="admin-modal-row">
             <span>Fecha de pago</span>
             <strong>{pago.fechaPago ? new Date(pago.fechaPago).toLocaleString() : "—"}</strong>
@@ -211,7 +223,7 @@ export default function Pagos({ pagos = [] }) {
 
   return (
     <section className="admin-table-section">
-      <h3>Gestión de Pagos</h3>
+      
 
       <ResumenPagos pagos={pagos} />
 

@@ -1,0 +1,286 @@
+/* =========================================================
+   AGENDA DE CANCHAS - DISEÑO PREMIUM (Modern & Clean)
+========================================================= */
+
+/* 1. CONTENEDOR PRINCIPAL */
+.agenda-canchas-section {
+  width: 100%;
+  margin-bottom: 0;
+  color: #334155;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Animación de entrada suave */
+  animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.agenda-canchas-section h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+/* =========================================================
+   2. CAJA DE FILTROS (Tarjeta Independiente)
+========================================================= */
+.agenda-canchas-filtros {
+  background-color: #ffffff;
+  border: 1px solid #eef2f6; /* Borde mucho más sutil */
+  border-radius: 12px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  /* Sombra elegante y moderna */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03); 
+}
+
+.agenda-canchas-filtro-fecha,
+.agenda-canchas-filtro-estado {
+  background-color: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-width: 220px;
+}
+
+.agenda-canchas-filtro-fecha:hover,
+.agenda-canchas-filtro-estado:hover {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.agenda-canchas-filtro-fecha:focus,
+.agenda-canchas-filtro-estado:focus {
+  background-color: #ffffff;
+  border-color: #10b981; 
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+/* =========================================================
+   3. CAJA DE LA TABLA (Se estira hasta abajo)
+========================================================= */
+.agenda-canchas-table-wrapper {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  
+  height: calc(100vh - 250px); 
+  max-height: none; 
+  overflow-y: auto; 
+}
+
+/* Scrollbar estilo Mac/Tailwind */
+.agenda-canchas-table-wrapper::-webkit-scrollbar { width: 6px; }
+.agenda-canchas-table-wrapper::-webkit-scrollbar-track { background: transparent; margin: 4px 0; }
+.agenda-canchas-table-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.agenda-canchas-table-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+.agenda-canchas-table-wrapper table {
+  width: 100%;
+  border-collapse: separate; 
+  border-spacing: 0;
+  /* ALINEACIÓN A LA IZQUIERDA PARA MEJOR LECTURA */
+  text-align: left; 
+}
+
+.agenda-canchas-table-wrapper th:nth-child(1),
+.agenda-canchas-table-wrapper td:nth-child(1) { width: 15%; }
+
+.agenda-canchas-table-wrapper th:nth-child(2),
+.agenda-canchas-table-wrapper td:nth-child(2) { width: 25%; }
+
+/* Encabezado pegajoso (Sticky) para que no se pierda al bajar */
+.agenda-canchas-table-wrapper th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f8fafc; 
+  color: #64748b;
+  font-weight: 700;
+  padding: 16px 24px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.agenda-canchas-table-wrapper td {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+.agenda-canchas-table-wrapper td:first-child {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.agenda-canchas-table-wrapper tbody tr {
+  transition: all 0.2s ease;
+}
+.agenda-canchas-table-wrapper tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.agenda-canchas-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+.agenda-canchas-empty {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  padding: 30px 24px;
+  text-align: left;
+}
+
+/* =========================================================
+   BADGES (Etiquetas Pastel Perfeccionadas)
+========================================================= */
+.agenda-canchas-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 9999px; /* Píldora perfecta */
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: none;
+}
+
+.agenda-canchas-badge-pagado { background-color: #f3e8ff; color: #7e22ce; }
+.agenda-canchas-badge-sin-pago { background-color: #fef9c3; color: #a16207; }
+.agenda-canchas-badge-admin { background-color: #dbeafe; color: #1d4ed8; }
+.agenda-canchas-badge-fallido { background-color: #fee2e2; color: #b91c1c; }
+.agenda-canchas-badge-disponible { background-color: #dcfce7; color: #15803d; }
+
+/* =========================================================
+   BOTONES DE ACCIÓN (Ver Reserva - Diseño SaaS Premium)
+========================================================= */
+.agenda-canchas-btn-view {
+  background-color: #ffffff;
+  color: #334155;
+  border: 1px solid #e2e8f0; 
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.agenda-canchas-btn-view:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #10b981; /* Texto/Icono se pinta de verde al pasar el mouse */
+  transform: translateY(-1px);
+}
+
+.agenda-canchas-btn-view:active {
+  transform: translateY(0);
+}
+/* =========================================================
+   MODAL DE DETALLES (Efecto Tarjetas Internas)
+========================================================= */
+/* =========================================================
+   6. MODAL DE DETALLES (Tarjetas Internas)
+========================================================= */
+.agenda-canchas-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-color: rgba(15, 23, 42, 0.4); 
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px); 
+  display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+
+.agenda-canchas-modal {
+  background-color: #ffffff;
+  border-radius: 16px; 
+  width: 90%; max-width: 450px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-top: 4px solid #10b981; /* Acento verde arriba */
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.agenda-canchas-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24px 28px; border-bottom: 1px solid #f1f5f9;
+}
+
+.agenda-canchas-modal-header h3 {
+  margin: 0; font-size: 1.25rem; font-weight: 800; color: #0f172a;
+}
+
+.agenda-canchas-modal-close {
+  background: #f1f5f9; border: none; color: #64748b;
+  font-size: 1.2rem; width: 32px; height: 32px; border-radius: 50%; 
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s ease;
+}
+
+.agenda-canchas-modal-close:hover { background: #fee2e2; color: #ef4444; }
+
+.agenda-canchas-modal-body {
+  padding: 24px 28px 32px; display: flex; flex-direction: column; gap: 12px;
+}
+
+.agenda-canchas-modal-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; background-color: #f8fafc; 
+  border-radius: 10px; border: 1px solid #f1f5f9;
+}
+
+.agenda-canchas-modal-row span { color: #64748b; font-size: 0.9rem; font-weight: 500; }
+.agenda-canchas-modal-row strong { color: #0f172a; font-size: 0.95rem; font-weight: 700; }
+
+.agenda-canchas-modal-row:last-child {
+  margin-top: 8px; background-color: #f0fdf4; border: 1px solid #dcfce7;
+}
+.agenda-canchas-modal-row:last-child span { color: #166534; font-weight: 600; }
+.agenda-canchas-modal-row:last-child strong { color: #15803d; font-size: 1.2rem; }
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 768px) {
+  .agenda-canchas-section {
+    padding: 20px;
+  }
+  
+  .agenda-canchas-filtros {
+    flex-direction: column;
+  }
+  
+  .agenda-canchas-filtro-fecha,
+  .agenda-canchas-filtro-estado {
+    width: 100%;
+  }
+
+  .agenda-canchas-table-wrapper th,
+  .agenda-canchas-table-wrapper td {
+    padding: 16px;
+  }
+}

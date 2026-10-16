@@ -62,30 +62,30 @@
     min-width: 40px;
     border-radius: 12px;
 
-    background: linear-gradient(135deg, var(--primary-accent), var(--primary-light));
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: hidden;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    box-shadow: 0 4px 14px var(--primary-glow);
-    overflow: hidden;
-
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 .header-logo-badge:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px var(--primary-glow-strong);
+    box-shadow: none;
 }
 
 
 .header-logo-img {
-    width: 24px;
-    height: 24px;
-    color: #ffffff;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
-
 
 .header-info {
     display: flex;
@@ -307,8 +307,8 @@ html.light-theme .header-btn-login {
     }
 
     .header-logo-img {
-        width: 28px;
-        height: 28px;
+        width: 100%;
+        height: 100%;
     }
 
     .header-app-name {

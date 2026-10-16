@@ -19,18 +19,20 @@ import {
   FaCheckCircle,
   FaSearch,
   FaBell,
-  FaUserCircle,
-  FaChevronDown,
   FaTimesCircle,
   FaCog,
-  FaMoneyBillWave 
+  FaMoneyBillWave,
+  FaCalendarAlt,
+  FaUserCircle
 } from "react-icons/fa";
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 
+
 import Pagos from "./Pagos"
+import AgendaCanchas from './AgendaCanchas';
 
 
 
@@ -52,8 +54,19 @@ function AdminDashboard({ onLogout }) {
   const [usuarioDeshabilitar, setUsuarioDeshabilitar] = useState(null);
   const [busquedaUsuario, setBusquedaUsuario] = useState('');
   const [mostrarMenuPerfil, setMostrarMenuPerfil] = useState(false);
+  const [mostrarTodasNotificaciones, setMostrarTodasNotificaciones] = useState(false);
   const [mostrarNotificaciones, setMostrarNotificaciones] = useState(false);
   const [ordenUsuarios, setOrdenUsuarios] = useState({ campo: 'fechaRegistro', direccion: 'desc' });
+const [filtroNotificaciones, setFiltroNotificaciones] = useState('Todas');
+const [busqueda, setBusqueda] = useState('');
+const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
+const [creandoUsuario, setCreandoUsuario] = useState(false);
+const [errorNuevoUsuario, setErrorNuevoUsuario] = useState(null);
+const [nuevoUsuario, setNuevoUsuario] = useState({
+  nombre: '', apellido: '', email: '', contrasena: '', rol: 'usuario'
+});
+
+ 
   const [filtroTiempo, setFiltroTiempo] = useState('anio');
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [resumenStats, setResumenStats] = useState({
@@ -62,6 +75,11 @@ function AdminDashboard({ onLogout }) {
   ticketPromedio: 0,
   totalCanceladas: 0,
   ingresosPerdidos: 0
+});
+
+const [notificacionesLeidas, setNotificacionesLeidas] = useState(() => {
+  const guardadas = localStorage.getItem('admin_notificaciones_leidas');
+  return guardadas ? JSON.parse(guardadas) : [];
 });
   const [datosExport, setDatosExport] = useState({ ingresos: [], deportes: [], horarios: [] });
   const [apiOk, setApiOk] = useState(true);
@@ -82,6 +100,9 @@ function AdminDashboard({ onLogout }) {
 
 const [pagos, setPagos] = useState([])
 useEffect(() => {
+  const user = JSON.parse(localStorage.getItem('currentUser'));
+  if (user?.rol !== 'superadmin') return; // 👈 NUEVO: admin normal no carga pagos
+
   const fetchPagos = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -100,8 +121,10 @@ useEffect(() => {
  
   fetchPagos();
 }, []);
- 
 
+
+
+const [userRole, setUserRole] = useState(null);
 
 const [filtroEstadoReserva, setFiltroEstadoReserva] = useState("pendiente");
 
@@ -220,6 +243,7 @@ const guardarPerfilManual = async () => {
 
     const body = {
       nombre: perfilForm.nombre,
+      apellido: perfilForm.apellido,
       email: perfilForm.email
     };
     if (passwordForm.nueva) {
@@ -227,12 +251,12 @@ const guardarPerfilManual = async () => {
     }
 
     const res = await axios.put(
-      `http://localhost:8080/api/usuarios/actualizar/${currentUser.id}`,
+      `http://localhost:8080/api/usuarios/mi-perfil`,
       body,
       { headers }
     );
 
-    const userActualizado = { ...currentUser, nombreUsuario: res.data.nombre, email: res.data.email };
+    const userActualizado = { ...currentUser, nombreUsuario: res.data.nombre,apellido: res.data.apellido, email: res.data.email };
     localStorage.setItem('currentUser', JSON.stringify(userActualizado));
     setCurrentUser(userActualizado);   // ← ESTA LÍNEA ES LA QUE FALTABA
 
@@ -409,7 +433,7 @@ const generarNotificacionReserva = (r) => {
     : '';
 
   let estadoTexto = '';
-  let estadoClase = ''; 
+  let estadoClase = '';
 
   switch (r.estado) {
     case 'pendiente':
@@ -428,6 +452,10 @@ const generarNotificacionReserva = (r) => {
       estadoTexto = 'Canceló la reserva';
       estadoClase = 'noti-estado-cancelada';
       break;
+    case 'vencida': // 👈 NUEVO
+      estadoTexto = 'Venció sin completarse';
+      estadoClase = 'noti-estado-vencida';
+      break;
     default:
       estadoTexto = r.estado || 'Sin estado';
   }
@@ -443,6 +471,7 @@ const generarNotificacionReserva = (r) => {
   };
 };
 
+
 const generarNotificacionUsuario = (u) => {
   return {
     key: `usuario-${u.id}`,
@@ -455,15 +484,31 @@ const generarNotificacionUsuario = (u) => {
   };
 };
 
-// Combina reservas + usuarios, ordena por más reciente
+
+// 1. useState (los que ya tienes)
+
+// 2. Datos derivados
 const notificaciones = [
   ...reservas.map(generarNotificacionReserva),
   ...usuarios.map(generarNotificacionUsuario)
-]
-  .sort((a, b) => b.orden - a.orden)
-  .slice(0, 10);
+].sort((a, b) => b.orden - a.orden);
 
-const notificacionesPendientesCount = reservas.filter(r => r.estado === "pendiente").length;
+const notificacionesPendientesCount = notificaciones.filter(
+  n => !notificacionesLeidas.includes(n.key)
+).length;
+
+const marcarTodasComoLeidas = () => {
+  const todas = Array.from(
+    new Set([...notificacionesLeidas, ...notificaciones.map(n => n.key)])
+  );
+  setNotificacionesLeidas(todas);
+  localStorage.setItem('admin_notificaciones_leidas', JSON.stringify(todas));
+};
+
+// 3. useEffect, handlers, return
+
+
+
 
 const calcularGastoUsuario = (usuarioId) => {
   return reservas
@@ -472,7 +517,10 @@ const calcularGastoUsuario = (usuarioId) => {
 };
 
 const handleClickNotificacion = (n) => {
+  marcarComoLeida(n.key);
   setMostrarNotificaciones(false);
+  setMostrarTodasNotificaciones(false);
+
   if (n.tipo === 'reserva') {
     setActiveTab('reservas');
     setTimeout(() => {
@@ -493,8 +541,57 @@ const handleClickNotificacion = (n) => {
         setTimeout(() => fila.classList.remove('admin-reserva-highlight'), 2000);
       }
     }, 150);
+  } else if (n.tipo === 'cancha') {
+    setActiveTab('canchas');
+    setTimeout(() => {
+      const fila = document.getElementById(`cancha-row-${n.canchaId}`);
+      if (fila) {
+        fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        fila.classList.add('admin-reserva-highlight');
+        setTimeout(() => fila.classList.remove('admin-reserva-highlight'), 2000);
+      }
+    }, 150);
   }
 };
+const tiempoRelativo = (timestamp) => {
+  if (!timestamp) return '';
+  const ahora = Date.now();
+  const diffMs = ahora - timestamp;
+  const minutos = Math.floor(diffMs / 60000);
+  const horas = Math.floor(diffMs / 3600000);
+  const dias = Math.floor(diffMs / 86400000);
+  const meses = Math.floor(dias / 30);
+  const anios = Math.floor(dias / 365);
+
+  if (anios >= 1) return `${anios}a`;
+  if (meses >= 1) return `${meses}m`;
+  if (dias >= 1) return `${dias}d`;
+  if (horas >= 1) return `${horas}h`;
+  if (minutos >= 1) return `${minutos}min`;
+  return 'ahora';
+};
+
+
+const marcarComoLeida = (key) => {
+  setNotificacionesLeidas(prev => {
+    if (prev.includes(key)) return prev;
+    const nuevas = [...prev, key];
+    localStorage.setItem('admin_notificaciones_leidas', JSON.stringify(nuevas));
+    return nuevas;
+  });
+};
+
+// Esta constante ahora aplica ambos filtros a la vez
+const notificacionesFiltradas = notificaciones.filter(n => {
+  // 1. Verifica la pestaña (Todas vs No leídas)
+  const pasaFiltroPestana = filtroNotificaciones === 'Todas' || !notificacionesLeidas.includes(n.key);
+  
+  // 2. Verifica el texto del buscador (ignorando mayúsculas/minúsculas)
+  const pasaFiltroBusqueda = n.mensaje.toLowerCase().includes(busqueda.toLowerCase());
+
+  // Solo muestra la notificación si cumple con ambas condiciones
+  return pasaFiltroPestana && pasaFiltroBusqueda;
+});
 
 const usuariosFiltrados = usuarios.filter(u =>
   u.nombre?.toLowerCase().includes(busquedaUsuario.toLowerCase()) ||
@@ -572,40 +669,54 @@ const [nuevaCancha, setNuevaCancha] = useState({
   const deportesChartInstance = useRef(null);
   const horariosChartInstance = useRef(null);
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('currentUser'));
-    if (user?.rol !== 'admin') {
-      onLogout?.();
-      return;
-    }
-    setAdminName(user.nombreUsuario || 'Administrador');
+useEffect(() => {
+  const user = JSON.parse(localStorage.getItem('currentUser'));
+  if (user?.rol !== 'admin' && user?.rol !== 'superadmin') {
+    onLogout?.();
+    return;
+  }
+  setAdminName(user.nombreUsuario || 'Administrador');
+  setUserRole(user.rol); // 👈 NUEVO: guardamos el rol para usarlo en el resto del componente
 
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-        const [resUsuarios, resCanchas, resReservas] = await Promise.all([
+      const promesasBase = [
+        axios.get('http://localhost:8080/api/canchas', { headers }),
+        axios.get('http://localhost:8080/api/reservas', { headers })
+      ];
+
+      if (user.rol === 'superadmin') {
+        const [resUsuarios, resCanchas, resReservas, resPagos] = await Promise.all([
           axios.get('http://localhost:8080/api/usuarios', { headers }),
-          axios.get('http://localhost:8080/api/canchas', { headers }),
-          axios.get('http://localhost:8080/api/reservas', { headers })
+          ...promesasBase,
+          axios.get('http://localhost:8080/api/pagos', { headers })
         ]);
         setUsuarios(resUsuarios.data);
         setCanchas(resCanchas.data);
         setReservas(resReservas.data);
-        setApiOk(true);
-      } catch (err) {
-        console.error("Error al cargar datos de administración:", err);
-        setApiOk(false);
-      } finally {
-        setLoading(false);
-        
+        setPagos(resPagos.data); // 👈 ajusta el nombre del setter si es distinto
+      } else {
+        const [resCanchas, resReservas] = await Promise.all(promesasBase);
+        setCanchas(resCanchas.data);
+        setReservas(resReservas.data);
       }
-    };
+
+      setApiOk(true);
+    } catch (err) {
+      console.error("Error al cargar datos de administración:", err);
+      setApiOk(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 //Refresca la pagina cada 15 segundos para mantener los datos actualizados
     fetchData();
   }, [onLogout]);
+
   useEffect(() => {
   const intervalo = setInterval(async () => {
     if (activeTab === 'estadisticas') return;
@@ -613,14 +724,21 @@ const [nuevaCancha, setNuevaCancha] = useState({
     try {
       const token = localStorage.getItem('authToken');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const user = JSON.parse(localStorage.getItem('currentUser')); // 👈 NUEVO: necesitamos el rol aquí también
 
-      const [resUsuarios, resReservas] = await Promise.all([ 
-        axios.get('http://localhost:8080/api/usuarios', { headers }),
-        axios.get('http://localhost:8080/api/reservas', { headers })
-      ]);
+      const promesasReservas = axios.get('http://localhost:8080/api/reservas', { headers });
 
-      setUsuarios(prev => JSON.stringify(prev) === JSON.stringify(resUsuarios.data) ? prev : resUsuarios.data);
-      setReservas(prev => JSON.stringify(prev) === JSON.stringify(resReservas.data) ? prev : resReservas.data);
+      if (user?.rol === 'superadmin') {
+        const [resUsuarios, resReservas] = await Promise.all([
+          axios.get('http://localhost:8080/api/usuarios', { headers }),
+          promesasReservas
+        ]);
+        setUsuarios(prev => JSON.stringify(prev) === JSON.stringify(resUsuarios.data) ? prev : resUsuarios.data);
+        setReservas(prev => JSON.stringify(prev) === JSON.stringify(resReservas.data) ? prev : resReservas.data);
+      } else {
+        const resReservas = await promesasReservas;
+        setReservas(prev => JSON.stringify(prev) === JSON.stringify(resReservas.data) ? prev : resReservas.data);
+      }
     } catch (err) {
       console.error("Error refrescando datos:", err);
     }
@@ -1113,7 +1231,47 @@ const confirmarCambioEstadoConMotivo = () => {
   if (!modalEstadoCancha) return;
   cambiarEstadoCancha(modalEstadoCancha.cancha.id, modalEstadoCancha.nuevoEstado, motivoCanchaAdmin, observacionCanchaAdmin);
 };
+const handleCrearUsuario = async () => {
+  setErrorNuevoUsuario(null);
 
+  if (!nuevoUsuario.nombre.trim() || !nuevoUsuario.apellido.trim() ||
+      !nuevoUsuario.email.trim() || !nuevoUsuario.contrasena.trim()) {
+    setErrorNuevoUsuario('Todos los campos son obligatorios.');
+    return;
+  }
+
+  const emailValido = /^[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}$/.test(nuevoUsuario.email);
+  if (!emailValido) {
+    setErrorNuevoUsuario('El correo electrónico no tiene un formato válido.');
+    return;
+  }
+
+  if (nuevoUsuario.contrasena.length < 6) {
+    setErrorNuevoUsuario('La contraseña debe tener al menos 6 caracteres.');
+    return;
+  }
+
+  setCreandoUsuario(true);
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const res = await axios.post(
+      'http://localhost:8080/api/usuarios/crear-por-admin',
+      nuevoUsuario,
+      { headers }
+    );
+
+    setUsuarios(prev => [...prev, res.data.usuario]);
+    setModalAgregarAbierto(false);
+    setNuevoUsuario({ nombre: '', apellido: '', email: '', contrasena: '', rol: 'usuario' });
+    mostrarToast('exito', 'Usuario creado correctamente.');
+  } catch (err) {
+    setErrorNuevoUsuario(err.response?.data?.error || 'No se pudo crear el usuario.');
+  } finally {
+    setCreandoUsuario(false);
+  }
+};
   const handleAbrirEditarUsuario = (usuario) => {
     setEditandoUsuario(usuario);
     setNuevoRol(usuario.rol);
@@ -1151,9 +1309,11 @@ const handleGuardarRol = async () => {
     const token = localStorage.getItem('authToken');
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
+    const { contrasena, ...datosSinContrasena } = editandoUsuario; // 👈 quita el hash antes de enviar
+
     await axios.put(
       `http://localhost:8080/api/usuarios/actualizar/${editandoUsuario.id}`,
-      { ...editandoUsuario, rol: nuevoRol },
+      { ...datosSinContrasena, rol: nuevoRol },
       { headers }
     );
 
@@ -1300,11 +1460,14 @@ cerrarModalCancelar();
   const tituloPorTab = {
     Inicio: 'Inicio',
     estadisticas: 'Estadísticas',
-    usuarios: 'Usuarios',
-    reservas: 'Reservas',
-    pagos: 'Pagos',
-    canchas: 'Canchas',
-    configuracion: 'Configuración'
+    usuarios: 'Gestion de Usuarios',
+    reservas: 'Gestion de Reservas',
+    pagos: 'Gestion de Pagos',
+    canchas: 'Gestion de Canchas',
+    configuracion: 'Configuración',
+    Notificaciones: 'Notificaciones',
+    perfil:'Mi Perfil',
+    agenda: 'Agenda de Canchas'
   };
 
 
@@ -1363,7 +1526,15 @@ cerrarModalCancelar();
 )}
       {/* 1. SIDEBAR */}
       <aside className="admin-sidebar">
-        <h2>Admin Panel</h2>
+  <div className="sidebar-brand">
+    <div className="sidebar-logo-icon">
+      <FaFutbol className="futbol-icon"/> 
+    </div>
+    <div className="sidebar-brand-text">
+      <h2>Sports<span className="text-green">Match</span></h2>
+      <span className="sidebar-subtitle">Panel de administrador</span>
+    </div>
+  </div>
         <div className="admin-nav">
           <button
             onClick={() => setActiveTab('Inicio')}
@@ -1372,19 +1543,23 @@ cerrarModalCancelar();
             <FaTachometerAlt /> Inicio
           </button>
 
-          <button
-            onClick={() => setActiveTab('estadisticas')}
-            className={activeTab === 'estadisticas' ? 'active' : ''}
-          >
-            <FaChartBar /> Estadísticas
-          </button>
+          {userRole === 'superadmin' && (
+            <button
+              onClick={() => setActiveTab('estadisticas')}
+              className={activeTab === 'estadisticas' ? 'active' : ''}
+            >
+              <FaChartBar /> Estadísticas
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('usuarios')}
-            className={activeTab === 'usuarios' ? 'active' : ''}
-          >
-            <FaUserFriends /> Usuarios
-          </button>
+          {userRole === 'superadmin' && (
+            <button
+              onClick={() => setActiveTab('usuarios')}
+              className={activeTab === 'usuarios' ? 'active' : ''}
+            >
+              <FaUserFriends /> Usuarios
+            </button>
+          )}
 
           <button
             onClick={() => setActiveTab('reservas')}
@@ -1392,26 +1567,47 @@ cerrarModalCancelar();
           >
             <FaClipboardList /> Reservas
           </button>
-          <button
-            onClick={() => setActiveTab('pagos')}
-            className={activeTab === 'pagos' ? 'active' : ''}
-          >
-            <FaMoneyBillWave /> Pagos
 
-          </button>
-          <button
-            onClick={() => setActiveTab('canchas')}
-            className={activeTab === 'canchas' ? 'active' : ''}
-          >
-            <FaFutbol /> Canchas
-          </button>
-
-          <button
-             onClick={() => setActiveTab('configuracion')}
-            className={activeTab === 'configuracion' ? 'active' : ''}
+          {userRole === 'superadmin' && (
+            <button
+              onClick={() => setActiveTab('pagos')}
+              className={activeTab === 'pagos' ? 'active' : ''}
             >
-            <FaCog /> Configuración
+              <FaMoneyBillWave /> Pagos
+            </button>
+          )}
+
+          {userRole === 'superadmin' && (
+            <button
+              onClick={() => setActiveTab('canchas')}
+              className={activeTab === 'canchas' ? 'active' : ''}
+            >
+              <FaFutbol /> Canchas
+            </button>
+          )}
+
+          <button
+            onClick={() => setActiveTab('agenda')}
+            className={activeTab === 'agenda' ? 'active' : ''}
+          >
+            <FaCalendarAlt /> Agenda de Canchas
           </button>
+          {userRole === 'superadmin' && (
+            <button
+              onClick={() => setActiveTab('configuracion')}
+              className={activeTab === 'configuracion' ? 'active' : ''}
+            >
+              <FaCog /> Configuración
+            </button>
+          )}
+          <button
+            onClick={() => setActiveTab('perfil')}
+            className={activeTab === 'perfil' ? 'active' : ''}
+          >
+            <FaUserCircle /> Perfil
+          </button>
+          
+
           <button className="admin-logout-button" onClick={onLogout}>
             <FaSignOutAlt /> Cerrar Sesión
           </button>
@@ -1420,232 +1616,406 @@ cerrarModalCancelar();
         </div>
       </aside>
 {/* 2. PANEL CONTENEDOR PRINCIPAL */}
-      <div className="admin-content">
-       <header className="admin-header">
-  <div className="admin-header-titles">
-
-    <h3>{tituloPorTab[activeTab] || 'Panel'}</h3>
-  </div>
-
-  <div className="admin-header-right">
-    
-
-    <div className="admin-header-notif-wrapper">
-      <button
-        className="admin-header-icon-btn"
-        onClick={(e) => {
-          e.stopPropagation();
-          setMostrarNotificaciones(!mostrarNotificaciones);
-          setMostrarMenuPerfil(false);
-        }}
-        title="Notificaciones"
-      >
-        <FaBell />
-        {notificacionesPendientesCount > 0 && (
-          <span className="admin-header-badge">{notificacionesPendientesCount}</span>
-        )}
-      </button>
-
-      {mostrarNotificaciones && (
-        <div className="admin-notif-dropdown" onClick={(e) => e.stopPropagation()}>
-          <div className="admin-notif-header">
-            <h4>Notificaciones</h4>
-          </div>
-
-          <div className="admin-notif-list">
-            {notificaciones.length === 0 ? (
-              <p className="admin-notif-empty">No hay notificaciones.</p>
-            ) : (
-              notificaciones.map(n => (
-                <div
-                  key={n.key}
-                  className="admin-notif-item admin-notif-item-clickable"
-                  onClick={() => handleClickNotificacion(n)}
-                >
-                  <p className="admin-notif-mensaje">{n.mensaje}</p>
-                  <span className={`admin-notif-estado ${n.estadoClase}`}>{n.estadoTexto}</span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
+<div className="admin-content">
+  <header className="admin-header">
+    <div className="admin-header-titles">
+      {/* Puedes agregar un ícono dinámico aquí al lado del título si lo deseas */}
+      <h3>{tituloPorTab[activeTab] || 'Panel'}</h3>
     </div>
 
-    <div className="admin-header-profile" onClick={(e) => {
-      e.stopPropagation();
-      setMostrarMenuPerfil(!mostrarMenuPerfil);
-      setMostrarNotificaciones(false);
-    }}>
-      <FaUserCircle className="admin-header-avatar" />
-      <span className="admin-header-name">{adminName}</span>
-      <FaChevronDown className={`admin-header-chevron ${mostrarMenuPerfil ? 'open' : ''}`} />
+<div className="admin-header-right">
+  <div className="admin-header-notif-wrapper">
+    <button
+      className="admin-header-icon-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        setMostrarNotificaciones(!mostrarNotificaciones);
+        setMostrarMenuPerfil(false);
+      }}
+      title="Notificaciones"
+    >
+      <FaBell />
+      {notificacionesPendientesCount > 0 && (
+        <span className="admin-header-badge">{notificacionesPendientesCount}</span>
+      )}
+    </button>
 
-      {mostrarMenuPerfil && (
-        <div className="admin-header-dropdown" onClick={(e) => e.stopPropagation()}>
-          <button className="admin-header-dropdown-item" onClick={onLogout}>
-            <FaSignOutAlt /> Cerrar Sesión
+    {mostrarNotificaciones && (
+      <div className="admin-notif-dropdown" onClick={(e) => e.stopPropagation()}>
+        <div className="admin-notif-header">
+          <h4>Notificaciones</h4>
+          <button
+            className="admin-notif-ver-todas"
+            onClick={() => {
+              setActiveTab('Notificaciones');
+              setMostrarNotificaciones(false);
+            }}
+          >
+            Ver todas
           </button>
         </div>
-      )}
+
+        <div className="admin-notif-list">
+          {notificaciones.slice(0, 5).length === 0 ? (
+            <p className="admin-notif-empty">No hay notificaciones.</p>
+          ) : (
+            notificaciones.slice(0, 5).map(n => (
+              <div
+                key={n.key}
+                className={`admin-notif-item admin-notif-item-clickable ${
+                  notificacionesLeidas.includes(n.key) ? 'admin-notif-leida' : ''
+                }`}
+                onClick={() => handleClickNotificacion(n)}
+              >
+                <p className="admin-notif-mensaje">{n.mensaje}</p>
+                <div className="admin-notif-footer">
+                  <span className={`admin-notif-estado ${n.estadoClase}`}>{n.estadoTexto}</span>
+                  <span className="admin-notif-tiempo">{tiempoRelativo(n.orden)}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+
+
+
+      <div className="admin-header-profile" onClick={(e) => {
+        e.stopPropagation();
+        setMostrarMenuPerfil(!mostrarMenuPerfil);
+        setMostrarNotificaciones(false);
+        setMostrarTodasNotificaciones(false)
+      }}>
+        {/* NUEVO AVATAR: Círculo con la inicial del nombre */}
+        <div className="admin-avatar-initial">
+          {adminName ? adminName.charAt(0).toUpperCase() : 'A'}
+        </div>
+        <span className="admin-header-name">{adminName}</span>
+        
+      </div>
+    </div>
+  </header>
+
+    {mostrarTodasNotificaciones && (
+  <div
+    className="admin-notif-modal-overlay"
+    onClick={() => setMostrarTodasNotificaciones(false)}
+  >
+    <div className="admin-notif-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="admin-notif-header">
+        <h4>Todas las notificaciones</h4>
+        <div>
+          {notificacionesPendientesCount > 0 && (
+            <button className="admin-notif-ver-todas" onClick={marcarTodasComoLeidas}>
+              Marcar todas como leídas
+            </button>
+          )}
+          <button onClick={() => setMostrarTodasNotificaciones(false)}>✕</button>
+        </div>
+      </div>
+
+      <div className="admin-notif-modal-list">
+        {notificaciones.length === 0 ? (
+          <p className="admin-notif-empty">No hay notificaciones.</p>
+        ) : (
+          notificaciones.map(n => (
+            <div
+              key={n.key}
+              className={`admin-notif-item admin-notif-item-clickable ${
+                notificacionesLeidas.includes(n.key) ? 'admin-notif-leida' : ''
+              }`}
+              onClick={() => handleClickNotificacion(n)}
+            >
+              <p className="admin-notif-mensaje">{n.mensaje}</p>
+              <div className="admin-notif-footer">
+                <span className={`admin-notif-estado ${n.estadoClase}`}>{n.estadoTexto}</span>
+                <span className="admin-notif-tiempo">{tiempoRelativo(n.orden)}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   </div>
-</header>
-
-        {/* INICIO */}
-{activeTab === 'Inicio' && (
-  <>
-    {/* Bienvenida */}
-    <section className="admin-welcome-card">
-      <div>
-        <h2>¡Bienvenido, {adminName}! 👋</h2>
-        <p>
-          Administra usuarios, reservas y canchas desde un solo lugar.
-          Aquí encontrarás un resumen general del sistema.
-        </p>
-      </div>
-
-      <div className="admin-date-card">
-        <span>Fecha</span>
-        <h3>{new Date().toLocaleDateString("es-PE")}</h3>
-      </div>
-    </section>
-
-    {/* Resumen */}
-    <section className="admin-summary">
-      <div className="admin-summary-card">
-        <FaUsers className="icon" />
-        <h3>{usuarios?.length || 0}</h3>
-        <p>Usuarios Registrados</p>
-        <span className="admin-summary-subtext">
-          {usuarios.filter(u => u.rol === "admin").length} admins · {usuarios.filter(u => u.rol === "usuario").length} normales
-        </span>
-      </div>
-
-      <div className="admin-summary-card">
-        <FaFutbol className="icon" />
-        <h3>{canchas?.length || 0}</h3>
-        <p>Canchas Disponibles</p>
-      </div>
-
-      <div className="admin-summary-card">
-        <FaCalendarCheck className="icon" />
-        <h3>{reservas?.length || 0}</h3>
-        <p>Reservas Totales</p>
-      </div>
-
-      <div className="admin-summary-card">
-        <FaClipboardList className="icon" />
-        <h3>
-          {reservas?.filter(r => r.estado === "pendiente").length || 0}
-        </h3>
-        <p>Reservas Pendientes</p>
-      </div>
-
-      <div className="admin-summary-card">
-        <FaCalendarCheck className="icon" />
-        <h3>
-          {reservas?.filter(r => r.estado === "confirmada").length || 0}
-        </h3>
-        <p>Reservas Confirmadas</p>
-      </div>
-
-      <div className="admin-summary-card">
-        <FaTimesCircle className="icon" />
-        <h3>
-          {reservas?.filter(r => r.estado === "cancelada").length || 0}
-        </h3>
-        <p>Reservas Canceladas</p>
-      </div>
-    </section>
-
-
-
-    {/* Panel inferior */}
-    <section className="admin-home-grid">
-
-            {/* Canchas más reservadas */}
-  <div className="admin-home-card">
-    <h3>🏟️ Canchas Más Reservadas</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Cancha</th>
-          <th>Reservas</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.entries(
-          reservas?.reduce((acc, r) => {
-            const nombre = r.cancha?.nombre || 'Sin nombre';
-            acc[nombre] = (acc[nombre] || 0) + 1;
-            return acc;
-          }, {}) || {}
-        )
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([nombre, cantidad]) => (
-            <tr key={nombre}>
-              <td>{nombre}</td>
-              <td>{cantidad}</td>
-            </tr>
-          ))}
-      </tbody>
-    </table>
-  </div>
-
-
-      {/* Próximas reservas */}
-      <div className="admin-home-card">
-        <h3>📅 Próximas Reservas</h3>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Cancha</th>
-              <th>Fecha</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {reservas
-              ?.filter(r => {
-                if (!r.fechaReserva) return false;
-                const f = new Date(r.fechaReserva + 'T00:00:00');
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                return f >= hoy;
-              })
-              .sort((a, b) => new Date(a.fechaReserva) - new Date(b.fechaReserva))
-              .slice(0, 5)
-              .map(r => (
-                <tr key={r.id}>
-                  <td>{r.usuario?.nombre}</td>
-                  <td>{r.cancha?.nombre}</td>
-                  <td>{new Date(r.fechaReserva + 'T00:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</td>
-                  <td>{r.estado}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Estado del sistema */}
-      <div className="admin-home-card">
-        <h3>{apiOk ? '🟢' : '🔴'} Estado del Sistema</h3>
-
-        <p>{apiOk ? '✔' : '✖'} API {apiOk ? 'funcionando' : 'sin respuesta'}</p>
-        <p>{apiOk ? '✔' : '✖'} Base de datos {apiOk ? 'conectada' : 'sin conexión'}</p>
-        <p>{apiOk ? '✔ Panel operativo' : '✖ Revisar conexión'}</p>
-      </div>
-
-    </section>
-  </>
 )}
 
+       {/* INICIO */}
+{activeTab === 'Inicio' && (
+  userRole === 'superadmin' ? (
+    <>
+      {/* Bienvenida */}
+      <section className="admin-welcome-card">
+        <div>
+          <h2>¡Bienvenido, {adminName}! 👋</h2>
+          <p>
+            Administra usuarios, reservas y canchas desde un solo lugar.
+            Aquí encontrarás un resumen general del sistema.
+          </p>
+        </div>
+
+        <div className="admin-date-card">
+          <span>Fecha</span>
+          <h3>{new Date().toLocaleDateString("es-PE")}</h3>
+        </div>
+      </section>
+
+      {/* Resumen */}
+      <section className="admin-summary">
+        <div className="admin-summary-card">
+          <FaUsers className="icon" />
+          <h3>{usuarios?.length || 0}</h3>
+          <p>Usuarios Registrados</p>
+          <span className="admin-summary-subtext">
+            {usuarios.filter(u => u.rol === "admin" || u.rol === "superadmin").length} admins · {usuarios.filter(u => u.rol === "usuario").length} normales
+          </span>
+        </div>
+
+        <div className="admin-summary-card">
+          <FaFutbol className="icon" />
+          <h3>{canchas?.length || 0}</h3>
+          <p>Canchas Disponibles</p>
+        </div>
+
+        <div className="admin-summary-card">
+          <FaCalendarCheck className="icon" />
+          <h3>{reservas?.length || 0}</h3>
+          <p>Reservas Totales</p>
+        </div>
+
+        <div className="admin-summary-card">
+          <FaClipboardList className="icon" />
+          <h3>{reservas?.filter(r => r.estado === "pendiente").length || 0}</h3>
+          <p>Reservas Pendientes</p>
+        </div>
+
+        <div className="admin-summary-card">
+          <FaCalendarCheck className="icon" />
+          <h3>{reservas?.filter(r => r.estado === "confirmada").length || 0}</h3>
+          <p>Reservas Confirmadas</p>
+        </div>
+
+        <div className="admin-summary-card">
+          <FaTimesCircle className="icon" />
+          <h3>{reservas?.filter(r => r.estado === "cancelada").length || 0}</h3>
+          <p>Reservas Canceladas</p>
+        </div>
+      </section>
+
+      {/* Panel inferior */}
+      <section className="admin-home-grid">
+        <div className="admin-home-card">
+          <h3>🏟️ Canchas Más Reservadas</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Cancha</th>
+                <th>Reservas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(
+                reservas?.reduce((acc, r) => {
+                  const nombre = r.cancha?.nombre || 'Sin nombre';
+                  acc[nombre] = (acc[nombre] || 0) + 1;
+                  return acc;
+                }, {}) || {}
+              )
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([nombre, cantidad]) => (
+                  <tr key={nombre}>
+                    <td>{nombre}</td>
+                    <td>{cantidad}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="admin-home-card">
+          <h3>📅 Próximas Reservas</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Cancha</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservas
+                ?.filter(r => {
+                  if (!r.fechaReserva) return false;
+                  const f = new Date(r.fechaReserva + 'T00:00:00');
+                  const hoy = new Date();
+                  hoy.setHours(0, 0, 0, 0);
+                  return f >= hoy;
+                })
+                .sort((a, b) => new Date(a.fechaReserva) - new Date(b.fechaReserva))
+                .slice(0, 5)
+                .map(r => (
+                  <tr key={r.id}>
+                    <td>{r.usuario?.nombre}</td>
+                    <td>{r.cancha?.nombre}</td>
+                    <td>{new Date(r.fechaReserva + 'T00:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</td>
+                    <td>{r.estado}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="admin-home-card">
+          <h3>{apiOk ? '🟢' : '🔴'} Estado del Sistema</h3>
+          <p>{apiOk ? '✔' : '✖'} API {apiOk ? 'funcionando' : 'sin respuesta'}</p>
+          <p>{apiOk ? '✔' : '✖'} Base de datos {apiOk ? 'conectada' : 'sin conexión'}</p>
+          <p>{apiOk ? '✔ Panel operativo' : '✖ Revisar conexión'}</p>
+        </div>
+      </section>
+    </>
+  ) : (
+    // ===== INICIO PARA ADMIN NORMAL =====
+    <>
+      <section className="admin-welcome-card">
+        <div>
+          <h2>¡Bienvenido, {adminName}! 👋</h2>
+          <p>Aquí tienes el resumen de reservas que necesitan tu atención hoy.</p>
+        </div>
+
+        <div className="admin-date-card">
+          <span>Fecha</span>
+          <h3>{new Date().toLocaleDateString("es-PE")}</h3>
+        </div>
+      </section>
+
+      <section className="admin-summary">
+        <div className="admin-summary-card">
+          <FaClipboardList className="icon" />
+          <h3>{reservas?.filter(r => r.estado === "pendiente").length || 0}</h3>
+          <p>Pendientes por validar</p>
+        </div>
+
+        <div className="admin-summary-card">
+          <FaCalendarCheck className="icon" />
+          <h3>
+            {reservas?.filter(r => {
+              if (!r.fechaReserva) return false;
+              const hoy = new Date().toISOString().slice(0, 10);
+              return r.fechaReserva === hoy && r.estado !== 'cancelada' && r.estado !== 'vencida';
+            }).length || 0}
+          </h3>
+          <p>Reservas de hoy</p>
+        </div>
+
+        <div className="admin-summary-card">
+          <FaFutbol className="icon" />
+          <h3>{canchas?.filter(c => c.estado === 'activa').length || 0} / {canchas?.length || 0}</h3>
+          <p>Canchas disponibles hoy</p>
+        </div>
+      </section>
+
+      <section className="admin-home-grid">
+        <div className="admin-home-card">
+          <h3>⏳ Reservas Pendientes por Validar</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Cancha</th>
+                <th>Fecha</th>
+                <th>Horario</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservas
+                ?.filter(r => r.estado === "pendiente")
+                .slice(0, 5)
+                .map(r => (
+                  <tr key={r.id}>
+                    <td>{r.usuario?.nombre}</td>
+                    <td>{r.cancha?.nombre}</td>
+                    <td>{new Date(r.fechaReserva + 'T00:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</td>
+                    <td>{r.horaInicio} - {r.horaFin}</td>
+                  </tr>
+                ))}
+              {reservas?.filter(r => r.estado === "pendiente").length === 0 && (
+                <tr><td colSpan={4}>No hay reservas pendientes.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="admin-home-card">
+          <h3>📅 Reservas de Hoy</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Cancha</th>
+                <th>Horario</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservas
+                ?.filter(r => {
+                  if (!r.fechaReserva) return false;
+                  const hoy = new Date().toISOString().slice(0, 10);
+                  return r.fechaReserva === hoy && r.estado !== 'cancelada' && r.estado !== 'vencida';
+                })
+                .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio))
+                .map(r => (
+                  <tr key={r.id}>
+                    <td>{r.usuario?.nombre}</td>
+                    <td>{r.cancha?.nombre}</td>
+                    <td>{r.horaInicio} - {r.horaFin}</td>
+                    <td>{r.estado}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="admin-home-card">
+          <h3>📆 Próximas Reservas</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Cancha</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservas
+                ?.filter(r => {
+                  if (!r.fechaReserva) return false;
+                  const f = new Date(r.fechaReserva + 'T00:00:00');
+                  const hoy = new Date();
+                  hoy.setHours(0, 0, 0, 0);
+                  return f > hoy && r.estado !== 'cancelada' && r.estado !== 'vencida';
+                })
+                .sort((a, b) => new Date(a.fechaReserva) - new Date(b.fechaReserva))
+                .slice(0, 5)
+                .map(r => (
+                  <tr key={r.id}>
+                    <td>{r.usuario?.nombre}</td>
+                    <td>{r.cancha?.nombre}</td>
+                    <td>{new Date(r.fechaReserva + 'T00:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</td>
+                    <td>{r.estado}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </>
+  )
+)}
 {/* ESTADÍSTICAS Y GRÁFICOS */}
 {activeTab === 'estadisticas' && (
   <section className="admin-statistics-container">
@@ -1769,82 +2139,90 @@ cerrarModalCancelar();
   </section>
 
 
-  <section className="admin-table-section">
-<table>
-      <thead>
-        <tr>
-          <th className="admin-th-ordenable" onClick={() => handleOrdenar('nombre')}>
-            Nombre {ordenUsuarios.campo === 'nombre' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
-          </th>
-          <th className="admin-th-ordenable" onClick={() => handleOrdenar('email')}>
-            Email {ordenUsuarios.campo === 'email' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
-          </th>
-          <th className="admin-th-ordenable" onClick={() => handleOrdenar('rol')}>
-            Rol {ordenUsuarios.campo === 'rol' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
-          </th>
-          <th className="admin-th-ordenable" onClick={() => handleOrdenar('gasto')}>
-            Gasto Total {ordenUsuarios.campo === 'gasto' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
-          </th>
-          <th className="admin-th-ordenable" onClick={() => handleOrdenar('estado')}>
-            Estado {ordenUsuarios.campo === 'estado' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
-          </th>
-          <th className="admin-th-ordenable" onClick={() => handleOrdenar('fechaRegistro')}>
-            Fecha de Registro {ordenUsuarios.campo === 'fechaRegistro' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
-          </th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {usuariosFiltrados.map(u => (
-          <tr key={u.id} id={`usuario-row-${u.id}`}>
-            <td>{u.nombre}</td>
-            <td>{u.email}</td>
-            <td>
-              <span className={`admin-rol-badge ${u.rol === 'admin' ? 'admin-rol-admin' : 'admin-rol-usuario'}`}>
-                {u.rol}
-              </span>
-            </td>
-            <td>S/ {calcularGastoUsuario(u.id).toFixed(2)}</td>
-            <td>
-              <span className={u.habilitado === false ? "admin-usuario-deshabilitado-badge" : "badge-pagado"}>
-                {u.habilitado === false ? "Inactivo" : "Activo"}
-              </span>
-            </td>
-            <td>
-              {u.fechaRegistro
-                ? new Date(u.fechaRegistro).toLocaleDateString('es-PE', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                  })
-                : 'N/A'}
-            </td>
-            <td>
-              <button className="admin-edit-btn" onClick={() => handleAbrirEditarUsuario(u)} title="Editar rol">
-                <FaEdit />
-              </button>
-              <button
-                className={u.habilitado === false ? "admin-edit-btn" : "admin-delete-btn"}
-                onClick={() => abrirModalDeshabilitar(u)}
-                title={u.habilitado === false ? "Habilitar usuario" : "Deshabilitar usuario"}
-              >
-                {u.habilitado === false ? <FaCheckCircle /> : <FaBan />}
-              </button>
-              <button className="admin-delete-btn" onClick={() => handleEliminarUsuario(u.id)} title="Eliminar usuario">
-                <FaTrash />
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+ <section className="admin-table-section">
+  <div className="admin-table-header-row">
+    <button className="admin-add-btn" onClick={() => setModalAgregarAbierto(true)}>
+      + Agregar Usuario
+    </button>
+  </div>
 
-    {usuariosFiltrados.length === 0 && (
-      <p style={{ textAlign: 'center', color: 'var(--admin-text-muted)', padding: '20px' }}>
-        No se encontraron usuarios.
-      </p>
-    )}
-  </section>
+  <table>
+    <thead>
+      <tr>
+        <th className="admin-th-ordenable" onClick={() => handleOrdenar('nombre')}>
+          Nombres {ordenUsuarios.campo === 'nombre' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
+        </th>
+        <th className="admin-th-ordenable" onClick={() => handleOrdenar('apellido')}>
+          Apellido {ordenUsuarios.campo === 'apellido' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
+        </th>
+        <th className="admin-th-ordenable" onClick={() => handleOrdenar('email')}>
+          Correo {ordenUsuarios.campo === 'email' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
+        </th>
+        <th className="admin-th-ordenable" onClick={() => handleOrdenar('rol')}>
+          Rol {ordenUsuarios.campo === 'rol' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
+        </th>
+        <th className="admin-th-ordenable" onClick={() => handleOrdenar('gasto')}>
+          Gasto Total {ordenUsuarios.campo === 'gasto' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
+        </th>
+        <th className="admin-th-ordenable" onClick={() => handleOrdenar('estado')}>
+          Estado {ordenUsuarios.campo === 'estado' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
+        </th>
+        <th className="admin-th-ordenable" onClick={() => handleOrdenar('fechaRegistro')}>
+          Fecha de Registro {ordenUsuarios.campo === 'fechaRegistro' && (ordenUsuarios.direccion === 'asc' ? '▲' : '▼')}
+        </th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {usuariosFiltrados.map(u => (
+        <tr key={u.id} id={`usuario-row-${u.id}`}>
+          <td>{u.nombre}</td>
+          <td>{u.apellido || '—'}</td>
+          <td>{u.email}</td>
+          <td>
+            <span className={`admin-rol-badge ${u.rol === 'admin' ? 'admin-rol-admin' : u.rol === 'superadmin' ? 'admin-rol-superadmin' : 'admin-rol-usuario'}`}>
+              {u.rol}
+            </span>
+          </td>
+          <td>S/ {calcularGastoUsuario(u.id).toFixed(2)}</td>
+          <td>
+            <span className={u.habilitado === false ? "admin-usuario-deshabilitado-badge" : "badge-pagado"}>
+              {u.habilitado === false ? "Inactivo" : "Activo"}
+            </span>
+          </td>
+          <td>
+            {u.fechaRegistro
+              ? new Date(u.fechaRegistro).toLocaleDateString('es-PE', {
+                  day: '2-digit', month: '2-digit', year: 'numeric'
+                })
+              : 'N/A'}
+          </td>
+          <td>
+            <button className="admin-edit-btn" onClick={() => handleAbrirEditarUsuario(u)} title="Editar usuario">
+              <FaEdit />
+            </button>
+            <button
+              className={u.habilitado === false ? "admin-edit-btn" : "admin-delete-btn"}
+              onClick={() => abrirModalDeshabilitar(u)}
+              title={u.habilitado === false ? "Habilitar usuario" : "Deshabilitar usuario"}
+            >
+              {u.habilitado === false ? <FaCheckCircle /> : <FaBan />}
+            </button>
+            <button className="admin-delete-btn" onClick={() => handleEliminarUsuario(u.id)} title="Eliminar usuario">
+              <FaTrash />
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  {usuariosFiltrados.length === 0 && (
+    <p style={{ textAlign: 'center', color: 'var(--admin-text-muted)', padding: '20px' }}>
+      No se encontraron usuarios.
+    </p>
+  )}
+</section>
   </section>
 )}
 
@@ -1893,35 +2271,100 @@ cerrarModalCancelar();
           </div>
         </div>
       )}
+      {/* MODAL AGREGAR USUARIO */}
+{modalAgregarAbierto && (
+  <div className="admin-modal-overlay" onClick={() => setModalAgregarAbierto(false)}>
+    <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+      <div className="admin-modal-header">
+        <h3>Agregar Usuario</h3>
+        <button className="admin-modal-close" onClick={() => setModalAgregarAbierto(false)}><FaTimes /></button>
+      </div>
+      <div className="admin-modal-body">
+        {errorNuevoUsuario && (
+          <p className="admin-config-mensaje error">{errorNuevoUsuario}</p>
+        )}
+
+        <label className="admin-modal-label">Nombres</label>
+        <input
+          type="text"
+          className="admin-modal-select"
+          value={nuevoUsuario.nombre}
+          onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })}
+        />
+
+        <label className="admin-modal-label">Apellido</label>
+        <input
+          type="text"
+          className="admin-modal-select"
+          value={nuevoUsuario.apellido}
+          onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apellido: e.target.value })}
+        />
+
+        <label className="admin-modal-label">Correo electrónico</label>
+        <input
+          type="email"
+          className="admin-modal-select"
+          value={nuevoUsuario.email}
+          onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, email: e.target.value })}
+        />
+
+        <label className="admin-modal-label">Contraseña temporal</label>
+        <input
+          type="password"
+          className="admin-modal-select"
+          value={nuevoUsuario.contrasena}
+          onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, contrasena: e.target.value })}
+        />
+
+        <label className="admin-modal-label">Rol</label>
+        <select
+          className="admin-modal-select"
+          value={nuevoUsuario.rol}
+          onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, rol: e.target.value })}
+        >
+          <option value="usuario">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div className="admin-modal-footer">
+        <button className="admin-modal-cancel-btn" onClick={() => setModalAgregarAbierto(false)}>Cancelar</button>
+        <button className="admin-modal-save-btn" onClick={handleCrearUsuario} disabled={creandoUsuario}>
+          {creandoUsuario ? 'Creando...' : 'Crear Usuario'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 {/* RESERVAS */}
 {activeTab === "reservas" && (() => {
-  const ORDEN_ESTADO = { pendiente: 0, confirmada: 1, cancelada: 2 };
+  const ORDEN_ESTADO = { pendiente: 0, confirmada: 1, vencida: 2, cancelada: 3 };
 
-  const reservasVisibles = (
-    filtroEstadoReserva === "todas"
-      ? reservas.filter((r) =>
-          ["pendiente", "confirmada", "cancelada"].includes(r.estado)
-        )
-      : reservas.filter((r) => r.estado === filtroEstadoReserva)
-  )
-    .filter((r) => {
-      if (!busquedaReserva.trim()) return true;
-      const texto = busquedaReserva.toLowerCase();
-      return r.usuario?.nombre?.toLowerCase().includes(texto);
-    })
-    .filter((r) => {
-      if (!fechaFiltroReserva) return true;
-      return r.fechaReserva === fechaFiltroReserva;
-    })
-    .sort((a, b) => {
-      const ordenEstado = ORDEN_ESTADO[a.estado] - ORDEN_ESTADO[b.estado];
-      if (ordenEstado !== 0) return ordenEstado;
-      return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
-    });
+const reservasVisibles = (
+  filtroEstadoReserva === "todas"
+    ? reservas.filter((r) =>
+        ["pendiente", "confirmada", "cancelada", "vencida"].includes(r.estado)
+      )
+    : reservas.filter((r) => r.estado === filtroEstadoReserva)
+)
+  .filter((r) => {
+    if (!busquedaReserva.trim()) return true;
+    const texto = busquedaReserva.toLowerCase();
+    return r.usuario?.nombre?.toLowerCase().includes(texto);
+  })
+  .filter((r) => {
+    if (!fechaFiltroReserva) return true;
+    return r.fechaReserva === fechaFiltroReserva;
+  })
+  .sort((a, b) => {
+    const ordenEstado = ORDEN_ESTADO[a.estado] - ORDEN_ESTADO[b.estado];
+    if (ordenEstado !== 0) return ordenEstado;
+    return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
+  });
 
   const totalPendientes = reservas.filter((r) => r.estado === "pendiente").length;
   const totalConfirmadas = reservas.filter((r) => r.estado === "confirmada").length;
   const totalCanceladas = reservas.filter((r) => r.estado === "cancelada").length;
+  const totalVencidas = reservas.filter((r) => r.estado === "vencida").length;
 
   function ResumenReservas() {
     return (
@@ -1929,7 +2372,7 @@ cerrarModalCancelar();
         <div className="admin-summary-card">
           <span className="admin-summary-label">Total</span>
           <span className="admin-summary-value">
-            {totalPendientes + totalConfirmadas + totalCanceladas}
+            {totalPendientes + totalConfirmadas + totalCanceladas + totalVencidas}
           </span>
         </div>
         <div className="admin-summary-card">
@@ -1943,6 +2386,10 @@ cerrarModalCancelar();
         <div className="admin-summary-card">
           <span className="admin-summary-label">Canceladas</span>
           <span className="admin-summary-value">{totalCanceladas}</span>
+        </div>
+        <div className="admin-summary-card">
+          <span className="admin-summary-label">Vencidas</span>
+          <span className="admin-summary-value">{totalVencidas}</span>
         </div>
       </div>
     );
@@ -1974,6 +2421,7 @@ cerrarModalCancelar();
           <option value="pendiente">Pendientes</option>
           <option value="confirmada">Confirmadas</option>
           <option value="cancelada">Canceladas</option>
+          <option value="vencida">Vencidas</option>
           <option value="todas">Todas</option>
         </select>
       </div>
@@ -2016,6 +2464,8 @@ cerrarModalCancelar();
                         ? "badge badge-sin-pago"
                         : r.estado === "confirmada"
                         ? "badge badge-pagado"
+                        : r.estado === "vencida"
+                        ? "badge badge-vencida"
                         : "badge badge-fallido"
                     }
                   >
@@ -2038,6 +2488,10 @@ cerrarModalCancelar();
                           : r.canceladoPor === "sistema"
                           ? "Sistema"
                           : "Admin"}
+                      </span>
+                    ) : r.estado === "vencida" ? (
+                      <span className="badge badge-vencida">
+                        Venció automáticamente
                       </span>
                     ) : (
                     (() => {
@@ -2092,7 +2546,7 @@ cerrarModalCancelar();
                       </button>
                     )}
 
-                    {r.estado === "cancelada" && (
+                    {(r.estado === "cancelada" || r.estado === "vencida") && (
                       <span className="admin-empty-state" style={{ margin: 0 }}>
                         —
                       </span>
@@ -2192,7 +2646,7 @@ cerrarModalCancelar();
   return (
     <>
       <section className="admin-summary-section">
-        <h3>Gestión de Reservas</h3>
+        
         <ResumenReservas />
       </section>
 
@@ -2212,6 +2666,8 @@ cerrarModalCancelar();
 
 
 {activeTab === "pagos" && <Pagos pagos={pagos} />}
+
+
 
 
 {activeTab === "canchas" && (
@@ -2628,11 +3084,120 @@ cerrarModalCancelar();
           </div>
         )}
 
+{activeTab === 'Notificaciones' && (
+  <div className="adm-nc-wrapper">
+    
+    {/* COLUMNA PRINCIPAL */}
+    <div className="adm-nc-main-col">
+      <div className="adm-nc-header">
+        <div className="adm-nc-title-group">
+          <h2>Centro de notificaciones</h2>
+          
+        </div>
+        {notificacionesPendientesCount > 0 && (
+          <button className="adm-nc-btn-read-all" onClick={marcarTodasComoLeidas}>
+            Marcar todas como leídas
+          </button>
+        )}
+      </div>
+
+{/* BARRA DE HERRAMIENTAS (FILTROS) */}
+<div className="adm-nc-toolbar">
+  <div className="adm-nc-filters-group">
+    <button 
+      className={`adm-nc-filter-btn ${filtroNotificaciones === 'Todas' ? 'active' : ''}`}
+      onClick={() => setFiltroNotificaciones('Todas')}
+    >
+      Todas
+    </button>
+    <button 
+      className={`adm-nc-filter-btn ${filtroNotificaciones === 'No leídas' ? 'active' : ''}`}
+      onClick={() => setFiltroNotificaciones('No leídas')}
+    >
+      No leídas
+    </button>
+  </div>
+  <div className="adm-nc-search-box">
+  <input 
+    type="text" 
+    className="adm-nc-search-input" 
+    placeholder="Buscar notificación..." 
+    value={busqueda}
+    onChange={(e) => setBusqueda(e.target.value)} 
+  />
+</div>
+</div>
+
+{/* LISTA DE NOTIFICACIONES */}
+<div className="adm-nc-list-view">
+  {notificacionesFiltradas.length === 0 ? (
+    <p style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>
+      No hay notificaciones para mostrar.
+    </p>
+  ) : (
+    notificacionesFiltradas.map(n => {
+      // Verificamos si esta notificación específica ya fue leída
+      const estaLeida = notificacionesLeidas.includes(n.key);
+
+      return (
+        <div 
+          key={n.key} 
+          className={`adm-nc-row ${estaLeida ? 'leida' : 'no-leida'}`}
+          onClick={() => handleClickNotificacion(n)}
+          style={{ cursor: 'pointer' }}
+        >
+          {/* El punto verde desaparece si estaLeida es true */}
+          <div className={`adm-nc-status-dot ${estaLeida ? 'read' : 'unread'}`}></div>
+          
+          <div className="adm-nc-icon-circle green">
+            {/* SVG del calendario */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          
+          <div className="adm-nc-content-body">
+            <p className="adm-nc-message-text">{n.mensaje}</p>
+            <span className={`adm-nc-badge-status ${n.estadoClase}`}>{n.estadoTexto}</span>
+          </div>
+          
+          <span className="adm-nc-time-label">{tiempoRelativo(n.orden)}</span>
+        </div>
+      );
+    })
+  )}
+</div>
+    </div>
+
+    {/* COLUMNA RESUMEN */}
+    <div className="adm-nc-sidebar-col">
+      <h3 className="adm-nc-summary-title">Resumen</h3>
+      <div className="adm-nc-stats-container">
+        <div className="adm-nc-stat-card">
+          <div className="adm-nc-stat-icon">🔔</div>
+          <div className="adm-nc-stat-details">
+            <h4>{notificacionesPendientesCount}</h4>
+            <p>Sin leer</p>
+          </div>
+        </div>
+        {/* Aquí puedes agregar las otras tarjetas de resumen si tienes los datos */}
+      </div>
+    </div>
+
+  </div>
+)}
+       {activeTab === "agenda" && (
+  <AgendaCanchas canchas={canchas} reservas={reservas} />
+)}
+
         {activeTab === 'configuracion' && (
   <section className="admin-config-section">
     <div className="admin-config-header">
       <div>
-        <h2>Configuración</h2>
+        
         <p>Administra tu cuenta y las preferencias de SportsMatch.</p>
       </div>
     </div>
@@ -2644,91 +3209,7 @@ cerrarModalCancelar();
 )}
 
     <div className="admin-config-grid">
-
-      <div className="admin-config-card">
-  <div className="admin-config-card-header">
-    <div>
-      <h3>Datos de Perfil</h3>
-      <p>Información de tu cuenta.</p>
-    </div>
-  </div>
-
-  {!editandoPerfil ? (
-    <>
-      <label>Nombre</label>
-<p className="admin-config-valor-fijo">{currentUser?.nombreUsuario || '—'}</p>
-
-<label>Email</label>
-<p className="admin-config-valor-fijo">{currentUser?.email || '—'}</p>
-
-      <button
-  type="button"
-  className="admin-confirm-btn"
-  onClick={() => {
-    setPerfilForm({ nombre: currentUser?.nombreUsuario || '', email: currentUser?.email || '' });
-    setEditandoPerfil(true);
-  }}
->
-  Editar Perfil
-</button>
-    </>
-  ) : (
-    <>
-      <label>Nombre</label>
-      <input
-        type="text"
-        value={perfilForm.nombre}
-        onChange={(e) => setPerfilForm({ ...perfilForm, nombre: e.target.value })}
-      />
-
-      <label>Email</label>
-      <input
-        type="email"
-        value={perfilForm.email}
-        onChange={(e) => setPerfilForm({ ...perfilForm, email: e.target.value })}
-      />
-
-      <label>Nueva contraseña (opcional)</label>
-      <input
-        type="password"
-        value={passwordForm.nueva}
-        onChange={(e) => setPasswordForm({ ...passwordForm, nueva: e.target.value })}
-        placeholder="Dejar en blanco para no cambiar"
-      />
-
-      <label>Confirmar contraseña</label>
-      <input
-        type="password"
-        value={passwordForm.confirmar}
-        onChange={(e) => setPasswordForm({ ...passwordForm, confirmar: e.target.value })}
-        placeholder="Dejar en blanco para no cambiar"
-      />
-
-      <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
-        <button
-          type="button"
-          className="admin-confirm-btn"
-          onClick={guardarPerfilManual}
-          disabled={guardandoPerfil}
-        >
-          {guardandoPerfil ? 'Guardando...' : 'Guardar Perfil'}
-        </button>
-
-        <button
-          type="button"
-          className="admin-secondary-btn"
-          onClick={() => {
-            setPerfilForm({ nombre: currentUser.nombreUsuario || '', email: currentUser.email || '' });
-            setPasswordForm({ nueva: '', confirmar: '' });
-            setEditandoPerfil(false);
-          }}
-        >
-          Cancelar
-        </button>
-      </div>
-    </>
-  )}
-</div>
+      
 
       <div className="admin-config-card">
         <div className="admin-config-card-header">
@@ -2803,6 +3284,130 @@ cerrarModalCancelar();
     </div>
 
   </section>
+
+)}
+
+{activeTab === 'perfil' && (
+  <section className="admin-config-section">
+    <div className="admin-config-header">
+      <div>
+        <p>Administra tu cuenta</p>
+       
+      </div>
+    </div>
+
+    {mensajePerfil && (
+      <div ref={mensajeRef} className={`admin-config-mensaje ${mensajePerfil.tipo}`}>
+        {mensajePerfil.texto}
+      </div>
+    )}
+
+    <div className="admin-config-grid">
+      <div className="admin-config-card">
+        <div className="admin-config-card-header">
+          <div>
+            <h3>Datos de Perfil</h3>
+            <p>Información de tu cuenta.</p>
+          </div>
+        </div>
+
+        {!editandoPerfil ? (
+          <>
+            <label>Nombre</label>
+            <p className="admin-config-valor-fijo">{currentUser?.nombreUsuario || '—'}</p>
+
+            <label>Apellido</label>
+            <p className="admin-config-valor-fijo">{currentUser?.apellido || '—'}</p>
+
+            <label>Email</label>
+            <p className="admin-config-valor-fijo">{currentUser?.email || '—'}</p>
+
+            <button
+              type="button"
+              className="admin-confirm-btn"
+              onClick={() => {
+                setPerfilForm({
+                  nombre: currentUser?.nombreUsuario || '',
+                  apellido: currentUser?.apellido || '',
+                  email: currentUser?.email || ''
+                });
+                setEditandoPerfil(true);
+              }}
+            >
+              Editar Perfil
+            </button>
+          </>
+        ) : (
+          <>
+            <label>Nombre</label>
+            <input
+              type="text"
+              value={perfilForm.nombre}
+              onChange={(e) => setPerfilForm({ ...perfilForm, nombre: e.target.value })}
+            />
+
+            <label>Apellido</label>
+            <input
+              type="text"
+              value={perfilForm.apellido}
+              onChange={(e) => setPerfilForm({ ...perfilForm, apellido: e.target.value })}
+            />
+
+            <label>Email</label>
+            <input
+              type="email"
+              value={perfilForm.email}
+              onChange={(e) => setPerfilForm({ ...perfilForm, email: e.target.value })}
+            />
+
+            <label>Nueva contraseña (opcional)</label>
+            <input
+              type="password"
+              value={passwordForm.nueva}
+              onChange={(e) => setPasswordForm({ ...passwordForm, nueva: e.target.value })}
+              placeholder="Dejar en blanco para no cambiar"
+            />
+
+            <label>Confirmar contraseña</label>
+            <input
+              type="password"
+              value={passwordForm.confirmar}
+              onChange={(e) => setPasswordForm({ ...passwordForm, confirmar: e.target.value })}
+              placeholder="Dejar en blanco para no cambiar"
+            />
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+              <button
+                type="button"
+                className="admin-confirm-btn"
+                onClick={guardarPerfilManual}
+                disabled={guardandoPerfil}
+              >
+                {guardandoPerfil ? 'Guardando...' : 'Guardar Perfil'}
+              </button>
+
+              <button
+                type="button"
+                className="admin-secondary-btn"
+                onClick={() => {
+                  setPerfilForm({
+                    nombre: currentUser.nombreUsuario || '',
+                    apellido: currentUser.apellido || '',
+                    email: currentUser.email || ''
+                  });
+                  setPasswordForm({ nueva: '', confirmar: '' });
+                  setEditandoPerfil(false);
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  </section>
+
 )}
       </div>
     </div>

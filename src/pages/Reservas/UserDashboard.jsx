@@ -668,10 +668,10 @@ const marcarTodasComoLeidas = async () => {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  const reservasFuturas = reservas
+const reservasFuturas = reservas
     .filter(r => {
       const f = parseLocalDateString(r.fechaReserva);
-      return f && f >= hoy && r.estado !== 'cancelada';
+      return f && f >= hoy && r.estado !== 'cancelada' && r.estado !== 'vencida';
     })
     .sort((a, b) => {
       const fa = parseLocalDateString(a.fechaReserva);
@@ -684,7 +684,7 @@ const marcarTodasComoLeidas = async () => {
 
   const reservasPasadas = reservas.filter(r => {
     const f = parseLocalDateString(r.fechaReserva);
-    return r.estado === 'cancelada' || (f && f < hoy);
+    return r.estado === 'cancelada' || r.estado === 'vencida' || (f && f < hoy);
   });
 
   const totalGastado = reservas
@@ -877,7 +877,6 @@ const fechaHoraPago = pagoExitoso?.fechaPago
   <div className="modal-detail-row">
     <span className="modal-detail-label">Horario:</span>
     <span className="modal-detail-value">
-      {/* Cortamos los segundos innecesarios si vienen en formato HH:MM:SS */}
       {detallePago.horaInicio?.slice(0, 5)} - {detallePago.horaFin?.slice(0, 5)}
     </span>
   </div>
@@ -902,6 +901,15 @@ const fechaHoraPago = pagoExitoso?.fechaPago
       </span>
     </div>
   )}
+
+  {detallePago.estado === 'vencida' && (
+    <div className="modal-detail-row cancel-row">
+      <span className="modal-detail-label">Motivo:</span>
+      <span className="modal-detail-value">
+        Esta reserva venció automáticamente por no ser confirmada o pagada dentro del plazo establecido.
+      </span>
+    </div>
+  )}
 </div>
 
 <div className="admin-modal-footer">
@@ -912,7 +920,6 @@ const fechaHoraPago = pagoExitoso?.fechaPago
     </div>
   </div>
 )}
-
       {motivoDialog && (
         <div className="admin-modal-overlay" onClick={() => setMotivoDialog(null)}>
           <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
@@ -1377,11 +1384,11 @@ const fechaHoraPago = pagoExitoso?.fechaPago
                   </td>
                   <td>
                     <div className="user-actions-buttons">
-                      {r.estado !== "cancelada" && r.estado !== "pagada" && (
-                        <button className="user-cancel-button" onClick={() => handleCancelarReserva(r)}>
-                          <FaTimesCircle /> Cancelar
-                        </button>
-                      )}
+                      {r.estado !== "cancelada" && r.estado !== "pagada" && r.estado !== "vencida" && (
+                          <button className="user-cancel-button" onClick={() => handleCancelarReserva(r)}>
+                            <FaTimesCircle /> Cancelar
+                          </button>
+                        )}
                       {r.estado === "confirmada" && (
                         <button
                           className="user-pay-button"
@@ -1397,7 +1404,7 @@ const fechaHoraPago = pagoExitoso?.fechaPago
                     </div>
                   </td>
                   <td>
-                    {(r.estado === 'pagada' || r.estado === 'cancelada') && (
+                    {(r.estado === 'pagada' || r.estado === 'cancelada' || r.estado === 'vencida') && (
                       <button className="user-reserve-button" onClick={() => setDetallePago(r)}>
                         <FaEye /> Detalle
                       </button>
@@ -1435,6 +1442,7 @@ const fechaHoraPago = pagoExitoso?.fechaPago
             <option value="todos">Todos</option>
             <option value="pagada">Pagados</option>
             <option value="cancelada">Cancelados</option>
+            <option value="vencida">Vencidos</option>
             <option value="confirmada">Confirmados</option>
             <option value="pendiente">Pendientes</option>
           </select>
@@ -1470,7 +1478,7 @@ const fechaHoraPago = pagoExitoso?.fechaPago
                         : '—'}
                     </td>
                     <td>
-                      {(r.estado === 'pagada' || r.estado === 'cancelada') && (
+                      {(r.estado === 'pagada' || r.estado === 'cancelada' || r.estado === 'vencida') && (
                         <button className="user-reserve-button" onClick={() => setDetallePago(r)}>
                           <FaEye /> Detalle
                         </button>
@@ -1486,7 +1494,6 @@ const fechaHoraPago = pagoExitoso?.fechaPago
     )}
   </section>
 )}
-
 {activeTab === 'canchas' && (
   <Canchas setActiveTab={setActiveTab} setSelectedCanchaId={setSelectedCanchaId} />
 )}
